@@ -1,68 +1,71 @@
-## 🌍 Read this in other languages:
-- 🇬🇧 [English](README.md)
+## 🌍 他の言語で読む
+- 🇯🇵 [日本語](README.md)
+- 🇬🇧 [English](https://github.com/eduardogsilva/wireguard_webadmin/blob/main/README.md)
 - 🇧🇷 [Português](docs/README.pt-br.md)
 - 🇪🇸 [Español](docs/README.es.md)
 - 🇫🇷 [Français](docs/README.fr.md)
 - 🇩🇪 [Deutsch](docs/README.de.md)
 
-✨ If you find any issues with the translation or would like to request a new language, please open an [issue](https://github.com/eduardogsilva/wireguard_webadmin/issues).
+翻訳に問題がある場合や、新しい言語の追加を希望する場合は、[issue](https://github.com/pench999/wireguard_webadmin_ja/issues) からお知らせください。
 
 
-# wireguard_webadmin
+# wireguard_webadmin 日本語版
 
-**Self-hosted VPN management and Zero Trust access control — all on your infrastructure.**
+**セルフホスト型の VPN 管理と Zero Trust アクセス制御を、すべて自分のインフラ上で運用できます。**
 
-More than a WireGuard panel: manage peers, firewall rules, DNS, port forwarding, and publish internal apps with proper authentication — without relying on third-party services. Runs on any Linux machine with Docker. Free, open source, nothing leaves your server.
+wireguard_webadmin は、単なる WireGuard 管理パネルではありません。ピア、ファイアウォールルール、DNS、ポート転送を管理でき、さらに認証付きで内部アプリケーションを公開できます。外部の第三者サービスに依存せず、Docker が動作する Linux マシンで利用できます。無料・オープンソースで、データは自分のサーバー内に留まります。
 
-- ⚙️ **Manage** — Multiple WireGuard instances, peer traffic graphs, firewall, DNS blacklists, VPN invite links with QR code
-- 🔒 **Protect** — Zero Trust application gateway with TOTP, IP ACL, and anti-brute-force (Altcha PoW)
-- ⚡ **Automate** — Scheduled peer access, routing templates, expiring invite links, REST API v2
+このリポジトリは [eduardogsilva/wireguard_webadmin](https://github.com/eduardogsilva/wireguard_webadmin) の UI 日本語化フォークです。
 
-### 📖 Full documentation, installation guide and tips at [wireguard-webadmin.com](https://wireguard-webadmin.com/)
+- ⚙️ **管理** - 複数の WireGuard インスタンス、ピア通信グラフ、ファイアウォール、DNS ブラックリスト、QR コード付き VPN 招待リンク
+- 🔒 **保護** - TOTP、IP ACL、ブルートフォース対策 (Altcha PoW) を備えた Zero Trust アプリケーションゲートウェイ
+- ⚡ **自動化** - ピアアクセスのスケジュール制御、ルーティングテンプレート、有効期限付き招待リンク、REST API v2
+
+### 📖 詳細なドキュメント、インストール手順、設定のヒントは [wireguard-webadmin.com](https://wireguard-webadmin.com/) を参照してください
 
 ---
 
-## Quick Install
+## クイックインストール
 
 ```bash
 mkdir wireguard_webadmin && cd wireguard_webadmin
 wget -O docker-compose.yml https://raw.githubusercontent.com/eduardogsilva/wireguard_webadmin/main/docker-compose-caddy.yml
-# edit .env with your SERVER_ADDRESS
+# .env の SERVER_ADDRESS を環境に合わせて編集
 docker compose up -d
 ```
 
-> For detailed instructions, upgrade guide, and configuration tips visit **[wireguard-webadmin.com](https://wireguard-webadmin.com/)**.
+詳細な手順、アップグレードガイド、設定のヒントは **[wireguard-webadmin.com](https://wireguard-webadmin.com/)** を参照してください。
 
 ---
 
-## Screenshots
+## スクリーンショット
 
-### Peer List
-Real-time status and live bandwidth graphs for every peer across all WireGuard instances.
-![Peer List](docs/images/peer_list_dark.png)
+### ピア一覧
+すべての WireGuard インスタンスに登録されたピアのリアルタイム状態とライブ帯域グラフを確認できます。
+![ピア一覧](docs/images/peer_list_dark.png)
 
-### Peer Details
-Traffic history, last handshake, allowed IPs, and QR code — all in one place.
-![Peer Details](docs/images/peer_details.png)
+### ピア詳細
+通信履歴、最終ハンドシェイク、許可 IP、QR コードを 1 画面で確認できます。
+![ピア詳細](docs/images/peer_details.png)
 
-### Zero Trust Application Gateway
-Publish internal apps like Proxmox or Grafana with TOTP authentication in front — no open ports needed.
-![Zero Trust App Gateway](docs/images/zero_trust_app.png)
+### Zero Trust アプリケーションゲートウェイ
+Proxmox や Grafana などの内部アプリケーションを、TOTP 認証付きで公開できます。直接ポートを開放する必要はありません。
+![Zero Trust アプリケーションゲートウェイ](docs/images/zero_trust_app.png)
 
-### Firewall Management
-Per-instance iptables rules, port forwarding, and outbound ACLs managed from the UI.
-![Firewall](docs/images/firewall.png)
+### ファイアウォール管理
+インスタンスごとの iptables ルール、ポート転送、アウトバウンド ACL を UI から管理できます。
+![ファイアウォール](docs/images/firewall.png)
 
-### VPN Invite
-Generate a shareable invite with QR code and config file. The user scans or imports it directly into their WireGuard client.
-![VPN Invite](docs/images/vpn_invite.png)
+### VPN 招待
+QR コードと設定ファイルを含む共有用の招待を生成できます。ユーザーは WireGuard クライアントでスキャンまたはインポートするだけで利用できます。
+![VPN 招待](docs/images/vpn_invite.png)
 
 ---
 
-## License
+## ライセンス
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+このプロジェクトは MIT License で公開されています。詳細は [LICENSE](LICENSE) を参照してください。
 
-## Contributing
+## コントリビューション
 
-Contributions are welcome and greatly appreciated. Feel free to open issues or pull requests on [GitHub](https://github.com/eduardogsilva/wireguard_webadmin).
+不具合報告、翻訳改善、プルリクエストは歓迎します。日本語化に関する issue や pull request は、このフォークの [GitHub リポジトリ](https://github.com/pench999/wireguard_webadmin_ja) へお願いします。
