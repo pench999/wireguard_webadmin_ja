@@ -110,7 +110,7 @@ class InviteSettingsForm(forms.ModelForm):
                     ),
                     HTML('<hr>'),
                     Row(
-                        Column(HTML("<h5>User Authentication</h5>"), css_class='form-group col-md-12 mb-0'),
+                        Column(HTML("<h5>" + _("User Authentication") + "</h5>"), css_class='form-group col-md-12 mb-0'),
                         Column('enforce_random_password', css_class='form-group col-md-6 mb-0'),
                         Column('default_password', css_class='form-group col-md-6 mb-0'),
                         css_class='form-row'
@@ -303,7 +303,7 @@ class EmailSettingsForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
-            HTML("<h3>SMTP Settings</h3>"),
+            HTML("<h3>" + _("SMTP Settings") + "</h3>"),
             Row(
                 Column('smtp_username', css_class='form-group col-md-4 mb-0'),
                 Column('smtp_password', css_class='form-group col-md-4 mb-0'),

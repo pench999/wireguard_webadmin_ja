@@ -178,11 +178,11 @@ msgstr "APIドキュメント"
 #: app_gateway/forms.py:19 templates/app_gateway/app_gateway_list.html:67
 #: templates/app_gateway/application_details.html:36
 msgid "Upstream"
-msgstr "Upstream"
+msgstr "転送先"
 
 #: app_gateway/forms.py:20
 msgid "Allow invalid/self-signed certificate"
-msgstr "Allow invalid/self-signed certificate"
+msgstr "無効または自己署名証明書を許可"
 
 #: app_gateway/forms.py:42 app_gateway/forms.py:100 app_gateway/forms.py:145
 #: app_gateway/forms.py:163 app_gateway/forms.py:242 app_gateway/forms.py:284
@@ -229,7 +229,7 @@ msgstr "ポリシー種別"
 
 #: app_gateway/forms.py:115
 msgid "Allowed Groups"
-msgstr "許可グループ"
+msgstr "許可されたグループ"
 
 #: app_gateway/forms.py:116 templates/gatekeeper/gatekeeper_list.html:13
 msgid "Authentication Methods"
@@ -299,11 +299,11 @@ msgstr "This path prefix is reserved by the system."
 
 #: app_gateway/models.py:14
 msgid "Upstream address, e.g.: http://10.188.18.27:3000"
-msgstr "Upstream address, e.g.: http://10.188.18.27:3000"
+msgstr "転送先アドレス。例: http://10.188.18.27:3000"
 
 #: app_gateway/models.py:15
 msgid "Allow invalid or self-signed TLS certificates from the upstream"
-msgstr "Allow invalid or self-signed TLS certificates from the upstream"
+msgstr "転送先の無効または自己署名 TLS 証明書を許可します"
 
 #: app_gateway/models.py:53
 #: templates/app_gateway/access_policy_type_select.html:19
@@ -344,7 +344,7 @@ msgstr "アプリケーションを保存しました。"
 
 #: app_gateway/views.py:107
 msgid "\n        <h5>Application</h5>\n        <p>Define the main details of the application you want to expose through the gateway.</p>\n        <ul>\n            <li><strong>Name</strong>: A unique internal identifier for this application (e.g., \"wiki\", \"crm\"). Contains only letters, numbers, hyphens, or underscores.</li>\n            <li><strong>Display Name</strong>: A friendly, human-readable name for display purposes.</li>\n            <li><strong>Upstream</strong>: The destination URL where requests will be forwarded (e.g., <code>http://10.188.18.27:3000</code>). Must start with <code>http://</code> or <code>https://</code>.</li>\n        </ul>\n        "
-msgstr "\n        <h5>Application</h5>\n        <p>Define the main details of the application you want to expose through the gateway.</p>\n        <ul>\n            <li><strong>Name</strong>: A unique internal identifier for this application (e.g., \"wiki\", \"crm\"). Contains only letters, numbers, hyphens, or underscores.</li>\n            <li><strong>Display Name</strong>: A friendly, human-readable name for display purposes.</li>\n            <li><strong>Upstream</strong>: The destination URL where requests will be forwarded (e.g., <code>http://10.188.18.27:3000</code>). Must start with <code>http://</code> or <code>https://</code>.</li>\n        </ul>\n        "
+msgstr "<h5>アプリケーション</h5>\n        <p>ゲートウェイ経由で公開するアプリケーションの主要情報を定義します。</p>\n        <ul>\n            <li><strong>名前</strong>: このアプリケーションを識別する一意の内部名です（例: \"wiki\", \"crm\"）。英数字、ハイフン、アンダースコアのみ使用できます。</li>\n            <li><strong>表示名</strong>: 画面表示用のわかりやすい名前です。</li>\n            <li><strong>転送先</strong>: リクエストの転送先 URL です（例: <code>http://10.188.18.27:3000</code>）。<code>http://</code> または <code>https://</code> で始まる必要があります。</li>\n        </ul>"
 
 #: app_gateway/views.py:137
 msgid "The WireGuard WebAdmin application cannot be deleted."
@@ -416,7 +416,7 @@ msgstr "\n            <h5>Deny Policy</h5>\n            <p>A Deny policy blocks 
 
 #: app_gateway/views.py:275
 msgid "\n            <h5>Protected Policy</h5>\n            <p>A Protected policy requires users to authenticate before accessing the application.</p>\n            <ul>\n                <li><strong>Allowed Groups</strong>: Limits access to specific user groups. Note: Using groups requires selecting an Authentication Method of type \"Local Password\".</li>\n                <li><strong>Authentication Methods</strong>: Specify which methods users can use to authenticate (e.g., Local Password, TOTP, OIDC).</li>\n            </ul>\n            "
-msgstr "\n            <h5>Protected Policy</h5>\n            <p>A Protected policy requires users to authenticate before accessing the application.</p>\n            <ul>\n                <li><strong>Allowed Groups</strong>: Limits access to specific user groups. Note: Using groups requires selecting an Authentication Method of type \"Local Password\".</li>\n                <li><strong>Authentication Methods</strong>: Specify which methods users can use to authenticate (e.g., Local Password, TOTP, OIDC).</li>\n            </ul>\n            "
+msgstr "<h5>保護ポリシー</h5>\n            <p>保護ポリシーでは、アプリケーションへアクセスする前にユーザー認証が必要です。</p>\n            <ul>\n                <li><strong>許可されたグループ</strong>: 特定のユーザーグループにアクセスを制限します。注意: グループを使うには、認証方式として「ローカルパスワード」を選択する必要があります。</li>\n                <li><strong>認証方式</strong>: ユーザーが認証に使用できる方式を指定します（例: ローカルパスワード、TOTP、OIDC）。</li>\n            </ul>"
 
 #: app_gateway/views.py:306
 msgid "Access Policy deleted successfully."
@@ -510,7 +510,7 @@ msgstr "IPロック"
 #: templates/gatekeeper/gatekeeper_list.html:273
 #: templates/wireguard/wireguard_status.html:45
 msgid "IP Address"
-msgstr "IPアドレス"
+msgstr "IP アドレス"
 
 #: cluster/forms.py:22
 msgid "Country"
@@ -1039,19 +1039,19 @@ msgstr "パスワード"
 
 #: gatekeeper/forms.py:21
 msgid "Minimum 8 characters, with at least one uppercase letter, one lowercase letter, and one number."
-msgstr "Minimum 8 characters, with at least one uppercase letter, one lowercase letter, and one number."
+msgstr "8文字以上で、大文字・小文字・数字をそれぞれ1文字以上含めてください。"
 
 #: gatekeeper/forms.py:24
 msgid "Confirm Password"
-msgstr "Confirm Password"
+msgstr "パスワード確認"
 
 #: gatekeeper/forms.py:29 gatekeeper/forms.py:163
 msgid "TOTP Validation PIN"
-msgstr "TOTP Validation PIN"
+msgstr "TOTP 検証 PIN"
 
 #: gatekeeper/forms.py:32 gatekeeper/forms.py:166
 msgid "Enter a 6-digit PIN generated by your authenticator app to validate the secret."
-msgstr "Enter a 6-digit PIN generated by your authenticator app to validate the secret."
+msgstr "認証アプリで生成された6桁の PIN を入力して、シークレットを検証してください。"
 
 #: gatekeeper/forms.py:39 templates/accounts/login.html:14
 #: templates/gatekeeper/gatekeeper_list.html:62
@@ -1069,7 +1069,7 @@ msgstr "メール"
 
 #: gatekeeper/forms.py:41
 msgid "TOTP Secret"
-msgstr "TOTP Secret"
+msgstr "TOTP シークレット"
 
 #: gatekeeper/forms.py:88
 msgid "Password is required."
@@ -1133,11 +1133,11 @@ msgstr "Day(s)"
 
 #: gatekeeper/forms.py:189
 msgid "Authentication Type"
-msgstr "Authentication Type"
+msgstr "認証種別"
 
 #: gatekeeper/forms.py:190
 msgid "Global TOTP Secret"
-msgstr "Global TOTP Secret"
+msgstr "グローバル TOTP シークレット"
 
 #: gatekeeper/forms.py:191
 msgid "OIDC Provider URL"
@@ -1189,11 +1189,11 @@ msgstr "TOTP validation PIN must be empty for OIDC authentication."
 
 #: gatekeeper/forms.py:314 gatekeeper/forms.py:375 gatekeeper/forms.py:406
 msgid "Authentication Method"
-msgstr "Authentication Method"
+msgstr "認証方式"
 
 #: gatekeeper/forms.py:316 templates/gatekeeper/gatekeeper_list.html:274
 msgid "Prefix Length"
-msgstr "Prefix Length"
+msgstr "プレフィックス長"
 
 #: gatekeeper/forms.py:317 templates/firewall/firewall_rule_list.html:47
 #: templates/firewall/manage_firewall_rule.html:360
@@ -1212,11 +1212,11 @@ msgstr "Domain"
 
 #: gatekeeper/models.py:27
 msgid "Local Password"
-msgstr "Local Password"
+msgstr "ローカルパスワード"
 
 #: gatekeeper/models.py:28
 msgid "One-Time Password (TOTP)"
-msgstr "One-Time Password (TOTP)"
+msgstr "ワンタイムパスワード (TOTP)"
 
 #: gatekeeper/models.py:29
 msgid "OpenID Connect (OIDC)"
@@ -1224,7 +1224,7 @@ msgstr "OpenID Connect (OIDC)"
 
 #: gatekeeper/models.py:30
 msgid "IP Address List"
-msgstr "IP Address List"
+msgstr "IP アドレスリスト"
 
 #: gatekeeper/models.py:34
 msgid "Shared/global TOTP secret key"
@@ -1240,11 +1240,11 @@ msgstr "Password for local authentication (leave blank if not using)"
 
 #: gatekeeper/models.py:97
 msgid "Per-user TOTP secret key"
-msgstr "Per-user TOTP secret key"
+msgstr "ユーザー個別の TOTP シークレットキー"
 
 #: gatekeeper/models.py:142 templates/gatekeeper/gatekeeper_list.html:287
 msgid "Allow"
-msgstr "Allow"
+msgstr "許可"
 
 #: gatekeeper/views.py:58
 msgid "Edit Gatekeeper User"
@@ -1252,7 +1252,7 @@ msgstr "Edit Gatekeeper User"
 
 #: gatekeeper/views.py:61
 msgid "Create Gatekeeper User"
-msgstr "Create Gatekeeper User"
+msgstr "ゲートキーパーユーザーを作成"
 
 #: gatekeeper/views.py:68
 msgid "Gatekeeper User saved successfully."
@@ -1260,7 +1260,7 @@ msgstr "Gatekeeper User saved successfully."
 
 #: gatekeeper/views.py:73
 msgid "\n        <h4>Gatekeeper User</h4>\n        <p>Gatekeeper users are used for authenticating against protected applications managed by this gateway.</p>\n\n        <h5>Password</h5>\n        <p>Required when creating a user. When editing, leave both password fields blank to keep the current password.\n        Passwords are stored using <strong>Argon2id</strong> hashing.</p>\n\n        <h5>TOTP Secret</h5>\n        <p>Optional per-user TOTP secret. When set, this user will authenticate using their own secret instead of the\n        global TOTP secret configured on the Authentication Method. Use the buttons below the field to generate a\n        random secret and scan the QR code with your authenticator app. Validate the secret by entering the current\n        6-digit PIN before saving.</p>\n        "
-msgstr "\n        <h4>Gatekeeper User</h4>\n        <p>Gatekeeper users are used for authenticating against protected applications managed by this gateway.</p>\n\n        <h5>Password</h5>\n        <p>Required when creating a user. When editing, leave both password fields blank to keep the current password.\n        Passwords are stored using <strong>Argon2id</strong> hashing.</p>\n\n        <h5>TOTP Secret</h5>\n        <p>Optional per-user TOTP secret. When set, this user will authenticate using their own secret instead of the\n        global TOTP secret configured on the Authentication Method. Use the buttons below the field to generate a\n        random secret and scan the QR code with your authenticator app. Validate the secret by entering the current\n        6-digit PIN before saving.</p>\n        "
+msgstr "<h4>ゲートキーパーユーザー</h4>\n        <p>ゲートキーパーユーザーは、このゲートウェイで管理される保護対象アプリケーションへの認証に使用されます。</p>\n\n        <h5>パスワード</h5>\n        <p>ユーザー作成時は必須です。編集時に現在のパスワードを維持する場合は、両方のパスワード欄を空のままにしてください。\n        パスワードは <strong>Argon2id</strong> ハッシュで保存されます。</p>\n\n        <h5>TOTP シークレット</h5>\n        <p>ユーザー個別の任意の TOTP シークレットです。設定すると、このユーザーは認証方式に設定されたグローバル TOTP シークレットではなく、自分専用のシークレットで認証します。フィールド下のボタンでランダムなシークレットを生成し、認証アプリで QR コードをスキャンできます。保存前に現在の6桁 PIN を入力してシークレットを検証してください。</p>"
 
 #: gatekeeper/views.py:110
 msgid "Gatekeeper User deleted successfully."
@@ -1281,7 +1281,7 @@ msgstr "Edit Gatekeeper Group"
 
 #: gatekeeper/views.py:134
 msgid "Create Gatekeeper Group"
-msgstr "Create Gatekeeper Group"
+msgstr "ゲートキーパーグループを作成"
 
 #: gatekeeper/views.py:141
 msgid "Gatekeeper Group saved successfully."
@@ -1306,7 +1306,7 @@ msgstr "Edit Authentication Method"
 
 #: gatekeeper/views.py:187
 msgid "Create Authentication Method"
-msgstr "Create Authentication Method"
+msgstr "認証方式を作成"
 
 #: gatekeeper/views.py:194
 msgid "Authentication Method saved successfully."
@@ -1314,7 +1314,7 @@ msgstr "Authentication Method saved successfully."
 
 #: gatekeeper/views.py:199
 msgid "\n        <h4>Authentication Types</h4>\n        <p>Select how users will authenticate through this method.</p>\n        \n        <h5>Local Password</h5>\n        <p>Users will authenticate using a standard username and password stored locally. Only one of this type can be created.</p>\n        \n        <h5>OIDC (OpenID Connect)</h5>\n        <p>Users will authenticate via an external identity provider (like Keycloak or Google). Requires Provider URL, Client ID, and Client Secret.</p>\n        \n        <h5>TOTP (Time-Based One-Time Password)</h5>\n        <p>Users will need to enter a rotating token from an authenticator app. If a user does not have a personal TOTP configured, the <strong>Global TOTP Secret</strong> will be used instead. </p>\n        "
-msgstr "\n        <h4>Authentication Types</h4>\n        <p>Select how users will authenticate through this method.</p>\n        \n        <h5>Local Password</h5>\n        <p>Users will authenticate using a standard username and password stored locally. Only one of this type can be created.</p>\n        \n        <h5>OIDC (OpenID Connect)</h5>\n        <p>Users will authenticate via an external identity provider (like Keycloak or Google). Requires Provider URL, Client ID, and Client Secret.</p>\n        \n        <h5>TOTP (Time-Based One-Time Password)</h5>\n        <p>Users will need to enter a rotating token from an authenticator app. If a user does not have a personal TOTP configured, the <strong>Global TOTP Secret</strong> will be used instead. </p>\n        "
+msgstr "<h4>認証種別</h4>\n        <p>この方式でユーザーがどのように認証するかを選択します。</p>\n\n        <h5>ローカルパスワード</h5>\n        <p>ユーザーはローカルに保存された通常のユーザー名とパスワードで認証します。この種類は 1 つだけ作成できます。</p>\n\n        <h5>OIDC (OpenID Connect)</h5>\n        <p>ユーザーは Keycloak や Google などの外部 ID プロバイダーで認証します。プロバイダー URL、クライアント ID、クライアントシークレットが必要です。</p>\n\n        <h5>TOTP（時間ベースのワンタイムパスワード）</h5>\n        <p>ユーザーは認証アプリから生成されるローテーション式トークンを入力する必要があります。ユーザー個別の TOTP が未設定の場合は、<strong>グローバル TOTP シークレット</strong> が使用されます。</p>"
 
 #: gatekeeper/views.py:237
 #, python-format
@@ -1391,7 +1391,7 @@ msgstr "Edit IP Address"
 #: gatekeeper/views.py:412 templates/gatekeeper/gatekeeper_list.html:264
 #: templates/wireguard/wireguard_manage_peer.html:171
 msgid "Add IP Address"
-msgstr "Add IP Address"
+msgstr "IP アドレスを追加"
 
 #: gatekeeper/views.py:419
 msgid "IP Address saved successfully."
@@ -1399,7 +1399,7 @@ msgstr "IP Address saved successfully."
 
 #: gatekeeper/views.py:424
 msgid "\n        <h5>IP Address List</h5>\n        <p>Manage specific IP addresses or networks that are allowed or denied access when using the IP Address List authentication method.</p>\n        \n        <h5>IP Address & Prefix</h5>\n        <p>Enter a single IP address (e.g., 192.168.1.50) or a network address. Use the prefix length for CIDR notation (e.g., 24 for a /24 network). Leave prefix blank for a single host (/32 for IPv4, /128 for IPv6).</p>\n        \n        <h5>Action</h5>\n        <p><strong>Allow</strong>: Grants access to the specified IP/network.<br>\n        <strong>Deny</strong>: Specifically blocks access from the specified IP/network.</p>\n        \n        <h5>Description</h5>\n        <p>An optional note to help identify this entry (e.g., \"Office Network\", \"Blocked Attacker\").</p>\n        "
-msgstr "\n        <h5>IP Address List</h5>\n        <p>Manage specific IP addresses or networks that are allowed or denied access when using the IP Address List authentication method.</p>\n        \n        <h5>IP Address & Prefix</h5>\n        <p>Enter a single IP address (e.g., 192.168.1.50) or a network address. Use the prefix length for CIDR notation (e.g., 24 for a /24 network). Leave prefix blank for a single host (/32 for IPv4, /128 for IPv6).</p>\n        \n        <h5>Action</h5>\n        <p><strong>Allow</strong>: Grants access to the specified IP/network.<br>\n        <strong>Deny</strong>: Specifically blocks access from the specified IP/network.</p>\n        \n        <h5>Description</h5>\n        <p>An optional note to help identify this entry (e.g., \"Office Network\", \"Blocked Attacker\").</p>\n        "
+msgstr "<h5>IP アドレスリスト</h5>\n        <p>IP アドレスリスト認証方式を使用する際に、アクセスを許可または拒否する特定の IP アドレスやネットワークを管理します。</p>\n\n        <h5>IP アドレスとプレフィックス</h5>\n        <p>単一の IP アドレス（例: 192.168.1.50）またはネットワークアドレスを入力します。CIDR 表記にはプレフィックス長を使用します（例: /24 ネットワークなら 24）。単一ホストの場合は空欄にします（IPv4 は /32、IPv6 は /128）。</p>\n\n        <h5>アクション</h5>\n        <p><strong>許可</strong>: 指定した IP/ネットワークからのアクセスを許可します。<br>\n        <strong>拒否</strong>: 指定した IP/ネットワークからのアクセスを明示的にブロックします。</p>\n\n        <h5>説明</h5>\n        <p>この項目を識別しやすくするための任意のメモです（例: \"Office Network\", \"Blocked Attacker\"）。</p>"
 
 #: gatekeeper/views.py:460
 msgid "IP Address deleted successfully."
@@ -1435,7 +1435,7 @@ msgstr "WireGuard インスタンス"
 
 #: routing_templates/forms.py:30 templates/routing_templates/list.html:24
 msgid "Default Template"
-msgstr "Default Template"
+msgstr "デフォルトテンプレート"
 
 #: routing_templates/forms.py:31 templates/routing_templates/list.html:10
 msgid "Route Type"
@@ -1443,16 +1443,16 @@ msgstr "ルート種別"
 
 #: routing_templates/forms.py:32 routing_templates/models.py:16
 msgid "Custom Routes"
-msgstr "Custom Routes"
+msgstr "カスタムルート"
 
 #: routing_templates/forms.py:33
 msgid "Allow Peer Custom Routes"
-msgstr "Allow Peer Custom Routes"
+msgstr "ピアごとのカスタムルートを許可"
 
 #: routing_templates/forms.py:34
 #: templates/wireguard/wireguard_manage_server.html:69 wireguard/forms.py:26
 msgid "Enforce Route Policy"
-msgstr "Enforce Route Policy"
+msgstr "ルートポリシーを強制"
 
 #: routing_templates/forms.py:91
 msgid "Custom routes should be empty when Route Type is 'Default Route'."
@@ -1483,19 +1483,19 @@ msgstr "'%(line)s' is not a network address. Use the network address (e.g., '%(n
 
 #: routing_templates/models.py:13
 msgid "Default Route (0.0.0.0/0)"
-msgstr "Default Route (0.0.0.0/0)"
+msgstr "デフォルトルート (0.0.0.0/0)"
 
 #: routing_templates/models.py:14
 msgid "Routes from Peers on same Interface"
-msgstr "Routes from Peers on same Interface"
+msgstr "同じインターフェース上のピアからのルート"
 
 #: routing_templates/models.py:15
 msgid "Routes from All Peers"
-msgstr "Routes from All Peers"
+msgstr "すべてのピアからのルート"
 
 #: routing_templates/models.py:25
 msgid "One route per line in CIDR notation."
-msgstr "One route per line in CIDR notation."
+msgstr "CIDR 表記で 1 行に 1 つずつ入力します。"
 
 #: routing_templates/views.py:16 templates/template_parts/base_sidebar.html:42
 msgid "Routing Templates"
@@ -1519,7 +1519,7 @@ msgstr "ルーティングテンプレートを追加"
 
 #: routing_templates/views.py:58
 msgid "\n        <h5>Routing Templates</h5>\n        <p>Define routing configurations that can be applied to peers.</p>\n        \n        <h5>Default Template</h5>\n        <p>If checked, this template will be the default for the selected WireGuard instance. Only one default template is allowed per instance.</p>\n\n        <h5>Route Type</h5>\n        <p>Select the type of routes to push to the client.</p>\n        <ul>\n            <li><strong>Default Route (0.0.0.0/0)</strong>: Redirects all traffic through the VPN.</li>\n            <li><strong>Routes from Peers on same Interface</strong>: Pushes routes for other peers on the same WireGuard interface.</li>\n            <li><strong>Routes from All Peers</strong>: Pushes routes for all peers across all interfaces.</li>\n            <li><strong>Custom Routes</strong>: Allows you to specify custom CIDR ranges.</li>\n        </ul>\n\n        <h5>Custom Routes</h5>\n        <p>Enter custom routes in CIDR notation, one per line (e.g., 192.168.1.0/24).</p>\n        \n        <h5>Allow Peer Custom Routes</h5>\n        <p>If checked, allows specific peers to add their own custom routes on top of this template.</p>\n        \n        <h5>Enforce Route Policy</h5>\n        <p>If enabled, firewall rules will be applied to strictly enforce this routing policy.<br>The peer will only be able to access networks explicitly defined by the assigned routing template.<br>Any traffic to destinations outside these routes will be blocked.</p>\n        <p>Note: depending on the number of routes and peers, enabling this option may generate a large number of firewall rules.</p>\n        "
-msgstr "\n        <h5>Routing Templates</h5>\n        <p>Define routing configurations that can be applied to peers.</p>\n        \n        <h5>Default Template</h5>\n        <p>If checked, this template will be the default for the selected WireGuard instance. Only one default template is allowed per instance.</p>\n\n        <h5>Route Type</h5>\n        <p>Select the type of routes to push to the client.</p>\n        <ul>\n            <li><strong>Default Route (0.0.0.0/0)</strong>: Redirects all traffic through the VPN.</li>\n            <li><strong>Routes from Peers on same Interface</strong>: Pushes routes for other peers on the same WireGuard interface.</li>\n            <li><strong>Routes from All Peers</strong>: Pushes routes for all peers across all interfaces.</li>\n            <li><strong>Custom Routes</strong>: Allows you to specify custom CIDR ranges.</li>\n        </ul>\n\n        <h5>Custom Routes</h5>\n        <p>Enter custom routes in CIDR notation, one per line (e.g., 192.168.1.0/24).</p>\n        \n        <h5>Allow Peer Custom Routes</h5>\n        <p>If checked, allows specific peers to add their own custom routes on top of this template.</p>\n        \n        <h5>Enforce Route Policy</h5>\n        <p>If enabled, firewall rules will be applied to strictly enforce this routing policy.<br>The peer will only be able to access networks explicitly defined by the assigned routing template.<br>Any traffic to destinations outside these routes will be blocked.</p>\n        <p>Note: depending on the number of routes and peers, enabling this option may generate a large number of firewall rules.</p>\n        "
+msgstr "<h5>ルーティングテンプレート</h5>\n        <p>ピアに適用できるルーティング設定を定義します。</p>\n\n        <h5>デフォルトテンプレート</h5>\n        <p>オンにすると、このテンプレートが選択した WireGuard インスタンスのデフォルトになります。デフォルトテンプレートはインスタンスごとに 1 つだけ設定できます。</p>\n\n        <h5>ルート種別</h5>\n        <p>クライアントへ配布するルートの種類を選択します。</p>\n        <ul>\n            <li><strong>デフォルトルート (0.0.0.0/0)</strong>: すべての通信を VPN 経由にします。</li>\n            <li><strong>同じインターフェース上のピアからのルート</strong>: 同じ WireGuard インターフェース上の他ピアへのルートを配布します。</li>\n            <li><strong>すべてのピアからのルート</strong>: すべてのインターフェースにまたがる全ピアへのルートを配布します。</li>\n            <li><strong>カスタムルート</strong>: 任意の CIDR 範囲を指定できます。</li>\n        </ul>\n\n        <h5>カスタムルート</h5>\n        <p>カスタムルートを CIDR 表記で 1 行に 1 つずつ入力します（例: 192.168.1.0/24）。</p>\n\n        <h5>ピアごとのカスタムルートを許可</h5>\n        <p>オンにすると、特定のピアがこのテンプレートに加えて独自のカスタムルートを追加できます。</p>\n\n        <h5>ルートポリシーを強制</h5>\n        <p>有効にすると、このルーティングポリシーを厳密に適用するためにファイアウォールルールが適用されます。<br>ピアは割り当てられたルーティングテンプレートで明示されたネットワークにのみアクセスできます。<br>これらのルート外への通信はブロックされます。</p>\n        <p>注: ルート数やピア数によっては、このオプションを有効にすると多数のファイアウォールルールが生成される場合があります。</p>"
 
 #: scheduler/forms.py:17
 msgid "Profile Name"
@@ -1750,25 +1750,25 @@ msgstr "編集"
 
 #: templates/app_gateway/access_policy_type_select.html:12
 msgid "Choose the type of access policy you want to create."
-msgstr "Choose the type of access policy you want to create."
+msgstr "作成するアクセスポリシーの種類を選択してください。"
 
 #: templates/app_gateway/access_policy_type_select.html:20
 msgid "Allow access to everyone without authentication."
-msgstr "Allow access to everyone without authentication."
+msgstr "認証なしですべてのユーザーにアクセスを許可します。"
 
 #: templates/app_gateway/access_policy_type_select.html:21
 #: templates/app_gateway/access_policy_type_select.html:32
 #: templates/app_gateway/access_policy_type_select.html:43
 msgid "Select"
-msgstr "Select"
+msgstr "選択"
 
 #: templates/app_gateway/access_policy_type_select.html:31
 msgid "Require authentication using specified methods or groups."
-msgstr "Require authentication using specified methods or groups."
+msgstr "指定した方式またはグループによる認証を要求します。"
 
 #: templates/app_gateway/access_policy_type_select.html:42
 msgid "Deny all access."
-msgstr "Deny all access."
+msgstr "すべてのアクセスを拒否します。"
 
 #: templates/app_gateway/app_gateway_list.html:13
 #: templates/app_gateway/app_gateway_list.html:31
@@ -1809,15 +1809,15 @@ msgstr "Default (Deny)"
 
 #: templates/app_gateway/app_gateway_list.html:98
 msgid "No Applications found."
-msgstr "No Applications found."
+msgstr "アプリケーションが見つかりません。"
 
 #: templates/app_gateway/app_gateway_list.html:110
 msgid "Application"
-msgstr "Application"
+msgstr "アプリケーション"
 
 #: templates/app_gateway/app_gateway_list.html:129
 msgid "No Hosts found."
-msgstr "No Hosts found."
+msgstr "ホストが見つかりません。"
 
 #: templates/app_gateway/app_gateway_list.html:137
 msgid "Add Access Policy"
@@ -1872,7 +1872,7 @@ msgstr "Set Policy"
 
 #: templates/app_gateway/application_details.html:56
 msgid "Application Hosts"
-msgstr "Application Hosts"
+msgstr "アプリケーションホスト"
 
 #: templates/app_gateway/application_details.html:60
 #: templates/app_gateway/application_details.html:65
@@ -2159,31 +2159,31 @@ msgstr "自動ルールを表示"
 
 #: templates/firewall/manage_firewall_rule.html:18
 msgid "General"
-msgstr "General"
+msgstr "全般"
 
 #: templates/firewall/manage_firewall_rule.html:79
 msgid "\n                                    <h5>Advanced VPN Firewall Configuration</h5>\n                                    <p>\n                                        This interface serves as a comprehensive tool for managing firewall rules, enabling users to implement advanced traffic policies between VPN peers and networks. It simplifies establishing firewall rules, packet filtering, and NAT configurations, allowing for precise control over network security. Users can define source and destination IP addresses, ports, protocols, and actions to tailor traffic flow, ensuring a secure and efficient networking environment.\n                                    </p>\n                                    "
-msgstr "\n                                    <h5>Advanced VPN Firewall Configuration</h5>\n                                    <p>\n                                        This interface serves as a comprehensive tool for managing firewall rules, enabling users to implement advanced traffic policies between VPN peers and networks. It simplifies establishing firewall rules, packet filtering, and NAT configurations, allowing for precise control over network security. Users can define source and destination IP addresses, ports, protocols, and actions to tailor traffic flow, ensuring a secure and efficient networking environment.\n                                    </p>\n                                    "
+msgstr "<h5>高度な VPN ファイアウォール設定</h5>\n                                    <p>\n                                        この画面ではファイアウォールルールを管理し、VPN ピアやネットワーク間の高度な通信ポリシーを設定できます。ファイアウォールルール、パケットフィルタリング、NAT 設定を扱いやすくし、ネットワークセキュリティを細かく制御できます。送信元・宛先 IP アドレス、ポート、プロトコル、アクションを指定して通信の流れを調整できます。\n                                    </p>"
 
 #: templates/firewall/manage_firewall_rule.html:100
 msgid "Interface"
-msgstr "Interface"
+msgstr "インターフェース"
 
 #: templates/firewall/manage_firewall_rule.html:179
 msgid "\n                                    <h5>Source Selection</h5>\n                                    <p>\n                                        You have the option to apply this rule to a specific IP address or network and/or to multiple peers.<br><br>\n                                        Enabling the \"Include peer networks\" option will automatically include all Allowed IPs associated with each selected peer.<br><br>\n                                        Please note that selecting multiple peers with included networks on both the source and destination ends may result in a rapid increase in the number of firewall rules generated, depending on your configuration.<br><br>\n                                        The \"Not Source\" option negates the selected source IP, network, or peer(s).\n                                    </p>\n                                    "
-msgstr "\n                                    <h5>Source Selection</h5>\n                                    <p>\n                                        You have the option to apply this rule to a specific IP address or network and/or to multiple peers.<br><br>\n                                        Enabling the \"Include peer networks\" option will automatically include all Allowed IPs associated with each selected peer.<br><br>\n                                        Please note that selecting multiple peers with included networks on both the source and destination ends may result in a rapid increase in the number of firewall rules generated, depending on your configuration.<br><br>\n                                        The \"Not Source\" option negates the selected source IP, network, or peer(s).\n                                    </p>\n                                    "
+msgstr "<h5>送信元の選択</h5>\n                                    <p>\n                                        このルールの送信元として、特定の IP アドレスまたはネットワーク、あるいは複数のピアを指定できます。<br><br>\n                                        「ピアのネットワークを含める」を有効にすると、選択した各ピアに関連付けられたすべての Allowed IP が送信元に自動的に含まれます。<br><br>\n                                        複数のピアを選択すると、生成されるルール数が増える場合があります。\n                                    </p>"
 
 #: templates/firewall/manage_firewall_rule.html:240
 msgid "\n                                    <h5>Destination Selection</h5>\n                                    <p>\n                                        You have the option to apply this rule to a specific IP address or network and/or to multiple peers as the destination.<br><br>\n                                        Enabling the \"Include peer networks\" option will automatically include all Allowed IPs associated with each selected peer as the destination.<br><br>\n                                        Please note that selecting multiple peers with included networks on both the source and destination ends may result in a rapid increase in the number of firewall rules generated, depending on your configuration.<br><br>\n                                        The \"Not Destination\" option negates the selected destination IP, network, or peer(s).\n                                    </p>\n                                    "
-msgstr "\n                                    <h5>Destination Selection</h5>\n                                    <p>\n                                        You have the option to apply this rule to a specific IP address or network and/or to multiple peers as the destination.<br><br>\n                                        Enabling the \"Include peer networks\" option will automatically include all Allowed IPs associated with each selected peer as the destination.<br><br>\n                                        Please note that selecting multiple peers with included networks on both the source and destination ends may result in a rapid increase in the number of firewall rules generated, depending on your configuration.<br><br>\n                                        The \"Not Destination\" option negates the selected destination IP, network, or peer(s).\n                                    </p>\n                                    "
+msgstr "<h5>宛先の選択</h5>\n                                    <p>\n                                        このルールの宛先として、特定の IP アドレスまたはネットワーク、あるいは複数のピアを指定できます。<br><br>\n                                        「ピアのネットワークを含める」を有効にすると、選択した各ピアに関連付けられたすべての Allowed IP が宛先に自動的に含まれます。\n                                    </p>"
 
 #: templates/firewall/manage_firewall_rule.html:297
 msgid "\n                                    <h5>Protocol and Port</h5>\n                                    <p>\n                                        Only the most commonly used protocols are listed here. If you require a specific protocol, please open an issue on GitHub.<br><br>\n                                        Selecting TCP+UDP will result in the duplication of generated rules.<br><br>\n                                        Ports can be specified as single numbers (e.g., 8080) or as ranges (e.g., 8001:8999).\n                                    </p>\n                                    "
-msgstr "\n                                    <h5>Protocol and Port</h5>\n                                    <p>\n                                        Only the most commonly used protocols are listed here. If you require a specific protocol, please open an issue on GitHub.<br><br>\n                                        Selecting TCP+UDP will result in the duplication of generated rules.<br><br>\n                                        Ports can be specified as single numbers (e.g., 8080) or as ranges (e.g., 8001:8999).\n                                    </p>\n                                    "
+msgstr "<h5>プロトコルとポート</h5>\n                                    <p>\n                                        よく使われるプロトコルのみを選択できます。特定のプロトコルが必要な場合は GitHub で Issue を作成してください。<br><br>\n                                        TCP+UDP を選択すると、生成されるルールは TCP 用と UDP 用に複製されます。<br><br>\n                                        ポートは単一の番号（例: 8080）または範囲（例: 8000:8010）で指定できます。\n                                    </p>"
 
 #: templates/firewall/manage_firewall_rule.html:320
 msgid "Packet State"
-msgstr "Packet State"
+msgstr "パケット状態"
 
 #: templates/firewall/manage_firewall_rule.html:471
 msgid "Please type 'delete' to remove this firewall rule."
@@ -2191,7 +2191,7 @@ msgstr "Please type 'delete' to remove this firewall rule."
 
 #: templates/firewall/manage_firewall_settings.html:61
 msgid "Reset firewall to default"
-msgstr "Reset firewall to default"
+msgstr "ファイアウォールをデフォルトに戻す"
 
 #: templates/firewall/manage_firewall_settings.html:77
 msgid "Reseting the firewall to default will remove all rules and settings. Are you sure you want to continue?\\n\\nType 'delete all rules and reset firewall' to confirm."
@@ -2215,7 +2215,7 @@ msgstr "Add Forward Rule (allow)"
 #: templates/firewall/manage_redirect_rule.html:80
 #: templates/firewall/redirect_rule_list.html:17
 msgid "Masquerade Source"
-msgstr "Masquerade Source"
+msgstr "送信元をマスカレード"
 
 #: templates/firewall/manage_redirect_rule.html:91
 msgid "\n                        <h5>Default Ports</h5>\n                        <p>The default <code>docker-compose.yml</code> file specifies the <b>TCP</b> port range <b>8080-8089</b>. If you wish to change the port forwarding to a different range, you must manually edit the <code>docker-compose.yml</code> file and rerun the Docker Compose step outlined in the <a href=\"https://github.com/eduardogsilva/wireguard_webadmin?tab=readme-ov-file#deployment\">deployment instructions</a>.</p>\n                        <h5>Destination Type: Peer</h5>\n                        <p>Port redirection will prioritize the first Peer IP address assigned a priority of Zero.</p>\n                        <h5>Destination Type: IP Address</h5>\n                        <p>Port forwarding rules will redirect to the specified IP address. Remember to allocate the IP address or network to a Peer.</p>\n                        <h5>Adding a Forward Rule</h5>\n                        <p>Automatically generates a forwarding rule to accommodate stricter firewall settings.</p>\n                        <h5>Masquerade Source</h5>\n                        <p>This serves as a temporary solution when a peer does not use the VPN as its default gateway. It's important to note that this configuration is not recommended, as it alters the source address of all connections to match the IP address of the WireGuard instance.</p>\n                        "
@@ -2235,7 +2235,7 @@ msgstr "Allow Forward"
 
 #: templates/firewall/redirect_rule_list.html:46
 msgid "This serves as a temporary solution when a peer does not use the VPN as its default gateway. It's important to note that this configuration is not recommended, as it alters the source address of all connections to match the IP address of the WireGuard instance."
-msgstr "This serves as a temporary solution when a peer does not use the VPN as its default gateway. It's important to note that this configuration is not recommended, as it alters the source address of all connections to match the IP address of the WireGuard instance."
+msgstr "これは、ピアが VPN をデフォルトゲートウェイとして使用していない場合の一時的な対処です。すべての接続の送信元アドレスを WireGuard インスタンスの IP アドレスに変更するため、この設定は推奨されません。"
 
 #: templates/firewall/redirect_rule_list.html:58
 msgid "Create Port forwarding Rule"
@@ -2244,12 +2244,12 @@ msgstr "Create Port forwarding Rule"
 #: templates/gatekeeper/gatekeeper_auth_method_form.html:67
 #: templates/gatekeeper/gatekeeper_user_form.html:43
 msgid "View QR Code"
-msgstr "View QR Code"
+msgstr "QR コードを表示"
 
 #: templates/gatekeeper/gatekeeper_auth_method_form.html:68
 #: templates/gatekeeper/gatekeeper_user_form.html:44
 msgid "Generate TOTP Secret"
-msgstr "Generate TOTP Secret"
+msgstr "TOTP シークレットを生成"
 
 #: templates/gatekeeper/gatekeeper_auth_method_form.html:105
 #: templates/gatekeeper/gatekeeper_user_form.html:81
@@ -2289,7 +2289,7 @@ msgstr "TOTP"
 
 #: templates/gatekeeper/gatekeeper_list.html:105
 msgid "No Gatekeeper Users found."
-msgstr "No Gatekeeper Users found."
+msgstr "ゲートキーパーユーザーが見つかりません。"
 
 #: templates/gatekeeper/gatekeeper_list.html:112
 msgid "Add Group"
@@ -2297,7 +2297,7 @@ msgstr "Add Group"
 
 #: templates/gatekeeper/gatekeeper_list.html:148
 msgid "No Gatekeeper Groups found."
-msgstr "No Gatekeeper Groups found."
+msgstr "ゲートキーパーグループが見つかりません。"
 
 #: templates/gatekeeper/gatekeeper_list.html:157
 msgid "Add Auth Method"
@@ -2528,80 +2528,80 @@ msgstr "招待設定"
 
 #: templates/wireguard/apply_route_template.html:8 wireguard_peer/views.py:350
 msgid "Apply Route Template"
-msgstr "Apply Route Template"
+msgstr "ルーティングテンプレートを適用"
 
 #: templates/wireguard/apply_route_template.html:13
 msgid "Select a routing template to apply to the peer"
-msgstr "Select a routing template to apply to the peer"
+msgstr "ピアに適用するルーティングテンプレートを選択してください"
 
 #: templates/wireguard/apply_route_template.html:16
 msgid "Current Active Template:"
-msgstr "Current Active Template:"
+msgstr "現在の有効テンプレート:"
 
 #: templates/wireguard/apply_route_template.html:26
 msgid "Template Name"
-msgstr "Template Name"
+msgstr "テンプレート名"
 
 #: templates/wireguard/apply_route_template.html:48
 msgid "Unlink"
-msgstr "Unlink"
+msgstr "リンク解除"
 
 #: templates/wireguard/apply_route_template.html:55
 msgid "No routing templates available for this interface."
-msgstr "No routing templates available for this interface."
+msgstr "このインターフェースで利用できるルーティングテンプレートはありません。"
 
 #: templates/wireguard/peer_list/peer_data.html:30
 msgid "Route policy enforced"
-msgstr "Route policy enforced"
+msgstr "ルートポリシー適用中"
 
 #: templates/wireguard/peer_list/peer_data.html:36
 #: templates/wireguard/peer_list/peer_preview_modal.html:16
 msgid "Throughput"
-msgstr "Throughput"
+msgstr "スループット"
 
 #: templates/wireguard/peer_list/peer_data.html:39
 #: templates/wireguard/peer_list/peer_preview_modal.html:20
 msgid "Transfer"
-msgstr "Transfer"
+msgstr "転送量"
 
 #: templates/wireguard/peer_list/peer_data.html:44
 #: templates/wireguard/peer_list/script_wireguard_status_update.html:146
 #: wireguard_peer/views.py:82
 msgid "Primary Server"
-msgstr "Primary Server"
+msgstr "プライマリサーバー"
 
 #: templates/wireguard/peer_list/peer_data.html:47
 #: templates/wireguard/peer_list/peer_preview_modal.html:24
 msgid "Latest Handshake"
-msgstr "Latest Handshake"
+msgstr "最新ハンドシェイク"
 
 #: templates/wireguard/peer_list/peer_data.html:61
 #: templates/wireguard/peer_list/peer_preview_modal.html:32
 msgid "Endpoints"
-msgstr "Endpoints"
+msgstr "エンドポイント"
 
 #: templates/wireguard/peer_list/peer_data.html:66
 #: templates/wireguard/peer_list/peer_preview_modal.html:36
 msgid "Allowed IPs"
-msgstr "Allowed IPs"
+msgstr "許可 IP"
 
 #: templates/wireguard/peer_list/peer_preview_modal.html:45
 #: templates/wireguard/wireguard_manage_peer.html:135
 msgid "Peer Traffic"
-msgstr "Peer Traffic"
+msgstr "ピア通信量"
 
 #: templates/wireguard/peer_list/peer_preview_modal.html:61
 #: templates/wireguard/wireguard_manage_peer.html:152
 msgid "No traffic history, please wait a few minutes"
-msgstr "No traffic history, please wait a few minutes"
+msgstr "通信履歴がありません。数分お待ちください。"
 
 #: templates/wireguard/peer_list/peer_preview_modal.html:69
 msgid "Close QR Code"
-msgstr "Close QR Code"
+msgstr "QR コードを閉じる"
 
 #: templates/wireguard/peer_list/peer_preview_modal.html:82
 msgid "VPN Invite Details"
-msgstr "VPN Invite Details"
+msgstr "VPN 招待の詳細"
 
 #: templates/wireguard/peer_list/peer_preview_modal.html:88
 msgid "Expires on"
@@ -2860,59 +2860,59 @@ msgstr "AllowedIPs at client configuration file"
 
 #: templates/wireguard/wireguard_manage_peer.html:201
 msgid "Client Routing"
-msgstr "Client Routing"
+msgstr "クライアントルーティング"
 
 #: templates/wireguard/wireguard_manage_peer.html:206
 msgid "Apply template"
-msgstr "Apply template"
+msgstr "テンプレートを適用"
 
 #: templates/wireguard/wireguard_manage_peer.html:210
 msgid "Add Client route"
-msgstr "Add Client route"
+msgstr "クライアントルートを追加"
 
 #: templates/wireguard/wireguard_manage_peer.html:223
 msgid "Routing Template"
-msgstr "Routing Template"
+msgstr "ルーティングテンプレート"
 
 #: templates/wireguard/wireguard_manage_peer.html:236
 msgid "Template Route"
-msgstr "Template Route"
+msgstr "テンプレートルート"
 
 #: templates/wireguard/wireguard_manage_peer.html:247
 msgid "The client is not configured to use the VPN as the default gateway.\\n\\nOnly the specific networks listed below are routed through the VPN.\\n\\nNote: These routes are not automatically pushed to the client. You will need to manually update the client configuration file to reflect these settings."
-msgstr "The client is not configured to use the VPN as the default gateway.\\n\\nOnly the specific networks listed below are routed through the VPN.\\n\\nNote: These routes are not automatically pushed to the client. You will need to manually update the client configuration file to reflect these settings."
+msgstr "クライアントは VPN をデフォルトゲートウェイとして使用する設定ではありません。\\n\\n以下に表示された特定のネットワークのみが VPN 経由でルーティングされます。\\n\\n注: これらのルートはクライアントへ自動的には配布されません。設定を反映するには、クライアント設定ファイルを手動で更新する必要があります。"
 
 #: templates/wireguard/wireguard_manage_peer.html:250
 msgid "The client is configured to use the VPN as the default gateway. \\n\\nThis setting routes all client internet traffic through the VPN, enhancing privacy and security across all connections."
-msgstr "The client is configured to use the VPN as the default gateway. \\n\\nThis setting routes all client internet traffic through the VPN, enhancing privacy and security across all connections."
+msgstr "クライアントは VPN をデフォルトゲートウェイとして使用する設定です。\\n\\nこの設定では、クライアントのすべてのインターネット通信が VPN 経由でルーティングされ、すべての接続でプライバシーとセキュリティが向上します。"
 
 #: templates/wireguard/wireguard_manage_peer.html:258
 msgid "default route"
-msgstr "default route"
+msgstr "デフォルトルート"
 
 #: templates/wireguard/wireguard_manage_peer.html:292
 msgid "Peer List"
-msgstr "Peer List"
+msgstr "ピア一覧"
 
 #: templates/wireguard/wireguard_manage_peer.html:296
 msgid "Reactivate"
-msgstr "Reactivate"
+msgstr "再有効化"
 
 #: templates/wireguard/wireguard_manage_peer.html:298
 msgid "Suspend"
-msgstr "Suspend"
+msgstr "停止"
 
 #: templates/wireguard/wireguard_manage_peer.html:302
 msgid "Delete Peer"
-msgstr "Delete Peer"
+msgstr "ピアを削除"
 
 #: templates/wireguard/wireguard_manage_peer.html:312
 msgid "Please type \\\"delete\\\" to remove peer configuration."
-msgstr "Please type \\\"delete\\\" to remove peer configuration."
+msgstr "ピア設定を削除するには \\\"delete\\\" と入力してください。"
 
 #: templates/wireguard/wireguard_manage_server.html:25 wireguard/forms.py:15
 msgid "Display Name"
-msgstr "Display Name"
+msgstr "表示名"
 
 #: templates/wireguard/wireguard_manage_server.html:27
 msgid "\n                                Optional name used only for display in the web interface.\n                            "
@@ -2920,7 +2920,7 @@ msgstr "\n                                Optional name used only for display in
 
 #: templates/wireguard/wireguard_manage_server.html:31 wireguard/forms.py:23
 msgid "Web Refresh Interval"
-msgstr "Web Refresh Interval"
+msgstr "Web 更新間隔"
 
 #: templates/wireguard/wireguard_manage_server.html:33
 msgid "\n                                Interval used to refresh WireGuard status information in the web UI.\n                            "
@@ -3010,19 +3010,19 @@ msgstr "Instance Traffic"
 
 #: user_manager/forms.py:15
 msgid "Password Confirmation"
-msgstr "Password Confirmation"
+msgstr "パスワード確認"
 
 #: user_manager/forms.py:17
 msgid "Reload WireGuard"
-msgstr "Reload WireGuard"
+msgstr "WireGuard を再読み込み"
 
 #: user_manager/forms.py:18
 msgid "Restart WireGuard"
-msgstr "Restart WireGuard"
+msgstr "WireGuard を再起動"
 
 #: user_manager/forms.py:19
 msgid "Enhanced Filter"
-msgstr "Enhanced Filter"
+msgstr "拡張フィルター"
 
 #: user_manager/forms.py:119
 msgid "Password is required for new users."
@@ -3042,19 +3042,19 @@ msgstr "A peer group with that name already exists."
 
 #: user_manager/models.py:13
 msgid "Debugging Analyst"
-msgstr "Debugging Analyst"
+msgstr "デバッグ分析者"
 
 #: user_manager/models.py:14 vpn_invite/models.py:25
 msgid "View Only"
-msgstr "View Only"
+msgstr "閲覧のみ"
 
 #: user_manager/models.py:15 vpn_invite/models.py:25
 msgid "Peer Manager"
-msgstr "Peer Manager"
+msgstr "ピア管理者"
 
 #: user_manager/models.py:16 vpn_invite/models.py:25
 msgid "WireGuard Manager"
-msgstr "WireGuard Manager"
+msgstr "WireGuard 管理者"
 
 #: user_manager/models.py:17 vpn_invite/models.py:25
 msgid "Administrator"
@@ -3078,7 +3078,7 @@ msgstr "\n        <h5>Peers</h5>\n        <p>Select which peers can be managed b
 
 #: user_manager/views.py:98
 msgid "Edit User"
-msgstr "Edit User"
+msgstr "ユーザーを編集"
 
 #: user_manager/views.py:104
 msgid "User deleted|User deleted: "
@@ -3102,7 +3102,7 @@ msgstr "User created|User created: "
 
 #: user_manager/views.py:139
 msgid "\n        <h4>User Levels</h4>\n        <h5>Debugging Analyst</h5>\n        <p>Access to basic system information and logs for troubleshooting. No access to modify settings or view sensitive data such as peer keys.</p>\n\n        <h5>View Only</h5>\n        <p>Full view access, including peer keys and configuration files. Cannot modify any settings or configurations.</p>\n\n        <h5>Peer Manager</h5>\n        <p>Permissions to add, edit, and remove peers and IP addresses. Does not include access to modify WireGuard instance configurations or higher-level settings.</p>\n\n        <h5>Wireguard Manager</h5>\n        <p>Authority to add, edit, and remove configurations of WireGuard instances.</p>\n\n        <h5>Administrator</h5>\n        <p>Full access across the system. Can view and modify all settings, configurations and manage users. </p>\n\n        <br>\n        <h4>Peer Groups</h4>\n        <p>Select which peer groups this user can access. If no peer groups are selected, the user will have access to all peers.</p>\n\n        <h4>Console</h4>\n        <p>Enable or disable web console access for this user.</p>\n\n        <h4>Enhanced Filter</h4>\n        <p>This option filters the API status response to include only peers that the user has access to. Depending on the size of your environment, enabling this option may impact performance. To mitigate this, consider increasing the \"Web Refresh Interval\" to reduce the number of requests.</p>\n\n        "
-msgstr "\n        <h4>User Levels</h4>\n        <h5>Debugging Analyst</h5>\n        <p>Access to basic system information and logs for troubleshooting. No access to modify settings or view sensitive data such as peer keys.</p>\n\n        <h5>View Only</h5>\n        <p>Full view access, including peer keys and configuration files. Cannot modify any settings or configurations.</p>\n\n        <h5>Peer Manager</h5>\n        <p>Permissions to add, edit, and remove peers and IP addresses. Does not include access to modify WireGuard instance configurations or higher-level settings.</p>\n\n        <h5>Wireguard Manager</h5>\n        <p>Authority to add, edit, and remove configurations of WireGuard instances.</p>\n\n        <h5>Administrator</h5>\n        <p>Full access across the system. Can view and modify all settings, configurations and manage users. </p>\n\n        <br>\n        <h4>Peer Groups</h4>\n        <p>Select which peer groups this user can access. If no peer groups are selected, the user will have access to all peers.</p>\n\n        <h4>Console</h4>\n        <p>Enable or disable web console access for this user.</p>\n\n        <h4>Enhanced Filter</h4>\n        <p>This option filters the API status response to include only peers that the user has access to. Depending on the size of your environment, enabling this option may impact performance. To mitigate this, consider increasing the \"Web Refresh Interval\" to reduce the number of requests.</p>\n\n        "
+msgstr "<h4>ユーザーレベル</h4>\n        <h5>デバッグ分析者</h5>\n        <p>トラブルシューティング用の基本的なシステム情報とログにアクセスできます。設定変更やピアキーなどの機密データの閲覧はできません。</p>\n\n        <h5>閲覧のみ</h5>\n        <p>ピアキーや設定ファイルを含むすべての情報を閲覧できます。設定の変更はできません。</p>\n\n        <h5>ピア管理者</h5>\n        <p>ピアと IP アドレスの追加、編集、削除ができます。WireGuard インスタンス設定や上位設定の変更権限は含まれません。</p>\n\n        <h5>WireGuard 管理者</h5>\n        <p>WireGuard インスタンス設定の追加、編集、削除ができます。</p>\n\n        <h5>管理者</h5>\n        <p>システム全体への完全なアクセス権があります。すべての設定と構成の閲覧・変更、およびユーザー管理ができます。</p>\n\n        <h4>ピアグループ</h4>\n        <p>このユーザーがアクセスできるピアグループを選択します。何も選択しない場合、すべてのピアにアクセスできます。</p>\n\n        <h4>コンソール</h4>\n        <p>このユーザーの Web コンソールアクセスを有効または無効にします。</p>\n\n        <h4>拡張フィルター</h4>\n        <p>このオプションは、ユーザーがアクセスできるピアのみを API ステータス応答に含めるようにフィルタリングします。環境規模によっては、性能に影響する場合があります。影響を抑えるには「Web 更新間隔」を長くしてリクエスト数を減らしてください。</p>"
 
 #: user_manager/views.py:175
 msgid "Please type the username to proceed."
@@ -3116,87 +3116,87 @@ msgstr "URL"
 #: vpn_invite/forms.py:73 vpn_invite/forms.py:74 vpn_invite/forms.py:75
 #: vpn_invite/forms.py:76 vpn_invite/forms.py:77
 msgid "Text"
-msgstr "Text"
+msgstr "テキスト"
 
 #: vpn_invite/forms.py:83
 msgid "Web Page Instructions"
-msgstr "Web Page Instructions"
+msgstr "Web ページ説明"
 
 #: vpn_invite/forms.py:84
 msgid "Email Subject"
-msgstr "Email Subject"
+msgstr "メール件名"
 
 #: vpn_invite/forms.py:85
 msgid "Email Message"
-msgstr "Email Message"
+msgstr "メール本文"
 
 #: vpn_invite/forms.py:86
 msgid "Email Enabled"
-msgstr "Email Enabled"
+msgstr "メールを有効化"
 
 #: vpn_invite/forms.py:87
 msgid "WhatsApp Message"
-msgstr "WhatsApp Message"
+msgstr "WhatsApp メッセージ"
 
 #: vpn_invite/forms.py:88
 msgid "WhatsApp Enabled"
-msgstr "WhatsApp Enabled"
+msgstr "WhatsApp を有効化"
 
 #: vpn_invite/forms.py:89
 msgid "Text Message"
-msgstr "Text Message"
+msgstr "SMS メッセージ"
 
 #: vpn_invite/forms.py:90
 msgid "Expiration (minutes)"
-msgstr "Expiration (minutes)"
+msgstr "有効期限（分）"
 
 #: vpn_invite/forms.py:91
 msgid "Random Password"
-msgstr "Random Password"
+msgstr "ランダムパスワード"
 
 #: vpn_invite/forms.py:92
 msgid "Invite URL"
-msgstr "Invite URL"
+msgstr "招待 URL"
 
 #: vpn_invite/forms.py:93
 msgid "Required User Level"
-msgstr "Required User Level"
+msgstr "必要なユーザーレベル"
 
 #: vpn_invite/forms.py:94
 msgid "Default Password"
-msgstr "Default Password"
+msgstr "デフォルトパスワード"
 
 #: vpn_invite/forms.py:95
 msgid "Random Password Length"
-msgstr "Random Password Length"
+msgstr "ランダムパスワード長"
 
 #: vpn_invite/forms.py:96
 msgid "Random Password Complexity"
-msgstr "Random Password Complexity"
+msgstr "ランダムパスワードの複雑さ"
 
 #: vpn_invite/forms.py:103
 msgid "General Settings"
-msgstr "General Settings"
+msgstr "全般設定"
 
 #: vpn_invite/forms.py:125
 msgid "Download Buttons"
-msgstr "Download Buttons"
+msgstr "ダウンロードボタン"
 
 #: vpn_invite/forms.py:158
 msgid "Message templates"
-msgstr "Message templates"
+msgstr "メッセージテンプレート"
 
 #: vpn_invite/forms.py:165
 msgid "Email Message Template"
-msgstr "Email Message Template"
+msgstr "メール本文テンプレート"
 
 #: vpn_invite/forms.py:176
 msgid "WhatsApp Message Template"
-msgstr "WhatsApp Message Template"
+msgstr "WhatsApp メッセージテンプレート"
 
 #: vpn_invite/forms.py:183
 msgid "Text Message Template"
-msgstr "Text Message Template"
+msgstr "SMS メッセージテンプレート"
 
 #: vpn_invite/forms.py:205
 msgid "Invite URL must start with 'https://'."
@@ -3245,15 +3245,15 @@ msgstr "The template must include the placeholder '{invite_url}'."
 
 #: vpn_invite/forms.py:283
 msgid "Host"
-msgstr "Host"
+msgstr "ホスト"
 
 #: vpn_invite/forms.py:285
 msgid "Encryption"
-msgstr "Encryption"
+msgstr "暗号化"
 
 #: vpn_invite/forms.py:286
 msgid "From Address"
-msgstr "From Address"
+msgstr "送信元アドレス"
 
 #: vpn_invite/forms.py:337
 msgid "SMTP port must be between 1 and 65535."
@@ -3270,23 +3270,23 @@ msgstr "<h2>Welcome to Your VPN Setup</h2>\n<p>Begin by downloading the WireGuar
 
 #: vpn_invite/models.py:30
 msgid "Letters, Digits, Special Characters"
-msgstr "Letters, Digits, Special Characters"
+msgstr "英字、数字、記号"
 
 #: vpn_invite/models.py:31
 msgid "Letters, Digits"
-msgstr "Letters, Digits"
+msgstr "英字、数字"
 
 #: vpn_invite/models.py:31
 msgid "Letters"
-msgstr "Letters"
+msgstr "英字"
 
 #: vpn_invite/models.py:31
 msgid "Digits"
-msgstr "Digits"
+msgstr "数字"
 
 #: vpn_invite/models.py:55
 msgid "Download the WireGuard app for your device using one of the links below. After installation, you can scan the QR code or download the configuration file to import on your device."
-msgstr "Download the WireGuard app for your device using one of the links below. After installation, you can scan the QR code or download the configuration file to import on your device."
+msgstr "下記リンクからデバイス用の WireGuard アプリをダウンロードしてください。インストール後、QR コードをスキャンするか設定ファイルをダウンロードしてデバイスに取り込めます。"
 
 #: vpn_invite/models.py:61
 msgid "WireGuard VPN Invite"
@@ -3298,7 +3298,7 @@ msgstr "Invite Settings|Settings saved successfully."
 
 #: vpn_invite/views.py:57
 msgid "VPN Invite Settings"
-msgstr "VPN Invite Settings"
+msgstr "VPN 招待設定"
 
 #: vpn_invite/views.py:73
 msgid "Email Settings|Settings saved successfully."
@@ -3667,3 +3667,273 @@ msgstr "転送"
 
 msgid "Post Routing"
 msgstr "ポストルーティング"
+
+msgid "Define routing configurations that can be applied to peers."
+msgstr "ピアに適用できるルーティング設定を定義します。"
+
+msgid "If checked, this template will be the default for the selected WireGuard instance. Only one default template is allowed per instance."
+msgstr "オンにすると、このテンプレートが選択した WireGuard インスタンスのデフォルトになります。デフォルトテンプレートはインスタンスごとに 1 つだけ設定できます。"
+
+msgid "Select the type of routes to push to the client."
+msgstr "クライアントに配布するルートの種類を選択します。"
+
+msgid "Pushes routes for other peers on the same WireGuard interface."
+msgstr "同じ WireGuard インターフェース上にある他のピアへのルートを配布します。"
+
+msgid "Pushes routes for all peers across all interfaces."
+msgstr "すべてのインターフェースにまたがる全ピアへのルートを配布します。"
+
+msgid "Enter custom routes in CIDR notation, one per line (e.g., 192.168.1.0/24)."
+msgstr "カスタムルートを CIDR 表記で 1 行に 1 つずつ入力します（例: 192.168.1.0/24）。"
+
+msgid "If checked, allows specific peers to add their own custom routes on top of this template."
+msgstr "オンにすると、特定のピアがこのテンプレートに加えて独自のカスタムルートを追加できます。"
+
+msgid "If enabled, firewall rules will be applied to strictly enforce this routing policy.<br>The peer will only be able to access networks explicitly defined by the assigned routing template.<br>Any traffic to destinations outside these routes will be blocked."
+msgstr "有効にすると、このルーティングポリシーを厳密に適用するためにファイアウォールルールが適用されます。<br>ピアは割り当てられたルーティングテンプレートで明示されたネットワークにのみアクセスできます。<br>これらのルート外への通信はブロックされます。"
+
+msgid "Note: depending on the number of routes and peers, enabling this option may generate a large number of firewall rules."
+msgstr "注: ルート数やピア数によっては、このオプションを有効にすると多数のファイアウォールルールが生成される場合があります。"
+
+msgid "User Levels"
+msgstr "ユーザーレベル"
+
+msgid "Access to basic system information and logs for troubleshooting. No access to modify settings or view sensitive data such as peer keys."
+msgstr "トラブルシューティング用の基本的なシステム情報とログにアクセスできます。設定変更やピアキーなどの機密データの閲覧はできません。"
+
+msgid "View Only User"
+msgstr "閲覧専用ユーザー"
+
+msgid "Full view access, including peer keys and configuration files. Cannot modify any settings or configurations."
+msgstr "ピアキーや設定ファイルを含むすべての情報を閲覧できます。設定の変更はできません。"
+
+msgid "Permissions to add, edit, and remove peers and IP addresses. Does not include access to modify WireGuard instance configurations or higher-level settings."
+msgstr "ピアと IP アドレスの追加、編集、削除ができます。WireGuard インスタンス設定や上位設定の変更権限は含まれません。"
+
+msgid "Authority to add, edit, and remove configurations of WireGuard instances."
+msgstr "WireGuard インスタンス設定の追加、編集、削除ができます。"
+
+msgid "Full access across the system. Can view and modify all settings, configurations and manage users."
+msgstr "システム全体への完全なアクセス権があります。すべての設定と構成の閲覧・変更、およびユーザー管理ができます。"
+
+msgid "Select which peer groups this user can access. If no peer groups are selected, the user will have access to all peers."
+msgstr "このユーザーがアクセスできるピアグループを選択します。何も選択しない場合、すべてのピアにアクセスできます。"
+
+msgid "Enable or disable web console access for this user."
+msgstr "このユーザーの Web コンソールアクセスを有効または無効にします。"
+
+msgid "This option filters the API status response to include only peers that the user has access to. Depending on the size of your environment, enabling this option may impact performance. To mitigate this, consider increasing the \"Web Refresh Interval\" to reduce the number of requests."
+msgstr "このオプションは、ユーザーがアクセスできるピアのみを API ステータス応答に含めるようにフィルタリングします。環境規模によっては、性能に影響する場合があります。影響を抑えるには「Web 更新間隔」を長くしてリクエスト数を減らしてください。"
+
+msgid "Advanced VPN Firewall Configuration"
+msgstr "高度な VPN ファイアウォール設定"
+
+msgid "Source Selection"
+msgstr "送信元の選択"
+
+msgid "Destination Selection"
+msgstr "宛先の選択"
+
+msgid "Protocol and Port"
+msgstr "プロトコルとポート"
+
+msgid "Default Ports"
+msgstr "デフォルトポート"
+
+msgid "Destination Type: Peer"
+msgstr "宛先種別: ピア"
+
+msgid "Port redirection will prioritize the first Peer IP address assigned a priority of Zero."
+msgstr "ポートリダイレクトでは、優先度 0 が割り当てられた最初のピア IP アドレスが優先されます。"
+
+msgid "Destination Type: IP Address"
+msgstr "宛先種別: IP アドレス"
+
+msgid "Port forwarding rules will redirect to the specified IP address. Remember to allocate the IP address or network to a Peer."
+msgstr "ポート転送ルールは指定した IP アドレスへ転送します。その IP アドレスまたはネットワークをピアに割り当てておく必要があります。"
+
+msgid "Adding a Forward Rule"
+msgstr "転送ルールの追加"
+
+msgid "Automatically generates a forwarding rule to accommodate stricter firewall settings."
+msgstr "より厳格なファイアウォール設定に対応するため、転送ルールを自動生成します。"
+
+msgid "Reseting the firewall to default will remove all rules and settings. Are you sure you want to continue?\\n\\nType 'delete all rules and reset firewall' to confirm."
+msgstr "ファイアウォールをデフォルトに戻すと、すべてのルールと設定が削除されます。続行しますか？\\n\\n確認するには 'delete all rules and reset firewall' と入力してください。"
+
+msgid "Define the main details of the application you want to expose through the gateway."
+msgstr "ゲートウェイ経由で公開するアプリケーションの主要情報を定義します。"
+
+msgid "Public Policy"
+msgstr "公開ポリシー"
+
+msgid "A Public policy allows access to the application without requiring any authentication."
+msgstr "公開ポリシーでは、認証なしでアプリケーションへアクセスできます。"
+
+msgid "Deny Policy"
+msgstr "拒否ポリシー"
+
+msgid "A Deny policy blocks all access to the matched routes."
+msgstr "拒否ポリシーでは、一致したルートへのすべてのアクセスをブロックします。"
+
+msgid "Protected Policy"
+msgstr "保護ポリシー"
+
+msgid "A Protected policy requires users to authenticate before accessing the application."
+msgstr "保護ポリシーでは、アプリケーションへアクセスする前にユーザー認証が必要です。"
+
+msgid "Specify which methods users can use to authenticate (e.g., Local Password, TOTP, OIDC)."
+msgstr "ユーザーが認証に使用できる方式を指定します（例: ローカルパスワード、TOTP、OIDC）。"
+
+msgid "Application Route"
+msgstr "アプリケーションルート"
+
+msgid "A Route defines a path prefix within this Application that requires a specific Access Policy."
+msgstr "ルートは、このアプリケーション内で特定のアクセスポリシーを必要とするパス接頭辞を定義します。"
+
+msgid "Gatekeeper User"
+msgstr "ゲートキーパーユーザー"
+
+msgid "Gatekeeper users are used for authenticating against protected applications managed by this gateway."
+msgstr "ゲートキーパーユーザーは、このゲートウェイで管理される保護対象アプリケーションへの認証に使用されます。"
+
+msgid "Required when creating a user. When editing, leave both password fields blank to keep the current password.\n        Passwords are stored using <strong>Argon2id</strong> hashing."
+msgstr "ユーザー作成時は必須です。編集時に現在のパスワードを維持する場合は、両方のパスワード欄を空のままにしてください。\n        パスワードは <strong>Argon2id</strong> ハッシュで保存されます。"
+
+msgid "Authentication Types"
+msgstr "認証種別"
+
+msgid "Select how users will authenticate through this method."
+msgstr "この方式でユーザーがどのように認証するかを選択します。"
+
+msgid "Users will authenticate using a standard username and password stored locally. Only one of this type can be created."
+msgstr "ユーザーはローカルに保存された通常のユーザー名とパスワードで認証します。この種類は 1 つだけ作成できます。"
+
+msgid "Users will authenticate via an external identity provider (like Keycloak or Google). Requires Provider URL, Client ID, and Client Secret."
+msgstr "ユーザーは Keycloak や Google などの外部 ID プロバイダーで認証します。プロバイダー URL、クライアント ID、クライアントシークレットが必要です。"
+
+msgid "TOTP (Time-Based One-Time Password)"
+msgstr "TOTP（時間ベースのワンタイムパスワード）"
+
+msgid "Manage specific IP addresses or networks that are allowed or denied access when using the IP Address List authentication method."
+msgstr "IP アドレスリスト認証方式を使用する際に、アクセスを許可または拒否する特定の IP アドレスやネットワークを管理します。"
+
+msgid "IP Address & Prefix"
+msgstr "IP アドレスとプレフィックス"
+
+msgid "Enter a single IP address (e.g., 192.168.1.50) or a network address. Use the prefix length for CIDR notation (e.g., 24 for a /24 network). Leave prefix blank for a single host (/32 for IPv4, /128 for IPv6)."
+msgstr "単一の IP アドレス（例: 192.168.1.50）またはネットワークアドレスを入力します。CIDR 表記にはプレフィックス長を使用します（例: /24 ネットワークなら 24）。単一ホストの場合は空欄にします（IPv4 は /32、IPv6 は /128）。"
+
+msgid "An optional note to help identify this entry (e.g., \"Office Network\", \"Blocked Attacker\")."
+msgstr "この項目を識別しやすくするための任意のメモです（例: \"Office Network\", \"Blocked Attacker\"）。"
+
+msgid "API Keys allow external applications to interact with the WireGuard WebAdmin API."
+msgstr "API キーにより、外部アプリケーションが WireGuard WebAdmin API と連携できます。"
+
+msgid "Token:"
+msgstr "トークン:"
+
+msgid "Allowed Instances:"
+msgstr "許可されたインスタンス:"
+
+msgid "Permissions:"
+msgstr "権限:"
+
+msgid "Welcome to Your VPN Setup"
+msgstr "VPN 設定へようこそ"
+
+msgid "Begin by downloading the WireGuard app for your device using one of the links below."
+msgstr "下記リンクから、お使いのデバイス用の WireGuard アプリをダウンロードしてください。"
+
+msgid "Once installed, you can either <strong>scan the QR code</strong> or <strong>download the configuration file</strong> to quickly import your settings and start using your secure VPN connection."
+msgstr "インストール後、<strong>QR コードをスキャン</strong>するか、<strong>設定ファイルをダウンロード</strong>して設定を取り込み、安全な VPN 接続を開始できます。"
+
+msgid "Authentication Required"
+msgstr "認証が必要です"
+
+msgid "Enter Password:"
+msgstr "パスワードを入力:"
+
+msgid "VPN Configuration"
+msgstr "VPN 設定"
+
+msgid "Server:"
+msgstr "サーバー:"
+
+msgid "Download Config"
+msgstr "設定をダウンロード"
+
+msgid "Database settings updated"
+msgstr "データベース設定を更新しました"
+
+msgid "The following modifications have been applied to your database:"
+msgstr "以下の変更がデータベースに適用されました:"
+
+msgid "Patch"
+msgstr "パッチ"
+
+msgid "Field"
+msgstr "フィールド"
+
+msgid "Value"
+msgstr "値"
+
+msgid "Objects"
+msgstr "オブジェクト"
+
+msgid "Reason"
+msgstr "理由"
+
+msgid "Configure Peer Allowed IP"
+msgstr "ピアの許可 IP を設定"
+
+msgid "Firewall migration required"
+msgstr "ファイアウォールの移行が必要です"
+
+msgid "This is a recommended filter list"
+msgstr "推奨フィルターリストです"
+
+msgid "Not source"
+msgstr "送信元ではない"
+
+msgid "Not destination"
+msgstr "宛先ではない"
+
+msgid "Not state"
+msgstr "状態ではない"
+
+msgid "Include peer networks"
+msgstr "ピアのネットワークを含める"
+
+msgid "User Authentication"
+msgstr "ユーザー認証"
+
+msgid "OIDC (OpenID Connect)"
+msgstr "OIDC (OpenID Connect)"
+
+msgid "Show QR Code"
+msgstr "QR コードを表示"
+
+msgid "Submit"
+msgstr "送信"
+
+msgid "Denied"
+msgstr "拒否"
+
+msgid "The client is not configured to use the VPN as the default gateway.\\n\\nOnly the specific networks listed below are routed through the VPN.\\n\\nNote: These routes are not automatically pushed to the client. You will need to manually update the client configuration file to reflect these settings."
+msgstr "クライアントは VPN をデフォルトゲートウェイとして使用する設定ではありません。\\n\\n以下に表示された特定のネットワークのみが VPN 経由でルーティングされます。\\n\\n注: これらのルートはクライアントへ自動的には配布されません。設定を反映するには、クライアント設定ファイルを手動で更新する必要があります。"
+
+msgid "SMTP Settings"
+msgstr "SMTP 設定"
+
+msgid "None (Insecure)"
+msgstr "なし（安全ではありません）"
+
+msgid "No authentication (Insecure)"
+msgstr "認証なし（安全ではありません）"
+
+msgid "SSL"
+msgstr "SSL"
+
+msgid "TLS"
+msgstr "TLS"

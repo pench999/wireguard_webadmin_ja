@@ -98,18 +98,18 @@
 <body>
 <div class="container">
     {% if not authenticated %}
-        <h1>Authentication Required</h1>
+        <h1>{% trans 'Authentication Required' %}</h1>
         {% if error %}
             <div class="error">{{ error }}</div>
         {% endif %}
         <form method="post">
             {% csrf_token %}
-            <label for="password">Enter Password:</label>
+            <label for="password">{% trans 'Enter Password:' %}</label>
             <input type="password" name="password" id="password" required>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary">{% trans 'Submit' %}</button>
         </form>
     {% else %}
-        <h1>VPN Configuration</h1>
+        <h1>{% trans 'VPN Configuration' %}</h1>
         <div class="instructions">
             {{ invite_settings.download_instructions|safe }}
         </div>
@@ -132,7 +132,7 @@
         </div>
         {% if cluster_settings and servers|length > 1 %}
         <div style="text-align: center; margin-bottom: 15px;">
-            <label for="server_select">Server:</label>
+            <label for="server_select">{% trans 'Server:' %}</label>
             <select id="server_select" style="padding: 5px; border-radius: 4px; border: 1px solid #ccc;">
                 {% for server in servers %}
                 <option value="{{ server.uuid }}">{{ server.name }}</option>
@@ -141,8 +141,8 @@
         </div>
         {% endif %}
         <div class="button-group">
-            <a href="/invite/download_config/?token={{ peer_invite.uuid }}&password={{ password }}" target="_blank" class="btn btn-primary" id="downloadConfigButton">Download Config</a>
-            <a href="#" id="viewQrButton" class="btn btn-secondary"{% if not peer_invite.peer.private_key %} style="opacity: 0.5; cursor: not-allowed;"{% endif %}>View QR Code</a>
+            <a href="/invite/download_config/?token={{ peer_invite.uuid }}&password={{ password }}" target="_blank" class="btn btn-primary" id="downloadConfigButton">{% trans 'Download Config' %}</a>
+            <a href="#" id="viewQrButton" class="btn btn-secondary"{% if not peer_invite.peer.private_key %} style="opacity: 0.5; cursor: not-allowed;"{% endif %}>{% trans 'View QR Code' %}</a>
         </div>
         <div class="qr-code" id="qrCodeContainer">
             <!-- QR Code will be loaded here when the button is clicked -->

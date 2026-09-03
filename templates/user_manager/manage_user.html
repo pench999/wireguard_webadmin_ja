@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block content %}
 <div class="container mt-3">
     <div class="card card-primary card-outline">
         <div class="card-header">
-            <h3 class="card-title">{{ form.instance.pk|yesno:"Edit User,Create New User" }}</h3>
+            <h3 class="card-title">{{ form.instance.pk|yesno:_("Edit User,Create New User") }}</h3>
         </div>
         <div class="card-body">
 <div class="row">
@@ -50,20 +51,20 @@
     
     <div class="col-md-8">
         
-        <h5>Debugging Analyst</h5>
-        <p>Access to basic system information and logs for troubleshooting. No access to modify settings or view sensitive data such as peer keys.</p>
+        <h5>{% trans 'Debugging Analyst' %}</h5>
+        <p>{% trans 'Access to basic system information and logs for troubleshooting. No access to modify settings or view sensitive data such as peer keys.' %}</p>
 
-        <h5>View Only User</h5>
-        <p>Full view access, including peer keys and configuration files. Cannot modify any settings or configurations.</p>
+        <h5>{% trans 'View Only User' %}</h5>
+        <p>{% trans 'Full view access, including peer keys and configuration files. Cannot modify any settings or configurations.' %}</p>
 
-        <h5>Peer Manager</h5>
-        <p>Permissions to add, edit, and remove peers and IP addresses. Does not include access to modify WireGuard instance configurations or higher-level settings.</p>
+        <h5>{% trans 'Peer Manager' %}</h5>
+        <p>{% trans 'Permissions to add, edit, and remove peers and IP addresses. Does not include access to modify WireGuard instance configurations or higher-level settings.' %}</p>
 
-        <h5>Wireguard Manager</h5>
-        <p>Authority to add, edit, and remove configurations of WireGuard instances.</p>
+        <h5>{% trans 'Wireguard Manager' %}</h5>
+        <p>{% trans 'Authority to add, edit, and remove configurations of WireGuard instances.' %}</p>
 
-        <h5>Administrator</h5>
-        <p>Full access across the system. Can view and modify all settings, configurations and manage users. </p>
+        <h5>{% trans 'Administrator' %}</h5>
+        <p>{% trans 'Full access across the system. Can view and modify all settings, configurations and manage users.' %}</p>
 
     </div>
 
