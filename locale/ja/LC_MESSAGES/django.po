@@ -1654,11 +1654,11 @@ msgstr "ダークモード切替"
 
 #: templates/accounts/logout.html:11
 msgid "You have been successfully logged out."
-msgstr "You have been successfully logged out."
+msgstr "ログアウトしました。"
 
 #: templates/accounts/logout.html:14
 msgid "Login again"
-msgstr "Login again"
+msgstr "もう一度ログイン"
 
 #: templates/api_v2/api_documentation.html:33
 msgid "Authentication"
@@ -3950,3 +3950,6 @@ msgstr "このクライアントは VPN をデフォルトゲートウェイと�
 #: wireguard_peer/views.py templates/wireguard/peer_list/script_vpn_invite.html
 msgid "The client is configured to use the VPN as the default gateway. \n\nThis setting routes all client internet traffic through the VPN, enhancing privacy and security across all connections."
 msgstr "このクライアントは VPN をデフォルトゲートウェイとして使用する設定です。\n\nこの設定では、クライアントのすべてのインターネット通信が VPN 経由でルーティングされ、接続全体のプライバシーとセキュリティが高まります。"
+#: templates/accounts/logout.html templates/accounts/login.html accounts/views.py
+msgid "Login disabled|Login form is disabled. Check integration settings."
+msgstr "ログインは無効です|ログインフォームは無効です。連携設定を確認してください。"
