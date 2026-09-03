@@ -1927,7 +1927,7 @@ msgstr "状態"
 #: templates/wireguard/peer_list/peer_data.html:43
 #: templates/wireguard/peer_list/peer_preview_modal.html:28
 msgid "Location"
-msgstr "Location"
+msgstr "場所"
 
 #: templates/cluster/workers_list.html:12
 msgid "Last Seen"
@@ -2348,7 +2348,7 @@ msgstr "スケジュール可視化"
 #: templates/wireguard/apply_route_template.html:44
 #: templates/wireguard/wireguard_manage_peer.html:36
 msgid "Active"
-msgstr "アクティブ"
+msgstr "有効"
 
 #: templates/scheduler/scheduleprofile_form.html:71
 #: templates/scheduler/scheduleprofile_form.html:82
@@ -2459,7 +2459,7 @@ msgstr "ユーザー管理"
 #: templates/wireguard/peer_list/peer_preview_modal.html:133
 #: vpn_invite/views.py:37
 msgid "VPN Invite"
-msgstr "VPN招待"
+msgstr "VPN 招待"
 
 #: templates/user_manager/list.html:9 user_manager/forms.py:20
 msgid "User Level"
@@ -2528,7 +2528,7 @@ msgstr "招待設定"
 
 #: templates/wireguard/apply_route_template.html:8 wireguard_peer/views.py:350
 msgid "Apply Route Template"
-msgstr "ルーティングテンプレートを適用"
+msgstr "ルートテンプレートを適用"
 
 #: templates/wireguard/apply_route_template.html:13
 msgid "Select a routing template to apply to the peer"
@@ -2536,7 +2536,7 @@ msgstr "ピアに適用するルーティングテンプレートを選択して
 
 #: templates/wireguard/apply_route_template.html:16
 msgid "Current Active Template:"
-msgstr "現在の有効テンプレート:"
+msgstr "現在有効なテンプレート:"
 
 #: templates/wireguard/apply_route_template.html:26
 msgid "Template Name"
@@ -2544,7 +2544,7 @@ msgstr "テンプレート名"
 
 #: templates/wireguard/apply_route_template.html:48
 msgid "Unlink"
-msgstr "リンク解除"
+msgstr "解除"
 
 #: templates/wireguard/apply_route_template.html:55
 msgid "No routing templates available for this interface."
@@ -2573,7 +2573,7 @@ msgstr "プライマリサーバー"
 #: templates/wireguard/peer_list/peer_data.html:47
 #: templates/wireguard/peer_list/peer_preview_modal.html:24
 msgid "Latest Handshake"
-msgstr "最新ハンドシェイク"
+msgstr "最終ハンドシェイク"
 
 #: templates/wireguard/peer_list/peer_data.html:61
 #: templates/wireguard/peer_list/peer_preview_modal.html:32
@@ -2593,7 +2593,7 @@ msgstr "ピア通信量"
 #: templates/wireguard/peer_list/peer_preview_modal.html:61
 #: templates/wireguard/wireguard_manage_peer.html:152
 msgid "No traffic history, please wait a few minutes"
-msgstr "通信履歴がありません。数分お待ちください。"
+msgstr "通信履歴がありません。数分待ってから確認してください"
 
 #: templates/wireguard/peer_list/peer_preview_modal.html:69
 msgid "Close QR Code"
@@ -2605,23 +2605,23 @@ msgstr "VPN 招待の詳細"
 
 #: templates/wireguard/peer_list/peer_preview_modal.html:88
 msgid "Expires on"
-msgstr "Expires on"
+msgstr "有効期限"
 
 #: templates/wireguard/peer_list/peer_preview_modal.html:90
 msgid "Refresh Invite"
-msgstr "Refresh Invite"
+msgstr "招待を更新"
 
 #: templates/wireguard/peer_list/peer_preview_modal.html:94
 msgid "Enter Email or WhatsApp Number"
-msgstr "Enter Email or WhatsApp Number"
+msgstr "メールアドレスまたは WhatsApp 番号を入力"
 
 #: templates/wireguard/peer_list/peer_preview_modal.html:96
 msgid "Email or phone number"
-msgstr "Email or phone number"
+msgstr "メールアドレスまたは電話番号"
 
 #: templates/wireguard/peer_list/peer_preview_modal.html:100
 msgid "Copy Text"
-msgstr "Copy Text"
+msgstr "テキストをコピー"
 
 #: templates/wireguard/peer_list/peer_preview_modal.html:106
 msgid "WhatsApp"
@@ -2633,11 +2633,11 @@ msgstr "閉じる"
 
 #: templates/wireguard/peer_list/peer_preview_modal.html:125
 msgid "Config"
-msgstr "Config"
+msgstr "設定"
 
 #: templates/wireguard/peer_list/peer_preview_modal.html:129
 msgid "QR Code"
-msgstr "QR Code"
+msgstr "QR コード"
 
 #: templates/wireguard/peer_list/peer_preview_modal.html:145
 msgid "Server"
@@ -2645,80 +2645,80 @@ msgstr "サーバー"
 
 #: templates/wireguard/peer_list/script_peer_extras_toggle.html:7
 msgid "Hide extras"
-msgstr "Hide extras"
+msgstr "詳細情報を非表示"
 
 #: templates/wireguard/peer_list/script_peer_extras_toggle.html:10
 #: templates/wireguard/wireguard_peer_list.html:39
 msgid "Show extras"
-msgstr "Show extras"
+msgstr "詳細情報を表示"
 
 #: templates/wireguard/peer_list/script_peer_modal.html:50
 msgid "This configuration does not contain a private key. You must add the private key manually in your client before using it."
-msgstr "This configuration does not contain a private key. You must add the private key manually in your client before using it."
+msgstr "この設定には秘密鍵が含まれていません。使用する前に、クライアント側で秘密鍵を手動で追加する必要があります。"
 
 #: templates/wireguard/peer_list/script_vpn_invite.html:36
 #: templates/wireguard/peer_list/script_vpn_invite.html:170
 msgid "Access Password"
-msgstr "Access Password"
+msgstr "アクセスパスワード"
 
 #: templates/wireguard/peer_list/script_vpn_invite.html:36
 #: templates/wireguard/peer_list/script_vpn_invite.html:170
 msgid "(Share this password via a separate secure channel)"
-msgstr "(Share this password via a separate secure channel)"
+msgstr "(このパスワードは別の安全な経路で共有してください)"
 
 #: templates/wireguard/peer_list/script_vpn_invite.html:39
 msgid "Unknown error"
-msgstr "Unknown error"
+msgstr "不明なエラー"
 
 #: templates/wireguard/peer_list/script_vpn_invite.html:43
 msgid "Error creating invite."
-msgstr "Error creating invite."
+msgstr "招待の作成中にエラーが発生しました。"
 
 #: templates/wireguard/peer_list/script_vpn_invite.html:80
 msgid "Invite text copied to clipboard."
-msgstr "Invite text copied to clipboard."
+msgstr "招待文をクリップボードにコピーしました。"
 
 #: templates/wireguard/peer_list/script_vpn_invite.html:82
 msgid "Failed to copy text."
-msgstr "Failed to copy text."
+msgstr "テキストのコピーに失敗しました。"
 
 #: templates/wireguard/peer_list/script_vpn_invite.html:85
 msgid "Clipboard API not supported."
-msgstr "Clipboard API not supported."
+msgstr "Clipboard API はサポートされていません。"
 
 #: templates/wireguard/peer_list/script_vpn_invite.html:94
 msgid "Please enter a valid phone number for WhatsApp."
-msgstr "Please enter a valid phone number for WhatsApp."
+msgstr "WhatsApp 用の有効な電話番号を入力してください。"
 
 #: templates/wireguard/peer_list/script_vpn_invite.html:106
 #: templates/wireguard/peer_list/script_vpn_invite.html:152
 msgid "Invite data is not available."
-msgstr "Invite data is not available."
+msgstr "招待データを利用できません。"
 
 #: templates/wireguard/peer_list/script_vpn_invite.html:115
 msgid "Please enter a valid email address."
-msgstr "Please enter a valid email address."
+msgstr "有効なメールアドレスを入力してください。"
 
 #: templates/wireguard/peer_list/script_vpn_invite.html:137
 msgid "Error sending email."
-msgstr "Error sending email."
+msgstr "メール送信中にエラーが発生しました。"
 
 #: templates/wireguard/peer_list/script_vpn_invite.html:172
 msgid "Invite refreshed."
-msgstr "Invite refreshed."
+msgstr "招待を更新しました。"
 
 #: templates/wireguard/peer_list/script_vpn_invite.html:174
 #: templates/wireguard/peer_list/script_vpn_invite.html:178
 msgid "Error refreshing invite."
-msgstr "Error refreshing invite."
+msgstr "招待の更新中にエラーが発生しました。"
 
 #: templates/wireguard/peer_list/script_vpn_invite.html:193
 msgid "No invite data available to refresh."
-msgstr "No invite data available to refresh."
+msgstr "更新できる招待データがありません。"
 
 #: templates/wireguard/peer_list/script_vpn_invite.html:213
 msgid "Error closing invite:"
-msgstr "Error closing invite:"
+msgstr "招待を閉じる処理でエラーが発生しました:"
 
 #: templates/wireguard/peer_list/script_wireguard_status_update.html:267
 msgid "This address does not appear in the wg show command output, likely indicating that another peer has an IP overlapping this network or that the configuration file is outdated."
@@ -2781,47 +2781,47 @@ msgstr "Please type \\\"delete\\\" to remove this IP address."
 
 #: templates/wireguard/wireguard_manage_peer.html:8
 msgid "Peer Configuration"
-msgstr "Peer Configuration"
+msgstr "ピア設定"
 
 #: templates/wireguard/wireguard_manage_peer.html:27
 msgid "Peer State"
-msgstr "Peer State"
+msgstr "ピア状態"
 
 #: templates/wireguard/wireguard_manage_peer.html:31
 msgid "Suspended"
-msgstr "Suspended"
+msgstr "停止中"
 
 #: templates/wireguard/wireguard_manage_peer.html:40
 msgid "Scheduled suspend"
-msgstr "Scheduled suspend"
+msgstr "停止予定"
 
 #: templates/wireguard/wireguard_manage_peer.html:43
 msgid "Scheduled unsuspend"
-msgstr "Scheduled unsuspend"
+msgstr "再有効化予定"
 
 #: templates/wireguard/wireguard_manage_peer.html:54
 msgid "Peer Schedule"
-msgstr "Peer Schedule"
+msgstr "ピアスケジュール"
 
 #: templates/wireguard/wireguard_manage_peer.html:60
 msgid "Disabled by schedule"
-msgstr "Disabled by schedule"
+msgstr "スケジュールにより無効"
 
 #: templates/wireguard/wireguard_manage_peer.html:62
 msgid "Next enable"
-msgstr "Next enable"
+msgstr "次回有効化"
 
 #: templates/wireguard/wireguard_manage_peer.html:65
 msgid "Enabled by schedule"
-msgstr "Enabled by schedule"
+msgstr "スケジュールにより有効"
 
 #: templates/wireguard/wireguard_manage_peer.html:67
 msgid "Next disable"
-msgstr "Next disable"
+msgstr "次回無効化"
 
 #: templates/wireguard/wireguard_manage_peer.html:71
 msgid "No profile associated"
-msgstr "No profile associated"
+msgstr "関連付けられたプロファイルはありません"
 
 #: templates/wireguard/wireguard_manage_peer.html:83 wireguard_peer/forms.py:41
 msgid "Persistent Keepalive"
@@ -2843,20 +2843,20 @@ msgstr "Pre-Shared Key"
 
 #: templates/wireguard/wireguard_manage_peer.html:166
 msgid "AllowedIPs at Peer section of wg"
-msgstr "AllowedIPs at Peer section of wg"
+msgstr "wg の Peer セクションにある AllowedIPs: wg"
 
 #: templates/wireguard/wireguard_manage_peer.html:167
 msgid "Peer IP Addresses and networks"
-msgstr "Peer IP Addresses and networks"
+msgstr "ピア IP アドレスとネットワーク"
 
 #: templates/wireguard/wireguard_manage_peer.html:185
 #: templates/wireguard/wireguard_manage_peer.html:274
 msgid "Main ip address"
-msgstr "Main ip address"
+msgstr "メイン IP アドレス"
 
 #: templates/wireguard/wireguard_manage_peer.html:200
 msgid "AllowedIPs at client configuration file"
-msgstr "AllowedIPs at client configuration file"
+msgstr "クライアント設定ファイル内の AllowedIPs"
 
 #: templates/wireguard/wireguard_manage_peer.html:201
 msgid "Client Routing"
@@ -2965,20 +2965,20 @@ msgstr "\n                                Enforces routing rules defined by rout
 
 #: templates/wireguard/wireguard_peer_list.html:33
 msgid "Are you sure you want to create a new peer?"
-msgstr "Are you sure you want to create a new peer?"
+msgstr "新しいピアを作成してもよろしいですか？"
 
 #: templates/wireguard/wireguard_peer_list.html:34
 #: templates/wireguard/wireguard_peer_list.html:37
 msgid "Create Peer"
-msgstr "Create Peer"
+msgstr "ピアを作成"
 
 #: templates/wireguard/wireguard_peer_list.html:43
 msgid "Enabled Peers"
-msgstr "Enabled Peers"
+msgstr "有効なピア"
 
 #: templates/wireguard/wireguard_peer_list.html:48
 msgid "Disabled Peers"
-msgstr "Disabled Peers"
+msgstr "無効なピア"
 
 #: templates/wireguard/wireguard_peer_list.html:61
 msgid "No WireGuard Instances Found"
@@ -3406,31 +3406,31 @@ msgstr "Invalid config file"
 
 #: wireguard_peer/forms.py:125
 msgid "Reactivate now"
-msgstr "Reactivate now"
+msgstr "今すぐ再有効化"
 
 #: wireguard_peer/forms.py:128
 msgid "Suspend now"
-msgstr "Suspend now"
+msgstr "今すぐ停止"
 
 #: wireguard_peer/forms.py:139
 msgid "Schedule"
-msgstr "Schedule"
+msgstr "スケジュール"
 
 #: wireguard_peer/forms.py:143
 msgid "Clear Schedule"
-msgstr "Clear Schedule"
+msgstr "スケジュールをクリア"
 
 #: wireguard_peer/forms.py:181
 msgid "The difference between suspend and unsuspend times must be at least 5 minutes."
-msgstr "The difference between suspend and unsuspend times must be at least 5 minutes."
+msgstr "停止時刻と再有効化時刻の差は 5 分以上にしてください。"
 
 #: wireguard_peer/forms.py:185
 msgid "Scheduled suspension time must be at least 10 minutes in the future."
-msgstr "Scheduled suspension time must be at least 10 minutes in the future."
+msgstr "停止予定時刻は現在から 10 分以上先にしてください。"
 
 #: wireguard_peer/forms.py:188
 msgid "Scheduled unsuspension time must be at least 10 minutes in the future."
-msgstr "Scheduled unsuspension time must be at least 10 minutes in the future."
+msgstr "再有効化予定時刻は現在から 10 分以上先にしてください。"
 
 #: wireguard_peer/functions.py:58
 msgid "Error creating peer|The specified IP address is not available."
@@ -3438,7 +3438,7 @@ msgstr "Error creating peer|The specified IP address is not available."
 
 #: wireguard_peer/functions.py:84 wireguard_peer/views.py:150
 msgid "Peer created|Peer created successfully."
-msgstr "Peer created|Peer created successfully."
+msgstr "ピアを作成しました|ピアを作成しました。"
 
 #: wireguard_peer/functions.py:87
 msgid "Error creating peer|No available IP address found for peer creation."
@@ -3446,7 +3446,7 @@ msgstr "Error creating peer|No available IP address found for peer creation."
 
 #: wireguard_peer/views.py:28
 msgid "Disabled WireGuard Peer List"
-msgstr "Disabled WireGuard Peer List"
+msgstr "無効な WireGuard ピア一覧"
 
 #: wireguard_peer/views.py:31
 msgid "WireGuard Peer List"
@@ -3454,75 +3454,75 @@ msgstr "WireGuard ピア一覧"
 
 #: wireguard_peer/views.py:158
 msgid "Peer not created|Missing instance parameter."
-msgstr "Peer not created|Missing instance parameter."
+msgstr "ピアを作成できません|インスタンスパラメーターがありません。"
 
 #: wireguard_peer/views.py:179
 msgid "Peer deleted|Peer deleted successfully."
-msgstr "Peer deleted|Peer deleted successfully."
+msgstr "ピアを削除しました|ピアを削除しました。"
 
 #: wireguard_peer/views.py:182
 msgid "Error deleting peer|Invalid confirmation message. Type \"delete\" to confirm."
-msgstr "Error deleting peer|Invalid confirmation message. Type \"delete\" to confirm."
+msgstr "ピア削除エラー|確認メッセージが無効です。確認するには \"delete\" と入力してください。"
 
 #: wireguard_peer/views.py:184
 msgid "Peer Configuration: "
-msgstr "Peer Configuration: "
+msgstr "ピア設定: "
 
 #: wireguard_peer/views.py:229
 msgid "Peer updated|Peer updated successfully."
-msgstr "Peer updated|Peer updated successfully."
+msgstr "ピアを更新しました|ピアを更新しました。"
 
 #: wireguard_peer/views.py:232
 msgid "Edit Peer"
-msgstr "Edit Peer"
+msgstr "ピアを編集"
 
 #: wireguard_peer/views.py:234
 msgid "Edit Peer Name"
-msgstr "Edit Peer Name"
+msgstr "ピア名を編集"
 
 #: wireguard_peer/views.py:236
 msgid "Edit Keepalive"
-msgstr "Edit Keepalive"
+msgstr "Keepalive を編集"
 
 #: wireguard_peer/views.py:238
 msgid "Edit Keys"
-msgstr "Edit Keys"
+msgstr "キーを編集"
 
 #: wireguard_peer/views.py:270
 msgid "IP address deleted|IP address deleted successfully."
-msgstr "IP address deleted|IP address deleted successfully."
+msgstr "IP アドレスを削除しました|IP アドレスを削除しました。"
 
 #: wireguard_peer/views.py:275
 msgid "Error deleting IP address|Invalid confirmation message. Type \"delete\" to confirm."
-msgstr "Error deleting IP address|Invalid confirmation message. Type \"delete\" to confirm."
+msgstr "IP アドレス削除エラー|確認メッセージが無効です。確認するには \"delete\" と入力してください。"
 
 #: wireguard_peer/views.py:280
 msgid "Manage client route"
-msgstr "Manage client route"
+msgstr "クライアントルートを管理"
 
 #: wireguard_peer/views.py:282
 msgid "Manage IP address or Network"
-msgstr "Manage IP address or Network"
+msgstr "IP アドレスまたはネットワークを管理"
 
 #: wireguard_peer/views.py:295
 msgid "IP address updated|IP address updated successfully."
-msgstr "IP address updated|IP address updated successfully."
+msgstr "IP アドレスを更新しました|IP アドレスを更新しました。"
 
 #: wireguard_peer/views.py:297
 msgid "IP address added|IP address added successfully."
-msgstr "IP address added|IP address added successfully."
+msgstr "IP アドレスを追加しました|IP アドレスを追加しました。"
 
 #: wireguard_peer/views.py:329
 msgid "Route template unlinked successfully."
-msgstr "Route template unlinked successfully."
+msgstr "ルートテンプレートの関連付けを解除しました。"
 
 #: wireguard_peer/views.py:339
 msgid "Cannot apply template: This template does not allow custom routes, but the peer has custom client routes defined."
-msgstr "Cannot apply template: This template does not allow custom routes, but the peer has custom client routes defined."
+msgstr "テンプレートを適用できません。このテンプレートはカスタムルートを許可していませんが、ピアにはカスタムクライアントルートが定義されています。"
 
 #: wireguard_peer/views.py:346
 msgid "Route template applied successfully."
-msgstr "Route template applied successfully."
+msgstr "ルートテンプレートを適用しました。"
 
 #: wireguard_peer/views.py:379
 msgid "Peer suspension/unsuspension scheduled successfully."
@@ -3937,3 +3937,16 @@ msgstr "SSL"
 
 msgid "TLS"
 msgstr "TLS"
+
+#: templates/wireguard/peer_list/peer_preview_modal.html
+msgid "Peer Preview"
+msgstr "ピアプレビュー"
+#: templates/wireguard/peer_list/peer_preview_modal.html
+msgid "Please type \"delete\" to remove peer configuration."
+msgstr "ピア設定を削除するには \"delete\" と入力してください。"
+#: wireguard_peer/views.py templates/wireguard/peer_list/script_vpn_invite.html
+msgid "The client is not configured to use the VPN as the default gateway.\n\nOnly the specific networks listed below are routed through the VPN.\n\nNote: These routes are not automatically pushed to the client. You will need to manually update the client configuration file to reflect these settings."
+msgstr "このクライアントは VPN をデフォルトゲートウェイとして使用する設定ではありません。\n\n以下に表示されている特定のネットワークだけが VPN 経由でルーティングされます。\n\n注意: これらのルートはクライアントへ自動配布されません。設定を反映するには、クライアント設定ファイルを手動で更新する必要があります。"
+#: wireguard_peer/views.py templates/wireguard/peer_list/script_vpn_invite.html
+msgid "The client is configured to use the VPN as the default gateway. \n\nThis setting routes all client internet traffic through the VPN, enhancing privacy and security across all connections."
+msgstr "このクライアントは VPN をデフォルトゲートウェイとして使用する設定です。\n\nこの設定では、クライアントのすべてのインターネット通信が VPN 経由でルーティングされ、接続全体のプライバシーとセキュリティが高まります。"
