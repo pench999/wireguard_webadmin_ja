@@ -88,16 +88,16 @@
                     </div>
                     <div class="col-md-8">
                         {% blocktrans %}
-                        <h5>Default Ports</h5>
-                        <p>The default <code>docker-compose.yml</code> file specifies the <b>TCP</b> port range <b>8080-8089</b>. If you wish to change the port forwarding to a different range, you must manually edit the <code>docker-compose.yml</code> file and rerun the Docker Compose step outlined in the <a href="https://github.com/eduardogsilva/wireguard_webadmin?tab=readme-ov-file#deployment">deployment instructions</a>.</p>
-                        <h5>Destination Type: Peer</h5>
-                        <p>Port redirection will prioritize the first Peer IP address assigned a priority of Zero.</p>
-                        <h5>Destination Type: IP Address</h5>
-                        <p>Port forwarding rules will redirect to the specified IP address. Remember to allocate the IP address or network to a Peer.</p>
-                        <h5>Adding a Forward Rule</h5>
-                        <p>Automatically generates a forwarding rule to accommodate stricter firewall settings.</p>
-                        <h5>Masquerade Source</h5>
-                        <p>This serves as a temporary solution when a peer does not use the VPN as its default gateway. It's important to note that this configuration is not recommended, as it alters the source address of all connections to match the IP address of the WireGuard instance.</p>
+                        <h5>デフォルトポート</h5>
+                        <p>標準の <code>docker-compose.yml</code> では、<b>TCP</b> ポート範囲 <b>8080-8089</b> が指定されています。別の範囲へポート転送を変更する場合は、<code>docker-compose.yml</code> を手動で編集し、<a href="https://github.com/eduardogsilva/wireguard_webadmin?tab=readme-ov-file#deployment">デプロイ手順</a>に記載された Docker Compose の手順を再実行してください。</p>
+                        <h5>宛先タイプ: ピア</h5>
+                        <p>ポートリダイレクトは、優先度 0 が割り当てられた最初のピア IP アドレスを優先します。</p>
+                        <h5>宛先タイプ: IP アドレス</h5>
+                        <p>ポート転送ルールは、指定した IP アドレスへ転送します。その IP アドレスまたはネットワークをピアへ割り当てておく必要があります。</p>
+                        <h5>転送ルールの追加</h5>
+                        <p>より厳格なファイアウォール設定に対応するため、転送を許可するルールを自動生成します。</p>
+                        <h5>送信元のマスカレード</h5>
+                        <p>ピアが VPN をデフォルトゲートウェイとして使用しない場合の一時的な対処です。ただし、すべての接続の送信元アドレスが WireGuard インスタンスの IP アドレスに書き換わるため、この設定は推奨されません。</p>
                         {% endblocktrans %}
                     </div>
                 </div>

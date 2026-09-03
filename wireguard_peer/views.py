@@ -112,7 +112,7 @@ def view_wireguard_peer_list(request):
 @login_required
 def view_wireguard_peer_sort(request):
     if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=30).exists():
-            return render(request, 'access_denied.html', {'page_title': 'Access Denied'})
+            return render(request, 'access_denied.html', {'page_title': 'アクセス拒否'})
     peer = get_object_or_404(Peer, uuid=request.GET.get('peer'))
     # check if the current sort order is duplicated with another peer
     if check_sort_order_conflict(peer):
@@ -128,7 +128,7 @@ def view_wireguard_peer_sort(request):
             previous_peer.save()
             sort_order_changed = True
         else:
-            messages.warning(request, 'Cannot move peer up|Peer is already at the top.')
+            messages.warning(request, 'ピアを上へ移動できません|このピアはすでに一番上にあります。')
     elif direction == 'down':
         next_peer = Peer.objects.filter(wireguard_instance=peer.wireguard_instance, sort_order__gt=peer.sort_order).order_by('sort_order').first()
         if next_peer:
@@ -137,7 +137,7 @@ def view_wireguard_peer_sort(request):
             next_peer.save()
             sort_order_changed = True
         else:
-            messages.warning(request, 'Cannot move peer down|Peer is already at the bottom.')
+            messages.warning(request, 'ピアを下へ移動できません|このピアはすでに一番下にあります。')
 
     if sort_order_changed:
         # check if the new sort order is duplicated with another peer
@@ -149,7 +149,7 @@ def view_wireguard_peer_sort(request):
 
 def view_wireguard_peer_create(request):
     if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=30).exists():
-        return render(request, 'access_denied.html', {'page_title': 'Access Denied'})
+        return render(request, 'access_denied.html', {'page_title': 'アクセス拒否'})
     user_acl = get_object_or_404(UserAcl, user=request.user)
 
     if request.GET.get('instance'):
@@ -175,7 +175,7 @@ def view_wireguard_peer_create(request):
 @login_required
 def view_wireguard_peer_manage(request):
     if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=20).exists():
-        return render(request, 'access_denied.html', {'page_title': 'Access Denied'})
+        return render(request, 'access_denied.html', {'page_title': 'アクセス拒否'})
     user_acl = get_object_or_404(UserAcl, user=request.user)
 
     current_peer = get_object_or_404(Peer, uuid=request.GET.get('peer'))
@@ -184,7 +184,7 @@ def view_wireguard_peer_manage(request):
     current_instance = current_peer.wireguard_instance
     if request.GET.get('action') == 'delete':
         if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=30).exists():
-            return render(request, 'access_denied.html', {'page_title': 'Access Denied'})
+            return render(request, 'access_denied.html', {'page_title': 'アクセス拒否'})
         if request.GET.get('confirmation') == 'delete':
             current_peer.delete()
             messages.success(request, _('Peer deleted|Peer deleted successfully.'))
@@ -195,7 +195,7 @@ def view_wireguard_peer_manage(request):
         else:
             messages.warning(request, _('Error deleting peer|Invalid confirmation message. Type "delete" to confirm.'))
             return redirect('/peer/manage/?peer=' + str(current_peer.uuid))
-    page_title = _('Peer Configuration: ') + str(current_peer)
+    page_title = _('ピア設定: ') + str(current_peer)
     peer_ip_list = current_peer.peerallowedip_set.filter(config_file='server').order_by('priority')
     peer_client_ip_list = current_peer.peerallowedip_set.filter(config_file='client').order_by('priority')
     
@@ -216,7 +216,7 @@ def view_wireguard_peer_manage(request):
 @login_required
 def view_wireguard_peer_edit_field(request):
     if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=30).exists():
-        return render(request, 'access_denied.html', {'page_title': 'Access Denied'})
+        return render(request, 'access_denied.html', {'page_title': 'アクセス拒否'})
     user_acl = get_object_or_404(UserAcl, user=request.user)
     
     current_peer = get_object_or_404(Peer, uuid=request.GET.get('peer'))
@@ -261,7 +261,7 @@ def view_wireguard_peer_edit_field(request):
 
 def view_manage_ip_address(request):
     if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=30).exists():
-        return render(request, 'access_denied.html', {'page_title': 'Access Denied'})
+        return render(request, 'access_denied.html', {'page_title': 'アクセス拒否'})
 
     user_acl = get_object_or_404(UserAcl, user=request.user)
     config_file = request.GET.get('config', 'server')
@@ -326,7 +326,7 @@ def view_manage_ip_address(request):
 @login_required
 def view_apply_route_template(request):
     if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=30).exists():
-        return render(request, 'access_denied.html', {'page_title': 'Access Denied'})
+        return render(request, 'access_denied.html', {'page_title': 'アクセス拒否'})
     
     user_acl = get_object_or_404(UserAcl, user=request.user)
     current_peer = get_object_or_404(Peer, uuid=request.GET.get('peer'))
@@ -376,7 +376,7 @@ def view_apply_route_template(request):
 @login_required
 def view_wireguard_peer_suspend(request):
     if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=30).exists():
-        return render(request, 'access_denied.html', {'page_title': 'Access Denied'})
+        return render(request, 'access_denied.html', {'page_title': 'アクセス拒否'})
     
     user_acl = get_object_or_404(UserAcl, user=request.user)
     current_peer = get_object_or_404(Peer, uuid=request.GET.get('peer'))
@@ -449,7 +449,7 @@ def view_wireguard_peer_suspend(request):
 @login_required
 def view_wireguard_peer_schedule_profile(request):
     if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=30).exists():
-        return render(request, 'access_denied.html', {'page_title': 'Access Denied'})
+        return render(request, 'access_denied.html', {'page_title': 'アクセス拒否'})
     
     user_acl = get_object_or_404(UserAcl, user=request.user)
     current_peer = get_object_or_404(Peer, uuid=request.GET.get('peer'))

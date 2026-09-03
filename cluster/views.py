@@ -80,20 +80,20 @@ def worker_manage(request):
     form_description = {
         'size': 'col-lg-6',
         'content': _('''
-        <h5>Worker Configuration</h5>
-        <p>Configure a cluster worker node that will synchronize with this primary instance.</p>
+        <h5>ワーカー設定</h5>
+        <p>このプライマリインスタンスと同期するクラスタワーカーノードを設定します。</p>
         
-        <h5>Name</h5>
-        <p>A unique name to identify this worker.</p>
+        <h5>名前</h5>
+        <p>このワーカーを識別するための一意な名前です。</p>
         
-        <h5>IP Address</h5>
-        <p>The IP address of the worker node. Leave empty if IP lock is disabled.</p>
+        <h5>IP アドレス</h5>
+        <p>ワーカーノードの IP アドレスです。IP ロックを無効にする場合は空欄のままにします。</p>
         
-        <h5>IP Lock</h5>
-        <p>When enabled, the worker can only connect from the specified IP address.</p>
+        <h5>IP ロック</h5>
+        <p>有効にすると、ワーカーは指定した IP アドレスからのみ接続できます。</p>
         
-        <h5>Location Information</h5>
-        <p>Optional location details for this worker (country, city, hostname).</p>
+        <h5>ロケーション情報</h5>
+        <p>このワーカーの任意のロケーション情報です (国、都市、ホスト名)。</p>
         ''')
     }
     
@@ -133,17 +133,17 @@ def cluster_settings(request):
     form_description = {
         'size': 'col-lg-6',
         'content': _('''
-        <h5>Cluster Mode</h5>
-        <p>Configure how the cluster operates and synchronizes configurations between nodes.</p>
+        <h5>クラスタモード</h5>
+        <p>クラスタの動作方法と、ノード間で設定を同期する方法を設定します。</p>
         
-        <h5>Sync Intervals</h5>
-        <p>Configure how frequently statistics and cache data are synchronized between cluster nodes.</p>
+        <h5>同期間隔</h5>
+        <p>統計情報とキャッシュデータをクラスタノード間で同期する頻度を設定します。</p>
         
-        <h5>Restart Mode</h5>
-        <p>Choose whether WireGuard services should be automatically restarted when configurations change, or if manual intervention is required.</p>
+        <h5>再起動モード</h5>
+        <p>設定変更時に WireGuard サービスを自動再起動するか、手動対応を必要とするかを選択します。</p>
         
-        <h5>Worker Display</h5>
-        <p>Select how workers should be identified in the interface - by name, server address, location, or a combination.</p>
+        <h5>ワーカー表示</h5>
+        <p>インターフェース上でワーカーを名前、サーバーアドレス、ロケーション、またはその組み合わせのどれで識別するかを選択します。</p>
         ''')
     }
     

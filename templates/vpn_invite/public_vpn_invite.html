@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="robots" content="noindex, noarchive">
-    <title>{% if authenticated %}VPN Invite{% else %}Authentication Required{% endif %}</title>
+    <title>{% if authenticated %}VPN 招待{% else %}認証が必要です{% endif %}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -98,7 +98,7 @@
 <body>
 <div class="container">
     {% if not authenticated %}
-        <h1>{% trans 'Authentication Required' %}</h1>
+        <h1>{% trans '認証が必要です' %}</h1>
         {% if error %}
             <div class="error">{{ error }}</div>
         {% endif %}
@@ -191,7 +191,7 @@
 
         downloadConfigButton.addEventListener("click", function (event) {
             if (!hasPrivateKey) {
-                if (!confirm("This configuration does not contain a private key. You must add the private key manually in your client before using it.")) {
+                if (!confirm("この設定には秘密鍵が含まれていません。使用する前に、クライアント側で秘密鍵を手動で追加する必要があります。")) {
                     event.preventDefault();
                     return false;
                 }

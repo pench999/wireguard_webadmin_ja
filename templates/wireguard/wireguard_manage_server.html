@@ -25,56 +25,56 @@
                         <h5>{% trans "Display Name" %}</h5>
                         <p>
                             {% blocktrans %}
-                                Optional name used only for display in the web interface.
+                                Web インターフェース上の表示にのみ使用する任意の名前です。
                             {% endblocktrans %}
                         </p>
                         <h5>{% trans "Web Refresh Interval" %}</h5>
                         <p>
                             {% blocktrans %}
-                                Interval used to refresh WireGuard status information in the web UI.
+                                Web UI で WireGuard の状態情報を更新する間隔です。
                             {% endblocktrans %}
                         </p>
                         <h5>{% trans "Public Address" %}</h5>
                         <p>
                             {% blocktrans %}
-                                Public hostname or IP address and UDP port used by peers to connect.
+                                ピアが接続に使用する公開ホスト名または IP アドレスと UDP ポートです。
                                 <br>
-                                The <b>listen port</b> must be exposed and mapped in your Docker compose (YAML) file.
+                                <b>待ち受けポート</b>は Docker compose (YAML) ファイルで公開し、マッピングしておく必要があります。
                             {% endblocktrans %}
                         </p>
                         <h5>{% trans "Interface Keys" %}</h5>
                         <p>
                             {% blocktrans %}
-                                WireGuard private and public keys for this interface.
+                                このインターフェースで使用する WireGuard の秘密鍵と公開鍵です。
                                 <br>
-                                The private key must remain secret.
-                                Changing it requires updating all peer configurations.
+                                秘密鍵は外部へ公開しないでください。
+                                変更した場合は、すべてのピア設定を更新する必要があります。
                             {% endblocktrans %}
                         </p>
                         <h5>{% trans "Internal Network" %}</h5>
                         <p>
                             {% blocktrans %}
-                                Internal IP address and netmask used by the WireGuard interface.
+                                WireGuard インターフェースで使用する内部 IP アドレスとネットマスクです。
                             {% endblocktrans %}
                         </p>
                         <h5>{% trans "DNS Configuration" %}</h5>
                         <p>
                             {% blocktrans %}
-                                DNS servers pushed to peers.
+                                ピアへ配布する DNS サーバーです。
                                 <br>
-                                Using the internal IP as primary DNS enables internal name resolution
-                                and DNS filtering.
+                                内部 IP をプライマリ DNS として使用すると、内部名前解決
+                                および DNS フィルタリングを利用できます。
                             {% endblocktrans %}
                         </p>
                         <h5>{% trans "Enforce Route Policy" %}</h5>
                         <p>
                             {% blocktrans %}
-                                Enforces routing rules defined by routing templates using firewall rules.
+                                ルーティングテンプレートで定義したルーティングルールを、ファイアウォールルールで強制します。
                                 <br>
-                                Peers with a default route (0.0.0.0/0) are not restricted.
+                                デフォルトルート (0.0.0.0/0) を持つピアは制限されません。
                                 <br><br>
-                                Note: depending on the number of routes and peers, this option may generate
-                                a large number of firewall rules.
+                                注意: ルート数やピア数によっては、このオプションにより
+                                大量のファイアウォールルールが生成される場合があります。
                             {% endblocktrans %}
                         </p>
                     </div>

@@ -55,7 +55,7 @@ msgstr "トークンを再生成"
 
 #: api_v2/forms.py:37
 msgid "Are you sure you want to regenerate the token? The old token will stop working immediately."
-msgstr "Are you sure you want to regenerate the token? The old token will stop working immediately."
+msgstr "トークンを再生成してもよろしいですか？古いトークンはすぐに使用できなくなります。"
 
 #: api_v2/forms.py:63 app_gateway/forms.py:41 app_gateway/forms.py:99
 #: app_gateway/forms.py:144 app_gateway/forms.py:162 app_gateway/forms.py:241
@@ -136,7 +136,7 @@ msgstr "アクセス拒否"
 
 #: api_v2/views.py:19 templates/template_parts/base_sidebar.html:126
 msgid "API Keys"
-msgstr "APIキー"
+msgstr "API キー"
 
 #: api_v2/views.py:32
 msgid "Edit API Key: "
@@ -197,19 +197,19 @@ msgstr "キャンセル"
 
 #: app_gateway/forms.py:55
 msgid "This upstream is reserved by the system."
-msgstr "This upstream is reserved by the system."
+msgstr "このアップストリームはシステムで予約されています。"
 
 #: app_gateway/forms.py:58
 msgid "Upstream URL cannot contain spaces."
-msgstr "Upstream URL cannot contain spaces."
+msgstr "アップストリーム URL に空白は使用できません。"
 
 #: app_gateway/forms.py:64
 msgid "Enter a valid upstream URL starting with http:// or https://"
-msgstr "Enter a valid upstream URL starting with http:// or https://"
+msgstr "http:// または https:// で始まる有効なアップストリーム URL を入力してください。"
 
 #: app_gateway/forms.py:66
 msgid "Upstream must be a bare host address with no path, query or fragment. Use http://host or http://host:port"
-msgstr "Upstream must be a bare host address with no path, query or fragment. Use http://host or http://host:port"
+msgstr "アップストリームはパス、クエリ、フラグメントを含まないホストアドレスにしてください。http://host または http://host:port を使用します。"
 
 #: app_gateway/forms.py:76 cluster/forms.py:24 dns/forms.py:65
 #: templates/app_gateway/app_gateway_list.html:109
@@ -221,7 +221,7 @@ msgstr "ホスト名"
 
 #: app_gateway/forms.py:84
 msgid "Hostname contains invalid characters."
-msgstr "Hostname contains invalid characters."
+msgstr "ホスト名に使用できない文字が含まれています。"
 
 #: app_gateway/forms.py:114 templates/app_gateway/app_gateway_list.html:147
 msgid "Policy Type"
@@ -237,27 +237,27 @@ msgstr "認証方式"
 
 #: app_gateway/forms.py:196
 msgid "Cannot select more than one Local Password authentication method."
-msgstr "Cannot select more than one Local Password authentication method."
+msgstr "ローカルパスワード認証方式は 2 つ以上選択できません。"
 
 #: app_gateway/forms.py:200
 msgid "Cannot select more than one OpenID Connect (OIDC) authentication method."
-msgstr "Cannot select more than one OpenID Connect (OIDC) authentication method."
+msgstr "OpenID Connect (OIDC) 認証方式は 2 つ以上選択できません。"
 
 #: app_gateway/forms.py:204
 msgid "Cannot select more than one TOTP authentication method."
-msgstr "Cannot select more than one TOTP authentication method."
+msgstr "TOTP 認証方式は 2 つ以上選択できません。"
 
 #: app_gateway/forms.py:208
 msgid "Cannot select both Local Password and OpenID Connect (OIDC) authentication methods."
-msgstr "Cannot select both Local Password and OpenID Connect (OIDC) authentication methods."
+msgstr "ローカルパスワード認証方式と OpenID Connect (OIDC) 認証方式は同時に選択できません。"
 
 #: app_gateway/forms.py:212
 msgid "At least one user group must be selected when using Local Password authentication."
-msgstr "At least one user group must be selected when using Local Password authentication."
+msgstr "ローカルパスワード認証を使用する場合は、少なくとも 1 つのユーザーグループを選択してください。"
 
 #: app_gateway/forms.py:216
 msgid "User groups can only be used with Local Password authentication."
-msgstr "User groups can only be used with Local Password authentication."
+msgstr "ユーザーグループはローカルパスワード認証でのみ使用できます。"
 
 #: app_gateway/forms.py:226 templates/app_gateway/app_gateway_list.html:70
 #: templates/app_gateway/application_details.html:39
@@ -283,19 +283,19 @@ msgstr "順序"
 
 #: app_gateway/forms.py:299
 msgid "Path prefix must start with /."
-msgstr "Path prefix must start with /."
+msgstr "パスプレフィックスは / で始めてください。"
 
 #: app_gateway/forms.py:301
 msgid "Path prefix cannot contain spaces."
-msgstr "Path prefix cannot contain spaces."
+msgstr "パスプレフィックスに空白は使用できません。"
 
 #: app_gateway/forms.py:303
 msgid "Path prefix contains invalid characters."
-msgstr "Path prefix contains invalid characters."
+msgstr "パスプレフィックスに使用できない文字が含まれています。"
 
 #: app_gateway/forms.py:308
 msgid "This path prefix is reserved by the system."
-msgstr "This path prefix is reserved by the system."
+msgstr "このパスプレフィックスはシステムで予約されています。"
 
 #: app_gateway/models.py:14
 msgid "Upstream address, e.g.: http://10.188.18.27:3000"
@@ -327,7 +327,7 @@ msgstr "アプリケーション詳細"
 
 #: app_gateway/views.py:90 app_gateway/views.py:174 app_gateway/views.py:204
 msgid "The WireGuard WebAdmin application cannot be modified."
-msgstr "The WireGuard WebAdmin application cannot be modified."
+msgstr "WireGuard WebAdmin アプリケーションは変更できません。"
 
 #: app_gateway/views.py:92 templates/app_gateway/application_details.html:16
 #: templates/app_gateway/application_details.html:23
@@ -348,7 +348,7 @@ msgstr "<h5>アプリケーション</h5>\n        <p>ゲートウェイ経由�
 
 #: app_gateway/views.py:137
 msgid "The WireGuard WebAdmin application cannot be deleted."
-msgstr "The WireGuard WebAdmin application cannot be deleted."
+msgstr "WireGuard WebAdmin アプリケーションは削除できません。"
 
 #: app_gateway/views.py:142
 msgid "Application deleted successfully."
@@ -387,7 +387,7 @@ msgstr "アプリケーションホストを削除"
 #: app_gateway/views.py:216
 #, python-format
 msgid "Are you sure you want to delete the host \"%(hostname)s\"?"
-msgstr "Are you sure you want to delete the host \"%(hostname)s\"?"
+msgstr "ホスト \"%(hostname)s\" を削除してもよろしいですか？"
 
 #: app_gateway/views.py:227
 #: templates/app_gateway/access_policy_type_select.html:9
@@ -424,7 +424,7 @@ msgstr "アクセスポリシーを削除しました。"
 
 #: app_gateway/views.py:308
 msgid "Cannot delete this Access Policy because it is currently in use by an Application Route or Application Default Policy."
-msgstr "Cannot delete this Access Policy because it is currently in use by an Application Route or Application Default Policy."
+msgstr "このアクセスポリシーはアプリケーションルートまたはアプリケーションのデフォルトポリシーで使用中のため削除できません。"
 
 #: app_gateway/views.py:313
 msgid "Delete Access Policy"
@@ -433,7 +433,7 @@ msgstr "アクセスポリシーを削除"
 #: app_gateway/views.py:315
 #, python-format
 msgid "Are you sure you want to delete the access policy \"%(name)s\"?"
-msgstr "Are you sure you want to delete the access policy \"%(name)s\"?"
+msgstr "アクセスポリシー \"%(name)s\" を削除してもよろしいですか？"
 
 #: app_gateway/views.py:331
 msgid "Edit Application Default Policy"
@@ -453,12 +453,12 @@ msgstr "アプリケーション既定ポリシーを削除しました。"
 
 #: app_gateway/views.py:372
 msgid "Delete Application Default Policy"
-msgstr "Delete Application Default Policy"
+msgstr "アプリケーションのデフォルトポリシーを削除"
 
 #: app_gateway/views.py:374
 #, python-format
 msgid "Are you sure you want to remove the default policy for \"%(name)s\"?"
-msgstr "Are you sure you want to remove the default policy for \"%(name)s\"?"
+msgstr "\"%(name)s\" のデフォルトポリシーを解除してもよろしいですか？"
 
 #: app_gateway/views.py:392
 msgid "Edit Application Route"
@@ -487,7 +487,7 @@ msgstr "アプリケーションルートを削除"
 #: app_gateway/views.py:450
 #, python-format
 msgid "Are you sure you want to delete the route \"%(name)s\" (%(path)s)?"
-msgstr "Are you sure you want to delete the route \"%(name)s\" (%(path)s)?"
+msgstr "ルート \"%(name)s\" (%(path)s) を削除してもよろしいですか？"
 
 #: app_gateway/views.py:468
 msgid "Configuration export is not available because Caddy is not enabled. To use App Gateway and Gatekeeper, start the application using docker-compose-caddy.yml."
@@ -522,11 +522,11 @@ msgstr "市区町村"
 
 #: cluster/forms.py:82
 msgid "A worker with that name already exists."
-msgstr "A worker with that name already exists."
+msgstr "同じ名前のワーカーが既に存在します。"
 
 #: cluster/forms.py:85
 msgid "IP Address is required when IP Lock is enabled."
-msgstr "IP Address is required when IP Lock is enabled."
+msgstr "IP ロックが有効な場合は IP アドレスが必要です。"
 
 #: cluster/forms.py:97
 msgid "Cluster Enabled"
@@ -550,7 +550,7 @@ msgstr "ワーカー表示"
 
 #: cluster/forms.py:136
 msgid "Cluster mode requires WireGuard status cache to be enabled."
-msgstr "Cluster mode requires WireGuard status cache to be enabled."
+msgstr "クラスタモードを使用するには WireGuard ステータスキャッシュを有効にする必要があります。"
 
 #: cluster/models.py:46
 msgid "IP lock is enabled, but the worker is attempting to access from a different IP address."
@@ -582,11 +582,11 @@ msgstr "ワーカーを編集: "
 
 #: cluster/views.py:57
 msgid "Worker deleted|Worker deleted: "
-msgstr "Worker deleted|Worker deleted: "
+msgstr "ワーカーを削除しました|ワーカーを削除しました: "
 
 #: cluster/views.py:60
 msgid "Worker not deleted|Invalid confirmation."
-msgstr "Worker not deleted|Invalid confirmation."
+msgstr "ワーカーは削除されませんでした|確認内容が無効です。"
 
 #: cluster/views.py:64 templates/cluster/workers_list.html:87
 msgid "Add Worker"
@@ -594,11 +594,11 @@ msgstr "ワーカーを追加"
 
 #: cluster/views.py:75
 msgid "Worker updated|Worker updated: "
-msgstr "Worker updated|Worker updated: "
+msgstr "ワーカーを更新しました|ワーカーを更新しました: "
 
 #: cluster/views.py:77
 msgid "Worker created|Worker created: "
-msgstr "Worker created|Worker created: "
+msgstr "ワーカーを作成しました|ワーカーを作成しました: "
 
 #: cluster/views.py:82
 msgid "\n        <h5>Worker Configuration</h5>\n        <p>Configure a cluster worker node that will synchronize with this primary instance.</p>\n        \n        <h5>Name</h5>\n        <p>A unique name to identify this worker.</p>\n        \n        <h5>IP Address</h5>\n        <p>The IP address of the worker node. Leave empty if IP lock is disabled.</p>\n        \n        <h5>IP Lock</h5>\n        <p>When enabled, the worker can only connect from the specified IP address.</p>\n        \n        <h5>Location Information</h5>\n        <p>Optional location details for this worker (country, city, hostname).</p>\n        "
@@ -634,7 +634,7 @@ msgstr "WireGuard show"
 
 #: console/views.py:40
 msgid "Enhanced filter is enabled. This command is not available."
-msgstr "Enhanced filter is enabled. This command is not available."
+msgstr "拡張フィルターが有効です。このコマンドは使用できません。"
 
 #: console/views.py:46
 msgid "Memory usage"
@@ -723,7 +723,7 @@ msgstr "DNS設定を適用しました"
 
 #: dns/views.py:84
 msgid "Default DNS Filter List created successfully"
-msgstr "Default DNS Filter List created successfully"
+msgstr "デフォルト DNS フィルターリストを作成しました"
 
 #: dns/views.py:87
 msgid "Pending Changes|There are pending DNS changes that have not been applied"
@@ -735,7 +735,7 @@ msgstr "DNSフォワーダ"
 
 #: dns/views.py:107
 msgid "All DNS queries will be forwarded to the primary resolver. If the primary resolver is not available, the secondary resolver will be used."
-msgstr "All DNS queries will be forwarded to the primary resolver. If the primary resolver is not available, the secondary resolver will be used."
+msgstr "すべての DNS クエリはプライマリリゾルバーへ転送されます。プライマリリゾルバーが利用できない場合は、セカンダリリゾルバーが使用されます。"
 
 #: dns/views.py:134
 msgid "Static DNS deleted successfully"
@@ -743,7 +743,7 @@ msgstr "静的DNSを削除しました"
 
 #: dns/views.py:137
 msgid "Static DNS not deleted|Invalid confirmation"
-msgstr "Static DNS not deleted|Invalid confirmation"
+msgstr "静的 DNS は削除されませんでした|確認内容が無効です"
 
 #: dns/views.py:147
 msgid "Static DNS saved successfully"
@@ -751,19 +751,19 @@ msgstr "静的DNSを保存しました"
 
 #: dns/views.py:170
 msgid "DNS Filter List not deleted | Filter List is enabled"
-msgstr "DNS Filter List not deleted | Filter List is enabled"
+msgstr "DNS フィルターリストは削除されませんでした | フィルターリストが有効です"
 
 #: dns/views.py:177
 msgid "Error removing config file: "
-msgstr "Error removing config file: "
+msgstr "設定ファイルの削除エラー: "
 
 #: dns/views.py:180
 msgid "DNS Filter List deleted successfully"
-msgstr "DNS Filter List deleted successfully"
+msgstr "DNS フィルターリストを削除しました"
 
 #: dns/views.py:183
 msgid "DNS Filter List not deleted | Invalid confirmation"
-msgstr "DNS Filter List not deleted | Invalid confirmation"
+msgstr "DNS フィルターリストは削除されませんでした | 確認内容が無効です"
 
 #: dns/views.py:195
 msgid "DNS Filter List saved successfully"
@@ -771,19 +771,19 @@ msgstr "DNSフィルターリストを保存しました"
 
 #: dns/views.py:222
 msgid "Failed to read existing config file: "
-msgstr "Failed to read existing config file: "
+msgstr "既存の設定ファイルの読み込みに失敗しました: "
 
 #: dns/views.py:240
 msgid "Failed to fetch the host list: "
-msgstr "Failed to fetch the host list: "
+msgstr "ホストリストの取得に失敗しました: "
 
 #: dns/views.py:250
 msgid "Failed to write config file: "
-msgstr "Failed to write config file: "
+msgstr "設定ファイルの書き込みに失敗しました: "
 
 #: dns/views.py:273
 msgid "DNS Filter List disabled | Unsupported format detected"
-msgstr "DNS Filter List disabled | Unsupported format detected"
+msgstr "DNS フィルターリストを無効化しました | 未対応の形式を検出しました"
 
 #: dns/views.py:286
 msgid "DNS Filter List updated successfully"
@@ -791,11 +791,11 @@ msgstr "DNSフィルターリストを更新しました"
 
 #: dns/views.py:300
 msgid "DNS Filter List not enabled | Unsupported format"
-msgstr "DNS Filter List not enabled | Unsupported format"
+msgstr "DNS フィルターリストは有効化されませんでした | 未対応の形式です"
 
 #: dns/views.py:302
 msgid "DNS Filter List not enabled | List has not been downloaded yet"
-msgstr "DNS Filter List not enabled | List has not been downloaded yet"
+msgstr "DNS フィルターリストは有効化されませんでした | リストがまだダウンロードされていません"
 
 #: dns/views.py:307
 msgid "DNS Filter List enabled successfully"
@@ -803,7 +803,7 @@ msgstr "DNSフィルターリストを有効化しました"
 
 #: dns/views.py:309
 msgid "DNS Filter List not enabled | No valid hosts found"
-msgstr "DNS Filter List not enabled | No valid hosts found"
+msgstr "DNS フィルターリストは有効化されませんでした | 有効なホストが見つかりません"
 
 #: dns/views.py:314
 msgid "DNS Filter List disabled successfully"
@@ -815,24 +815,24 @@ msgstr "ポートは必須です。"
 
 #: firewall/forms.py:44
 msgid "Port 8000 (tcp) is reserved for wireguard-webadmin."
-msgstr "Port 8000 (tcp) is reserved for wireguard-webadmin."
+msgstr "ポート 8000 (tcp) は wireguard-webadmin 用に予約されています。"
 
 #: firewall/forms.py:48
 #, python-format
 msgid "Port %s is already in use by another WireGuard instance."
-msgstr "Port %s is already in use by another WireGuard instance."
+msgstr "ポート %s は別の WireGuard インスタンスで既に使用されています。"
 
 #: firewall/forms.py:51
 msgid "Invalid Destination. Either Peer or IP Address must be informed."
-msgstr "Invalid Destination. Either Peer or IP Address must be informed."
+msgstr "宛先が無効です。ピアまたは IP アドレスのどちらかを指定してください。"
 
 #: firewall/forms.py:54
 msgid "Peer and IP Address cannot be selected at the same time."
-msgstr "Peer and IP Address cannot be selected at the same time."
+msgstr "ピアと IP アドレスは同時に選択できません。"
 
 #: firewall/forms.py:57
 msgid "IP Address cannot be used without selecting a WireGuard instance."
-msgstr "IP Address cannot be used without selecting a WireGuard instance."
+msgstr "WireGuard インスタンスを選択せずに IP アドレスを使用することはできません。"
 
 #: firewall/forms.py:81
 msgid "wg+ (Any WireGuard Interface)"
@@ -997,7 +997,7 @@ msgstr "ポート転送ルールを削除しました"
 
 #: firewall/views.py:44
 msgid "Error deleting Port Forward rule|Confirmation did not match. Port Forward rule was not deleted."
-msgstr "Error deleting Port Forward rule|Confirmation did not match. Port Forward rule was not deleted."
+msgstr "ポート転送ルールの削除エラー|確認内容が一致しません。ポート転送ルールは削除されませんでした。"
 
 #: firewall/views.py:54
 msgid "Port Forward rule saved successfully"
@@ -1017,7 +1017,7 @@ msgstr "ファイアウォールルールを削除しました"
 
 #: firewall/views.py:113
 msgid "Error deleting Firewall rule|Confirmation did not match. Firewall rule was not deleted."
-msgstr "Error deleting Firewall rule|Confirmation did not match. Firewall rule was not deleted."
+msgstr "ファイアウォールルールの削除エラー|確認内容が一致しません。ファイアウォールルールは削除されませんでした。"
 
 #: firewall/views.py:125
 msgid "Firewall rule saved successfully"
@@ -1025,11 +1025,11 @@ msgstr "ファイアウォールルールを保存しました"
 
 #: firewall/views.py:157
 msgid "Manage Firewall Settings"
-msgstr "Manage Firewall Settings"
+msgstr "ファイアウォール設定の管理"
 
 #: firewall/views.py:173
 msgid "Firewall settings saved successfully"
-msgstr "Firewall settings saved successfully"
+msgstr "ファイアウォール設定を保存しました"
 
 #: gatekeeper/forms.py:18 templates/accounts/login.html:23
 #: templates/vpn_invite/invite_settings.html:19 user_manager/forms.py:14
@@ -1073,63 +1073,63 @@ msgstr "TOTP シークレット"
 
 #: gatekeeper/forms.py:88
 msgid "Password is required."
-msgstr "Password is required."
+msgstr "パスワードが必要です。"
 
 #: gatekeeper/forms.py:91 user_manager/forms.py:127
 msgid "Password must be at least 8 characters long."
-msgstr "Password must be at least 8 characters long."
+msgstr "パスワードは 8 文字以上にしてください。"
 
 #: gatekeeper/forms.py:93
 msgid "Password must contain at least one lowercase letter."
-msgstr "Password must contain at least one lowercase letter."
+msgstr "パスワードには小文字を 1 文字以上含めてください。"
 
 #: gatekeeper/forms.py:95
 msgid "Password must contain at least one uppercase letter."
-msgstr "Password must contain at least one uppercase letter."
+msgstr "パスワードには大文字を 1 文字以上含めてください。"
 
 #: gatekeeper/forms.py:97
 msgid "Password must contain at least one number."
-msgstr "Password must contain at least one number."
+msgstr "パスワードには数字を 1 文字以上含めてください。"
 
 #: gatekeeper/forms.py:99
 msgid "Passwords do not match."
-msgstr "Passwords do not match."
+msgstr "パスワードが一致しません。"
 
 #: gatekeeper/forms.py:104 gatekeeper/forms.py:276
 msgid "Please provide a PIN to validate the TOTP secret."
-msgstr "Please provide a PIN to validate the TOTP secret."
+msgstr "TOTP シークレットを検証するための PIN を入力してください。"
 
 #: gatekeeper/forms.py:109 gatekeeper/forms.py:281
 msgid "Invalid TOTP PIN."
-msgstr "Invalid TOTP PIN."
+msgstr "TOTP PIN が無効です。"
 
 #: gatekeeper/forms.py:111 gatekeeper/forms.py:283
 msgid "Invalid TOTP secret format. Must be a valid Base32 string."
-msgstr "Invalid TOTP secret format. Must be a valid Base32 string."
+msgstr "TOTP シークレット形式が無効です。有効な Base32 文字列を指定してください。"
 
 #: gatekeeper/forms.py:131 templates/gatekeeper/gatekeeper_list.html:121
 msgid "Group Name"
-msgstr "Group Name"
+msgstr "グループ名"
 
 #: gatekeeper/forms.py:132 templates/gatekeeper/gatekeeper_list.html:122
 msgid "Members"
-msgstr "Members"
+msgstr "メンバー"
 
 #: gatekeeper/forms.py:169
 msgid "Session Expiration"
-msgstr "Session Expiration"
+msgstr "セッション有効期限"
 
 #: gatekeeper/forms.py:175
 msgid "Unit"
-msgstr "Unit"
+msgstr "単位"
 
 #: gatekeeper/forms.py:176
 msgid "Hour(s)"
-msgstr "Hour(s)"
+msgstr "時間"
 
 #: gatekeeper/forms.py:176
 msgid "Day(s)"
-msgstr "Day(s)"
+msgstr "日"
 
 #: gatekeeper/forms.py:189
 msgid "Authentication Type"
@@ -1153,39 +1153,39 @@ msgstr "OIDC Client Secret"
 
 #: gatekeeper/forms.py:257
 msgid "TOTP secret must be empty for Local Password authentication."
-msgstr "TOTP secret must be empty for Local Password authentication."
+msgstr "ローカルパスワード認証では TOTP シークレットを空にしてください。"
 
 #: gatekeeper/forms.py:259
 msgid "TOTP validation PIN must be empty for Local Password authentication."
-msgstr "TOTP validation PIN must be empty for Local Password authentication."
+msgstr "ローカルパスワード認証では TOTP 検証 PIN を空にしてください。"
 
 #: gatekeeper/forms.py:261
 msgid "OIDC fields must be empty for Local Password authentication."
-msgstr "OIDC fields must be empty for Local Password authentication."
+msgstr "ローカルパスワード認証では OIDC 項目を空にしてください。"
 
 #: gatekeeper/forms.py:267
 msgid "Only one Local Password authentication method can be configured."
-msgstr "Only one Local Password authentication method can be configured."
+msgstr "ローカルパスワード認証方式は 1 つだけ設定できます。"
 
 #: gatekeeper/forms.py:270
 msgid "OIDC fields must be empty for TOTP authentication."
-msgstr "OIDC fields must be empty for TOTP authentication."
+msgstr "TOTP 認証では OIDC 項目を空にしてください。"
 
 #: gatekeeper/forms.py:272
 msgid "TOTP secret is required for TOTP authentication."
-msgstr "TOTP secret is required for TOTP authentication."
+msgstr "TOTP 認証には TOTP シークレットが必要です。"
 
 #: gatekeeper/forms.py:285
 msgid "OIDC authentication is temporarily unavailable and will be available soon."
-msgstr "OIDC authentication is temporarily unavailable and will be available soon."
+msgstr "OIDC 認証は一時的に利用できません。近日中に利用可能になる予定です。"
 
 #: gatekeeper/forms.py:287
 msgid "TOTP secret must be empty for OIDC authentication."
-msgstr "TOTP secret must be empty for OIDC authentication."
+msgstr "OIDC 認証では TOTP シークレットを空にしてください。"
 
 #: gatekeeper/forms.py:289
 msgid "TOTP validation PIN must be empty for OIDC authentication."
-msgstr "TOTP validation PIN must be empty for OIDC authentication."
+msgstr "OIDC 認証では TOTP 検証 PIN を空にしてください。"
 
 #: gatekeeper/forms.py:314 gatekeeper/forms.py:375 gatekeeper/forms.py:406
 msgid "Authentication Method"
@@ -1204,7 +1204,7 @@ msgstr "実行"
 #: gatekeeper/forms.py:332
 #, python-format
 msgid "Prefix length for IPv%(version)d must be between 0 and %(max)d."
-msgstr "Prefix length for IPv%(version)d must be between 0 and %(max)d."
+msgstr "IPv%(version)d のプレフィックス長は 0 から %(max)d の間にしてください。"
 
 #: gatekeeper/forms.py:376 templates/gatekeeper/gatekeeper_list.html:238
 msgid "Domain"
@@ -2199,7 +2199,7 @@ msgstr "Reseting the firewall to default will remove all rules and settings. Are
 
 #: templates/firewall/manage_redirect_rule.html:40
 msgid "Destination Type"
-msgstr "Destination Type"
+msgstr "宛先タイプ"
 
 #: templates/firewall/manage_redirect_rule.html:42
 #: templates/firewall/manage_redirect_rule.html:48
@@ -2215,7 +2215,7 @@ msgstr "Add Forward Rule (allow)"
 #: templates/firewall/manage_redirect_rule.html:80
 #: templates/firewall/redirect_rule_list.html:17
 msgid "Masquerade Source"
-msgstr "送信元をマスカレード"
+msgstr "送信元のマスカレード"
 
 #: templates/firewall/manage_redirect_rule.html:91
 msgid "\n                        <h5>Default Ports</h5>\n                        <p>The default <code>docker-compose.yml</code> file specifies the <b>TCP</b> port range <b>8080-8089</b>. If you wish to change the port forwarding to a different range, you must manually edit the <code>docker-compose.yml</code> file and rerun the Docker Compose step outlined in the <a href=\"https://github.com/eduardogsilva/wireguard_webadmin?tab=readme-ov-file#deployment\">deployment instructions</a>.</p>\n                        <h5>Destination Type: Peer</h5>\n                        <p>Port redirection will prioritize the first Peer IP address assigned a priority of Zero.</p>\n                        <h5>Destination Type: IP Address</h5>\n                        <p>Port forwarding rules will redirect to the specified IP address. Remember to allocate the IP address or network to a Peer.</p>\n                        <h5>Adding a Forward Rule</h5>\n                        <p>Automatically generates a forwarding rule to accommodate stricter firewall settings.</p>\n                        <h5>Masquerade Source</h5>\n                        <p>This serves as a temporary solution when a peer does not use the VPN as its default gateway. It's important to note that this configuration is not recommended, as it alters the source address of all connections to match the IP address of the WireGuard instance.</p>\n                        "
@@ -2933,7 +2933,7 @@ msgstr "Public Address"
 
 #: templates/wireguard/wireguard_manage_server.html:39
 msgid "\n                                Public hostname or IP address and UDP port used by peers to connect.\n                                <br>\n                                The <b>listen port</b> must be exposed and mapped in your Docker compose (YAML) file.\n                            "
-msgstr "\n                                Public hostname or IP address and UDP port used by peers to connect.\n                                <br>\n                                The <b>listen port</b> must be exposed and mapped in your Docker compose (YAML) file.\n                            "
+msgstr "クライアントが接続に使用する公開ホスト名または IP アドレスです。NAT 配下の場合は、外部から到達できるアドレスを指定してください。"
 
 #: templates/wireguard/wireguard_manage_server.html:45
 msgid "Interface Keys"

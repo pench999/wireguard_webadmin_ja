@@ -82,7 +82,7 @@
 <script>
     function openCommandDialog(element) {
         var command = element.getAttribute('data-command');
-        var confirmation = prompt("Please type '{{ user_acl.user.username }}' to remove this user.");
+        var confirmation = prompt("{{ user_acl.user.username }} を入力すると、このユーザーを削除します。");
         if (confirmation) {
             var url = "?uuid={{ user_acl.uuid }}&action=delete&confirmation=" + encodeURIComponent(confirmation);
             window.location.href = url;

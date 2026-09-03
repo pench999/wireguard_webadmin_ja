@@ -59,11 +59,11 @@ def view_manage_api_key(request):
     form_description = {
         'size': '',
         'content': _('''
-        <h5>API Keys</h5>
-        <p>API Keys allow external applications to interact with the WireGuard WebAdmin API.</p>
-        <p><strong>Token:</strong> The secret token used for authentication. Keep this secure.</p>
-        <p><strong>Allowed Instances:</strong> The WireGuard instances this key can manage. If none are selected, the key has access to ALL instances.</p>
-        <p><strong>Permissions:</strong> specific actions allowed for this key.</p>
+        <h5>API キー</h5>
+        <p>API キーを使うと、外部アプリケーションから WireGuard WebAdmin API を操作できます。</p>
+        <p><strong>トークン:</strong> 認証に使用する秘密トークンです。安全に保管してください。</p>
+        <p><strong>許可インスタンス:</strong> このキーで管理できる WireGuard インスタンスです。未選択の場合、このキーはすべてのインスタンスへアクセスできます。</p>
+        <p><strong>権限:</strong> このキーに許可する具体的な操作です。</p>
         ''')
     }
 

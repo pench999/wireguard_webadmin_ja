@@ -2,10 +2,10 @@
 {% if not caddy_enabled %}
 <div class="alert alert-warning alert-dismissible">
     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-    <h5><i class="icon fas fa-exclamation-triangle"></i> {% trans 'Caddy is not enabled' %}</h5>
-    <p>{% trans 'The App Gateway and Gatekeeper modules require Caddy and the auth-gateway container to be running. Please start the application using <code>docker-compose-caddy.yml</code>.' %}</p>
-    <p>{% trans 'Depending on your custom firewall or proxy rules, the way you access wireguard_webadmin may change slightly after enabling Caddy.' %}</p>
-    <p>{% trans 'Switching to Caddy is simple, but it may require a bit of time and attention to review your current setup.' %}</p>
-    <p>{% trans 'For more information, see the discussion:' %} <a href="https://github.com/eduardogsilva/wireguard_webadmin/discussions/151" target="_blank" rel="noopener noreferrer">🚀 New Feature Release: Auth Gateway, Zero Trust & Caddy Integration</a></p>
+    <h5><i class="icon fas fa-exclamation-triangle"></i> {% trans 'Caddy が有効ではありません' %}</h5>
+    <p>{% trans 'App Gateway と Gatekeeper モジュールを使用するには、Caddy と auth-gateway コンテナが起動している必要があります。<code>docker-compose-caddy.yml</code> を使用してアプリケーションを起動してください。' %}</p>
+    <p>{% trans '独自のファイアウォールやプロキシルールによっては、Caddy 有効化後に wireguard_webadmin へのアクセス方法が少し変わる場合があります。' %}</p>
+    <p>{% trans 'Caddy への切り替えは簡単ですが、現在の構成を確認するために多少の時間と注意が必要になる場合があります。' %}</p>
+    <p>{% trans '詳細はディスカッションを参照してください:' %} <a href="https://github.com/eduardogsilva/wireguard_webadmin/discussions/151" target="_blank" rel="noopener noreferrer">新機能リリース: Auth Gateway、Zero Trust、Caddy 統合</a></p>
 </div>
 {% endif %}

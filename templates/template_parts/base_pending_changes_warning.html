@@ -3,7 +3,7 @@
     <div class="alert alert-warning" role="alert">
         <h4 class="alert-heading">{% trans 'Update Required' %}</h4>
         <p>
-            {% trans 'Your WireGuard settings have been modified. To apply these changes, please update the configuration and reload the WireGuard service.' %}
+            {% trans 'WireGuard 設定が変更されています。変更を反映するには、設定を更新して WireGuard サービスを再読み込みしてください。' %}
         </p>
         <p>
             <a
@@ -12,7 +12,7 @@
                     {% else %}
                         href="#" class="btn btn-secondary disabled"
                     {% endif %}
-            ><i class="fa fa-check"></i>{% trans 'Update and restart service' %}</a>
+            ><i class="fa fa-check"></i>{% trans '設定を更新してサービスを再起動' %}</a>
 
             <a
                     {% if user_acl.enable_reload %}
@@ -20,7 +20,7 @@
                     {% else %}
                         href="#" class="btn btn-secondary disabled"
                     {% endif %}
-            >{% trans 'Update and reload service' %}</a>
+            >{% trans '設定を更新してサービスを再読み込み' %}</a>
         </p>
 
     </div>

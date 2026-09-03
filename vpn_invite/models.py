@@ -5,17 +5,17 @@ from django.utils.translation import gettext_lazy as _
 
 from wireguard.models import Peer
 
-DEFAULT_INVITE_MESSAGE = _('''Hello,
+DEFAULT_INVITE_MESSAGE = _('''こんにちは。
 
-You're invited to join our secure WireGuard VPN network. Please click the link below to access your personalized VPN configuration:
+安全な WireGuard VPN ネットワークへの招待です。以下のリンクから、あなた専用の VPN 設定にアクセスしてください。
 
 {invite_url}
 
-Note: This invitation link will expire in {expire_minutes} minutes. If you need a new link after expiration, please request another invite.''')
+注意: この招待リンクは {expire_minutes} 分後に期限切れになります。期限切れ後に新しいリンクが必要な場合は、再度招待を依頼してください。''')
 
-DEFAULT_HTML_MESSAGE = _('''<h2>Welcome to Your VPN Setup</h2>
-<p>Begin by downloading the WireGuard app for your device using one of the links below.</p>
-<p>Once installed, you can either <strong>scan the QR code</strong> or <strong>download the configuration file</strong> to quickly import your settings and start using your secure VPN connection.</p>''')
+DEFAULT_HTML_MESSAGE = _('''<h2>VPN セットアップへようこそ</h2>
+<p>まず、下のリンクからお使いのデバイス用の WireGuard アプリをダウンロードしてください。</p>
+<p>インストール後、<strong>QR コードを読み取る</strong>か、<strong>設定ファイルをダウンロード</strong>することで、すぐに設定を取り込み、安全な VPN 接続を利用できます。</p>''')
 
 class InviteSettings(models.Model):
     name = models.CharField(max_length=16, default='default_settings', unique=True)
@@ -52,13 +52,13 @@ class InviteSettings(models.Model):
     download_3_enabled = models.BooleanField(default=True)
     download_4_enabled = models.BooleanField(default=True)
     download_5_enabled = models.BooleanField(default=True)
-    download_instructions = models.TextField(default=_('Download the WireGuard app for your device using one of the links below. After installation, you can scan the QR code or download the configuration file to import on your device.'))
+    download_instructions = models.TextField(default=_('下のリンクからお使いのデバイス用の WireGuard アプリをダウンロードしてください。インストール後、QR コードを読み取るか設定ファイルをダウンロードして、デバイスへ取り込めます。'))
 
     invite_url = models.URLField(default='')
 
     invite_text_body = models.TextField(default=DEFAULT_INVITE_MESSAGE)
 
-    invite_email_subject = models.CharField(max_length=64, default=_('WireGuard VPN Invite'), blank=True, null=True)
+    invite_email_subject = models.CharField(max_length=64, default=_('WireGuard VPN 招待'), blank=True, null=True)
     invite_email_body = models.TextField(default=DEFAULT_INVITE_MESSAGE)
     invite_email_enabled = models.BooleanField(default=True)
 
