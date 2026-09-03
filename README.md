@@ -36,6 +36,8 @@ docker compose up -d
 
 詳細な手順、アップグレードガイド、設定のヒントは **[wireguard-webadmin.com](https://wireguard-webadmin.com/)** を参照してください。
 
+日本語版の運用補足として、[ピア管理マニュアル](docs/peer_management_ja.md) も用意しています。
+
 ---
 
 ## スクリーンショット
