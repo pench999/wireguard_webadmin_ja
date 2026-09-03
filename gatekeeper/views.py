@@ -71,18 +71,17 @@ def view_manage_gatekeeper_user(request):
     form_description = {
         'size': 'col-lg-6',
         'content': _('''
-        <h4>Gatekeeper User</h4>
-        <p>Gatekeeper users are used for authenticating against protected applications managed by this gateway.</p>
+        <h4>Gatekeeper ユーザー</h4>
+        <p>Gatekeeper ユーザーは、このゲートウェイで管理する保護アプリケーションへの認証に使用します。</p>
 
-        <h5>Password</h5>
-        <p>Required when creating a user. When editing, leave both password fields blank to keep the current password.
-        Passwords are stored using <strong>Argon2id</strong> hashing.</p>
+        <h5>パスワード</h5>
+        <p>ユーザー作成時は必須です。編集時に現在のパスワードを維持する場合は、両方のパスワード欄を空欄にしてください。
+        パスワードは <strong>Argon2id</strong> ハッシュで保存されます。</p>
 
-        <h5>TOTP Secret</h5>
-        <p>Optional per-user TOTP secret. When set, this user will authenticate using their own secret instead of the
-        global TOTP secret configured on the Authentication Method. Use the buttons below the field to generate a
-        random secret and scan the QR code with your authenticator app. Validate the secret by entering the current
-        6-digit PIN before saving.</p>
+        <h5>TOTP シークレット</h5>
+        <p>ユーザーごとに任意で設定できる TOTP シークレットです。設定すると、認証方式に設定されたグローバル TOTP シークレットではなく、
+        このユーザー専用のシークレットで認証します。フィールド下のボタンでランダムシークレットを生成し、認証アプリで QR コードを読み取れます。
+        保存前に現在の 6 桁 PIN を入力してシークレットを検証してください。</p>
         ''')
     }
 
@@ -197,17 +196,17 @@ def view_manage_auth_method(request):
     form_description = {
         'size': '',
         'content': _('''
-        <h4>Authentication Types</h4>
-        <p>Select how users will authenticate through this method.</p>
+        <h4>認証種別</h4>
+        <p>この方式でユーザーがどのように認証するかを選択します。</p>
         
-        <h5>Local Password</h5>
-        <p>Users will authenticate using a standard username and password stored locally. Only one of this type can be created.</p>
+        <h5>ローカルパスワード</h5>
+        <p>ユーザーはローカルに保存された標準のユーザー名とパスワードで認証します。この種別は 1 つだけ作成できます。</p>
         
         <h5>OIDC (OpenID Connect)</h5>
-        <p>Users will authenticate via an external identity provider (like Keycloak or Google). Requires Provider URL, Client ID, and Client Secret.</p>
+        <p>ユーザーは Keycloak や Google などの外部 ID プロバイダー経由で認証します。プロバイダー URL、クライアント ID、クライアントシークレットが必要です。</p>
         
-        <h5>TOTP (Time-Based One-Time Password)</h5>
-        <p>Users will need to enter a rotating token from an authenticator app. If a user does not have a personal TOTP configured, the <strong>Global TOTP Secret</strong> will be used instead. </p>
+        <h5>TOTP (時間ベースのワンタイムパスワード)</h5>
+        <p>ユーザーは認証アプリのローテーション式トークンを入力します。ユーザー個別の TOTP が未設定の場合は、代わりに <strong>グローバル TOTP シークレット</strong> が使用されます。</p>
         ''')
     }
 
@@ -422,18 +421,18 @@ def view_manage_gatekeeper_ip(request):
     form_description = {
         'size': 'col-lg-6',
         'content': _('''
-        <h5>IP Address List</h5>
-        <p>Manage specific IP addresses or networks that are allowed or denied access when using the IP Address List authentication method.</p>
+        <h5>IP アドレスリスト</h5>
+        <p>IP アドレスリスト認証方式を使用する際に、アクセスを許可または拒否する特定の IP アドレスやネットワークを管理します。</p>
         
-        <h5>IP Address & Prefix</h5>
-        <p>Enter a single IP address (e.g., 192.168.1.50) or a network address. Use the prefix length for CIDR notation (e.g., 24 for a /24 network). Leave prefix blank for a single host (/32 for IPv4, /128 for IPv6).</p>
+        <h5>IP アドレスとプレフィックス</h5>
+        <p>単一の IP アドレス (例: 192.168.1.50) またはネットワークアドレスを入力します。CIDR 表記にはプレフィックス長を使用します (例: /24 ネットワークなら 24)。単一ホストの場合は空欄にできます (IPv4 は /32、IPv6 は /128)。</p>
         
-        <h5>Action</h5>
-        <p><strong>Allow</strong>: Grants access to the specified IP/network.<br>
-        <strong>Deny</strong>: Specifically blocks access from the specified IP/network.</p>
+        <h5>アクション</h5>
+        <p><strong>許可</strong>: 指定した IP/ネットワークからのアクセスを許可します。<br>
+        <strong>拒否</strong>: 指定した IP/ネットワークからのアクセスを明示的にブロックします。</p>
         
-        <h5>Description</h5>
-        <p>An optional note to help identify this entry (e.g., "Office Network", "Blocked Attacker").</p>
+        <h5>説明</h5>
+        <p>このエントリを識別しやすくするための任意メモです (例: "オフィスネットワーク", "ブロック対象")。</p>
         ''')
     }
 

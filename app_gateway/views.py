@@ -105,12 +105,12 @@ def view_manage_application(request):
     form_description = {
         'size': 'col-lg-6',
         'content': _('''
-        <h5>Application</h5>
-        <p>Define the main details of the application you want to expose through the gateway.</p>
+        <h5>アプリケーション</h5>
+        <p>ゲートウェイ経由で公開するアプリケーションの主要情報を定義します。</p>
         <ul>
-            <li><strong>Name</strong>: A unique internal identifier for this application (e.g., "wiki", "crm"). Contains only letters, numbers, hyphens, or underscores.</li>
-            <li><strong>Display Name</strong>: A friendly, human-readable name for display purposes.</li>
-            <li><strong>Upstream</strong>: The destination URL where requests will be forwarded (e.g., <code>http://10.188.18.27:3000</code>). Must start with <code>http://</code> or <code>https://</code>.</li>
+            <li><strong>名前</strong>: このアプリケーションの一意な内部識別子です (例: "wiki", "crm")。英数字、ハイフン、アンダースコアのみ使用できます。</li>
+            <li><strong>表示名</strong>: 表示用の、人が読みやすい名前です。</li>
+            <li><strong>アップストリーム</strong>: リクエストの転送先 URL です (例: <code>http://10.188.18.27:3000</code>)。<code>http://</code> または <code>https://</code> で始まる必要があります。</li>
         </ul>
         ''')
     }
@@ -257,27 +257,27 @@ def view_manage_access_policy(request):
         form_description = {
             'size': 'col-lg-6',
             'content': _('''
-            <h5>Public Policy</h5>
-            <p>A Public policy allows access to the application without requiring any authentication.</p>
+            <h5>公開ポリシー</h5>
+            <p>公開ポリシーでは、認証なしでアプリケーションへのアクセスを許可します。</p>
             ''')
         }
     elif policy_type == 'deny':
         form_description = {
             'size': 'col-lg-6',
             'content': _('''
-            <h5>Deny Policy</h5>
-            <p>A Deny policy blocks all access to the matched routes.</p>
+            <h5>拒否ポリシー</h5>
+            <p>拒否ポリシーでは、一致したルートへのすべてのアクセスをブロックします。</p>
             ''')
         }
     else:
         form_description = {
             'size': 'col-lg-6',
             'content': _('''
-            <h5>Protected Policy</h5>
-            <p>A Protected policy requires users to authenticate before accessing the application.</p>
+            <h5>保護ポリシー</h5>
+            <p>保護ポリシーでは、アプリケーションへアクセスする前にユーザー認証が必要です。</p>
             <ul>
-                <li><strong>Allowed Groups</strong>: Limits access to specific user groups. Note: Using groups requires selecting an Authentication Method of type "Local Password".</li>
-                <li><strong>Authentication Methods</strong>: Specify which methods users can use to authenticate (e.g., Local Password, TOTP, OIDC).</li>
+                <li><strong>許可グループ</strong>: 特定のユーザーグループにアクセスを限定します。グループを使用するには、"ローカルパスワード" 種別の認証方式を選択する必要があります。</li>
+                <li><strong>認証方式</strong>: ユーザーが認証に使用できる方式を指定します (例: ローカルパスワード、TOTP、OIDC)。</li>
             </ul>
             ''')
         }
@@ -408,13 +408,13 @@ def view_manage_application_route(request):
     form_description = {
         'size': 'col-lg-6',
         'content': _('''
-        <h5>Application Route</h5>
-        <p>A Route defines a path prefix within this Application that requires a specific Access Policy.</p>
+        <h5>アプリケーションルート</h5>
+        <p>ルートは、このアプリケーション内で特定のアクセスポリシーを必要とするパスプレフィックスを定義します。</p>
         <ul>
-            <li><strong>Route Name</strong>: An internal identifier for this route (e.g., "public_api", "admin_area"). Used for reference and exports.</li>
-            <li><strong>Path Prefix</strong>: The URL path that triggers this route (e.g., <code>/api/</code> or <code>/admin/</code>). Use <code>/</code> to match all remaining paths.</li>
-            <li><strong>Policy</strong>: The Access Policy that will be enforced when a user accesses this path.</li>
-            <li><strong>Order</strong>: Determines the priority of this route when evaluating the request. Lower numbers are evaluated first. If multiple routes match a path, the one with the lowest order wins.</li>
+            <li><strong>ルート名</strong>: このルートの内部識別子です (例: "public_api", "admin_area")。参照やエクスポートに使用されます。</li>
+            <li><strong>パスプレフィックス</strong>: このルートを適用する URL パスです (例: <code>/api/</code> または <code>/admin/</code>)。残りすべてのパスに一致させるには <code>/</code> を使用します。</li>
+            <li><strong>ポリシー</strong>: ユーザーがこのパスへアクセスしたときに適用されるアクセスポリシーです。</li>
+            <li><strong>順序</strong>: リクエスト評価時の優先順位を決定します。数値が小さいルートほど先に評価されます。複数のルートが一致した場合、最も小さい順序のルートが優先されます。</li>
         </ul>
         ''')
     }
