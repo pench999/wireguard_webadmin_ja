@@ -4,8 +4,8 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="genericModalLabel">Modal Title</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <h5 class="modal-title" id="genericModalLabel">{% trans 'Modal Title' %}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="{% trans 'Close' %}">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -14,9 +14,9 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal" id="genericModalCloseButton">
-                    Close
+                    {% trans 'Close' %}
                 </button>
-                <a href="#" class="btn btn-primary" id="genericModalActionButton">Action</a>
+                <a href="#" class="btn btn-primary" id="genericModalActionButton">{% trans 'Action' %}</a>
             </div>
         </div>
     </div>

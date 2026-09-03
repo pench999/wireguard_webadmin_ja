@@ -19,7 +19,7 @@
                 <a href="/peer/list/" class="nav-link {% if '/peer/' in request.path %}active{% endif %}">
                     <i class="fas fa-users-cog nav-icon"></i>
                     <p>
-                        Peers
+                        {% trans 'Peers' %}
                     </p>
                 </a>
             </li>
@@ -48,7 +48,7 @@
                 <a href="/dns/" class="nav-link {% if '/dns/' in request.path %}active{% endif %}">
                     <i class="fas fa-address-book nav-icon"></i>
                     <p>
-                        DNS
+                        {% trans 'DNS' %}
                     </p>
                 </a>
             </li>
@@ -57,7 +57,7 @@
                 <a href="/firewall/rule_list/" class="nav-link {% if '/firewall/' in request.path %}active{% endif %}">
                     <i class="fas fa-shield-alt nav-icon"></i>
                     <p>
-                        Firewall
+                        {% trans 'Firewall' %}
 
                     </p>
                 </a>
@@ -67,7 +67,7 @@
                 <a href="/gatekeeper/" class="nav-link {% if '/gatekeeper/' in request.path %}active{% endif %}">
                     <i class="fas fa-dungeon nav-icon"></i>
                     <p>
-                        Gatekeeper
+                        {% trans 'Gatekeeper' %}
                     </p>
                 </a>
             </li>
@@ -76,7 +76,7 @@
                 <a href="/app_gateway/" class="nav-link {% if '/app_gateway/' in request.path %}active{% endif %}">
                     <i class="fas fa-network-wired nav-icon"></i>
                     <p>
-                        App Gateway
+                        {% trans 'App Gateway' %}
                     </p>
                 </a>
             </li>
@@ -85,7 +85,7 @@
                 <a href="/console/" class="nav-link {% if '/console/' in request.path %}active{% endif %}">
                     <i class="fas fa-terminal nav-icon"></i>
                     <p>
-                        Console
+                        {% trans 'Console' %}
                     </p>
                 </a>
             </li>
@@ -104,7 +104,7 @@
                    class="nav-link {% if '/server/' in request.path %}active{% endif %}">
                     <i class="fas fa-cogs nav-icon"></i>
                     <p>
-                        WireGuard
+                        {% trans 'WireGuard' %}
                     </p>
                 </a>
             </li>

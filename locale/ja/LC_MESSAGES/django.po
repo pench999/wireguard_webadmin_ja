@@ -727,7 +727,7 @@ msgstr "Default DNS Filter List created successfully"
 
 #: dns/views.py:87
 msgid "Pending Changes|There are pending DNS changes that have not been applied"
-msgstr "Pending Changes|There are pending DNS changes that have not been applied"
+msgstr "未適用の変更|未適用の DNS 変更があります"
 
 #: dns/views.py:106
 msgid "DNS Forwarders"
@@ -1199,7 +1199,7 @@ msgstr "Prefix Length"
 #: templates/firewall/manage_firewall_rule.html:360
 #: templates/gatekeeper/gatekeeper_list.html:275
 msgid "Action"
-msgstr "Action"
+msgstr "実行"
 
 #: gatekeeper/forms.py:332
 #, python-format
@@ -1431,7 +1431,7 @@ msgstr "If you find any issues with the translation or would like to request a n
 #: templates/firewall/manage_redirect_rule.html:57
 #: templates/routing_templates/list.html:9
 msgid "WireGuard Instance"
-msgstr "WireGuard Instance"
+msgstr "WireGuard インスタンス"
 
 #: routing_templates/forms.py:30 templates/routing_templates/list.html:24
 msgid "Default Template"
@@ -1439,7 +1439,7 @@ msgstr "Default Template"
 
 #: routing_templates/forms.py:31 templates/routing_templates/list.html:10
 msgid "Route Type"
-msgstr "Route Type"
+msgstr "ルート種別"
 
 #: routing_templates/forms.py:32 routing_templates/models.py:16
 msgid "Custom Routes"
@@ -1515,7 +1515,7 @@ msgstr "Routing Template not deleted|Invalid confirmation."
 
 #: routing_templates/views.py:44 templates/routing_templates/list.html:38
 msgid "Add Routing Template"
-msgstr "Add Routing Template"
+msgstr "ルーティングテンプレートを追加"
 
 #: routing_templates/views.py:58
 msgid "\n        <h5>Routing Templates</h5>\n        <p>Define routing configurations that can be applied to peers.</p>\n        \n        <h5>Default Template</h5>\n        <p>If checked, this template will be the default for the selected WireGuard instance. Only one default template is allowed per instance.</p>\n\n        <h5>Route Type</h5>\n        <p>Select the type of routes to push to the client.</p>\n        <ul>\n            <li><strong>Default Route (0.0.0.0/0)</strong>: Redirects all traffic through the VPN.</li>\n            <li><strong>Routes from Peers on same Interface</strong>: Pushes routes for other peers on the same WireGuard interface.</li>\n            <li><strong>Routes from All Peers</strong>: Pushes routes for all peers across all interfaces.</li>\n            <li><strong>Custom Routes</strong>: Allows you to specify custom CIDR ranges.</li>\n        </ul>\n\n        <h5>Custom Routes</h5>\n        <p>Enter custom routes in CIDR notation, one per line (e.g., 192.168.1.0/24).</p>\n        \n        <h5>Allow Peer Custom Routes</h5>\n        <p>If checked, allows specific peers to add their own custom routes on top of this template.</p>\n        \n        <h5>Enforce Route Policy</h5>\n        <p>If enabled, firewall rules will be applied to strictly enforce this routing policy.<br>The peer will only be able to access networks explicitly defined by the assigned routing template.<br>Any traffic to destinations outside these routes will be blocked.</p>\n        <p>Note: depending on the number of routes and peers, enabling this option may generate a large number of firewall rules.</p>\n        "
@@ -1783,7 +1783,7 @@ msgstr "Access Policies"
 #: templates/app_gateway/app_gateway_list.html:68
 #: templates/dns/static_host_list.html:71
 msgid "Hosts"
-msgstr "Hosts"
+msgstr "ホスト"
 
 #: templates/app_gateway/app_gateway_list.html:44
 #: templates/app_gateway/app_gateway_list.html:50
@@ -1967,12 +1967,12 @@ msgstr "Last seen more than 10 minutes ago or never seen."
 
 #: templates/cluster/workers_list.html:82
 msgid "No workers configured"
-msgstr "No workers configured"
+msgstr "ワーカーが設定されていません"
 
 #: templates/cluster/workers_list.html:89
 #: templates/cluster/workers_list.html:92
 msgid "Cluster Information"
-msgstr "Cluster Information"
+msgstr "クラスタ情報"
 
 #: templates/cluster/workers_list.html:114
 msgid "DNS Version"
@@ -2052,7 +2052,7 @@ msgstr "Destination Hostname or IP Address"
 
 #: templates/dns/static_host_list.html:9
 msgid "Static Host List"
-msgstr "Static Host List"
+msgstr "静的ホスト一覧"
 
 #: templates/dns/static_host_list.html:45
 msgid "Add"
@@ -2069,23 +2069,23 @@ msgstr "適用"
 
 #: templates/dns/static_host_list.html:59
 msgid "DNS Filter Lists"
-msgstr "DNS Filter Lists"
+msgstr "DNS フィルターリスト"
 
 #: templates/dns/static_host_list.html:70
 msgid "Format"
-msgstr "Format"
+msgstr "形式"
 
 #: templates/dns/static_host_list.html:72
 msgid "Last Update"
-msgstr "Last Update"
+msgstr "最終更新"
 
 #: templates/dns/static_host_list.html:126
 msgid "Add Filter List"
-msgstr "Add Filter List"
+msgstr "フィルターリストを追加"
 
 #: templates/firewall/firewall_nav_tabs.html:11
 msgid "Port Forward"
-msgstr "Port Forward"
+msgstr "ポート転送"
 
 #: templates/firewall/firewall_rule_list.html:41
 msgid "Out"
@@ -2094,24 +2094,24 @@ msgstr "Out"
 #: templates/firewall/firewall_rule_list.html:42
 #: templates/firewall/manage_firewall_rule.html:141
 msgid "Source"
-msgstr "Source"
+msgstr "送信元"
 
 #: templates/firewall/firewall_rule_list.html:43
 #: templates/firewall/manage_firewall_rule.html:202
 #: templates/firewall/redirect_rule_list.html:15
 msgid "Destination"
-msgstr "Destination"
+msgstr "宛先"
 
 #: templates/firewall/firewall_rule_list.html:45
 #: templates/firewall/manage_redirect_rule.html:30
 #: templates/firewall/redirect_rule_list.html:14
 #: templates/wireguard/wireguard_status.html:47 vpn_invite/forms.py:284
 msgid "Port"
-msgstr "Port"
+msgstr "ポート"
 
 #: templates/firewall/firewall_rule_list.html:46
 msgid "State"
-msgstr "State"
+msgstr "状態"
 
 #: templates/firewall/firewall_rule_list.html:53
 msgid "Automatic rule: Allow established/related traffic"
@@ -2146,16 +2146,16 @@ msgstr "Automatic Rule: Firewall Settings Instance to Instance"
 
 #: templates/firewall/firewall_rule_list.html:208
 msgid "Create Firewall Rule"
-msgstr "Create Firewall Rule"
+msgstr "ファイアウォールルールを作成"
 
 #: templates/firewall/firewall_rule_list.html:209
 #: templates/firewall/redirect_rule_list.html:59
 msgid "Firewall Settings"
-msgstr "Firewall Settings"
+msgstr "ファイアウォール設定"
 
 #: templates/firewall/firewall_rule_list.html:210
 msgid "Display automatic rules"
-msgstr "Display automatic rules"
+msgstr "自動ルールを表示"
 
 #: templates/firewall/manage_firewall_rule.html:18
 msgid "General"
@@ -2334,11 +2334,11 @@ msgstr "Confirm Delete"
 
 #: templates/routing_templates/list.html:11
 msgid "Default"
-msgstr "Default"
+msgstr "デフォルト"
 
 #: templates/routing_templates/list.html:12
 msgid "Updated"
-msgstr "Updated"
+msgstr "更新日時"
 
 #: templates/scheduler/scheduleprofile_form.html:33
 msgid "Schedule Visualization"
@@ -2417,7 +2417,7 @@ msgstr "ピア"
 
 #: templates/scheduler/scheduleprofile_list.html:36
 msgid "No schedule profiles found."
-msgstr "No schedule profiles found."
+msgstr "スケジュールプロファイルが見つかりません。"
 
 #: templates/scheduler/scheduleprofile_list.html:44
 msgid "Add Profile"
@@ -2508,7 +2508,7 @@ msgstr "サーバーインスタンス"
 
 #: templates/vpn_invite/invite_settings.html:18
 msgid "Expiration"
-msgstr "Expiration"
+msgstr "有効期限"
 
 #: templates/vpn_invite/invite_settings.html:31
 msgid "Remove VPN invitation for peer"
@@ -2516,15 +2516,15 @@ msgstr "Remove VPN invitation for peer"
 
 #: templates/vpn_invite/invite_settings.html:38
 msgid "No active VPN invitations"
-msgstr "No active VPN invitations"
+msgstr "有効な VPN 招待はありません"
 
 #: templates/vpn_invite/invite_settings.html:49 vpn_invite/views.py:77
 msgid "Email Settings"
-msgstr "Email Settings"
+msgstr "メール設定"
 
 #: templates/vpn_invite/invite_settings.html:50
 msgid "Invite Settings"
-msgstr "Invite Settings"
+msgstr "招待設定"
 
 #: templates/wireguard/apply_route_template.html:8 wireguard_peer/views.py:350
 msgid "Apply Route Template"
@@ -2737,12 +2737,12 @@ msgstr "Public Key"
 #: templates/wireguard/server_detail.html:31
 #: templates/wireguard/server_list.html:20 wireguard/forms.py:20
 msgid "Listen Port"
-msgstr "Listen Port"
+msgstr "待受ポート"
 
 #: templates/wireguard/server_detail.html:35
 #: templates/wireguard/server_list.html:21
 msgid "Address"
-msgstr "Address"
+msgstr "アドレス"
 
 #: templates/wireguard/server_detail.html:50
 msgid "Edit Instance"
@@ -2754,15 +2754,15 @@ msgstr "Traffic Graph"
 
 #: templates/wireguard/server_list.html:7 wireguard/views.py:224
 msgid "WireGuard Instances"
-msgstr "WireGuard Instances"
+msgstr "WireGuard インスタンス"
 
 #: templates/wireguard/server_list.html:10
 msgid "Create Instance"
-msgstr "Create Instance"
+msgstr "インスタンスを作成"
 
 #: templates/wireguard/server_list.html:61
 msgid "No WireGuard instances found."
-msgstr "No WireGuard instances found."
+msgstr "WireGuard インスタンスが見つかりません。"
 
 #: templates/wireguard/wireguard_manage_ip.html:18
 msgid "Enter Allowed IP"
@@ -2982,27 +2982,27 @@ msgstr "Disabled Peers"
 
 #: templates/wireguard/wireguard_peer_list.html:61
 msgid "No WireGuard Instances Found"
-msgstr "No WireGuard Instances Found"
+msgstr "WireGuard インスタンスが見つかりません"
 
 #: templates/wireguard/wireguard_peer_list.html:63
 msgid "There are no WireGuard instances configured. You can add a new instance by clicking the button below."
-msgstr "There are no WireGuard instances configured. You can add a new instance by clicking the button below."
+msgstr "WireGuard インスタンスが設定されていません。下のボタンから新しいインスタンスを追加できます。"
 
 #: templates/wireguard/wireguard_peer_list.html:67
 msgid "Add WireGuard Instance"
-msgstr "Add WireGuard Instance"
+msgstr "WireGuard インスタンスを追加"
 
 #: templates/wireguard/wireguard_status.html:9
 msgid "Update Configuration"
-msgstr "Update Configuration"
+msgstr "設定を更新"
 
 #: templates/wireguard/wireguard_status.html:16
 msgid "Restart Wireguard service"
-msgstr "Restart Wireguard service"
+msgstr "WireGuard サービスを再起動"
 
 #: templates/wireguard/wireguard_status.html:24
 msgid "Reload Wireguard service"
-msgstr "Reload Wireguard service"
+msgstr "WireGuard サービスを再読み込み"
 
 #: templates/wireguard/wireguard_status.html:42
 msgid "Instance Traffic"
@@ -3058,7 +3058,7 @@ msgstr "WireGuard Manager"
 
 #: user_manager/models.py:17 vpn_invite/models.py:25
 msgid "Administrator"
-msgstr "Administrator"
+msgstr "管理者"
 
 #: user_manager/views.py:31
 msgid "Edit Peer Group: "
@@ -3326,7 +3326,7 @@ msgstr "The selected network range overlaps with another instance."
 
 #: wireguard/views.py:98
 msgid "WireGuard Status"
-msgstr "WireGuard Status"
+msgstr "WireGuard 状態"
 
 #: wireguard/views.py:131
 msgid "Update WireGuard Instance"
@@ -3450,7 +3450,7 @@ msgstr "Disabled WireGuard Peer List"
 
 #: wireguard_peer/views.py:31
 msgid "WireGuard Peer List"
-msgstr "WireGuard Peer List"
+msgstr "WireGuard ピア一覧"
 
 #: wireguard_peer/views.py:158
 msgid "Peer not created|Missing instance parameter."
@@ -3607,3 +3607,63 @@ msgstr "Errors encountered|Error processing one or more interfaces."
 #: wireguard_tools/views.py:379
 msgid "No interfaces found|No WireGuard interfaces were found to process."
 msgstr "No interfaces found|No WireGuard interfaces were found to process."
+
+msgid "Create new administrator"
+msgstr "新しい管理者を作成"
+
+msgid "Register"
+msgstr "登録"
+
+msgid "Retype password"
+msgstr "パスワードを再入力"
+
+msgid "Superuser created!"
+msgstr "スーパーユーザーを作成しました。"
+
+msgid "Proceed to login"
+msgstr "ログインへ進む"
+
+msgid "Home"
+msgstr "ホーム"
+
+msgid "Modal Title"
+msgstr "モーダルタイトル"
+
+msgid "An error occurred while fetching the update information. Please try again later."
+msgstr "更新情報の取得中にエラーが発生しました。しばらくしてからもう一度お試しください。"
+
+msgid "Error"
+msgstr "エラー"
+
+msgid "Firewall"
+msgstr "ファイアウォール"
+
+msgid "Gatekeeper"
+msgstr "ゲートキーパー"
+
+msgid "App Gateway"
+msgstr "アプリゲートウェイ"
+
+msgid "Wireguard Manager"
+msgstr "WireGuard 管理者"
+
+msgid "Wireguard"
+msgstr "WireGuard"
+
+msgid "DNS"
+msgstr "DNS"
+
+msgid "WireGuard"
+msgstr "WireGuard"
+
+msgid "Pending Changes"
+msgstr "未適用の変更"
+
+msgid "There are pending DNS changes that have not been applied"
+msgstr "未適用の DNS 変更があります"
+
+msgid "Forward"
+msgstr "転送"
+
+msgid "Post Routing"
+msgstr "ポストルーティング"

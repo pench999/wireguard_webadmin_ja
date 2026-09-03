@@ -1,4 +1,5 @@
 {% extends "base_login.html" %}
+{% load i18n %}
 
 {% block content %}
 
@@ -6,24 +7,24 @@
     <div class="register-logo">
       <a href="/"><b>wireguard-webadmin</b></a>
     </div>
-  
+
     <div class="card">
       <div class="card-body register-card-body">
-        <p class="login-box-msg">Create new administrator</p>
-  
+        <p class="login-box-msg">{% trans 'Create new administrator' %}</p>
+
         <form action="/accounts/create_first_user/" method="post">
             {% csrf_token %}
             <div class="input-group mb-3">
-              <input type="text" class="form-control" placeholder="username" name="username"> 
+              <input type="text" class="form-control" placeholder="{% trans 'Username' %}" name="username">
               <div class="input-group-append">
                 <div class="input-group-text">
                   <span class="fas fa-user"></span>
                 </div>
               </div>
             </div>
-            
+
             <div class="input-group mb-3">
-              <input type="password" class="form-control" placeholder="Password" name="password"> 
+              <input type="password" class="form-control" placeholder="{% trans 'Password' %}" name="password">
               <div class="input-group-append">
                 <div class="input-group-text">
                   <span class="fas fa-lock"></span>
@@ -31,26 +32,26 @@
               </div>
             </div>
             <div class="input-group mb-3">
-              <input type="password" class="form-control" placeholder="Retype password" name="password2"> 
+              <input type="password" class="form-control" placeholder="{% trans 'Retype password' %}" name="password2">
               <div class="input-group-append">
                 <div class="input-group-text">
                   <span class="fas fa-lock"></span>
                 </div>
               </div>
             </div>
-            
-            
+
+
             <div class="row">
               <div class="col-8">
               </div>
               <div class="col-4">
-                <button type="submit" class="btn btn-primary btn-block">Register</button>
+                <button type="submit" class="btn btn-primary btn-block">{% trans 'Register' %}</button>
               </div>
             </div>
           </form>
-          
-  
-        
+
+
+
       </div>
       <!-- /.form-box -->
     </div><!-- /.card -->
@@ -68,4 +69,4 @@
 
 
   {% endblock %}
-``` 
+```

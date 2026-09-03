@@ -52,7 +52,7 @@
                     // Update modal content
                     $('#genericModalLabel').text('Wireguard Webadmin Updates');
                     $('#genericModalBody').html(updatesHtml);
-                    $('#genericModalCloseButton').text('Close');
+                    $('#genericModalCloseButton').text("{% trans 'Close' %}");
                     $('#genericModalActionButton').text('Update Instructions').attr('href', 'https://github.com/eduardogsilva/wireguard_webadmin').attr('target', '_blank');
 
                     // Show modal
@@ -60,9 +60,9 @@
                 },
                 error: function(xhr, status, error) {
                     // Update modal for error display
-                    $('#genericModalLabel').text('Error');
-                    $('#genericModalBody').html('<p>An error occurred while fetching the update information. Please try again later.</p>');
-                    $('#genericModalCloseButton').text('Close');
+                    $('#genericModalLabel').text("{% trans 'Error' %}");
+                    $('#genericModalBody').html('<p>{% trans "An error occurred while fetching the update information. Please try again later." %}</p>');
+                    $('#genericModalCloseButton').text("{% trans 'Close' %}");
                     $('#genericModalActionButton').hide(); // Hide the action button in case of error
 
                     // Show modal
