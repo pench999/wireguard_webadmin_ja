@@ -23,6 +23,7 @@ from user_manager.models import UserAcl
 from vpn_invite.models import PeerInvite
 from wgwadmlibrary.tools import user_has_access_to_peer
 from wireguard.models import Peer, PeerAllowedIP, WireGuardInstance
+from wireguard_tools.functions import func_reload_wireguard_interface
 
 
 def clean_command_field(command_field):
@@ -324,26 +325,10 @@ def restart_wireguard_interfaces(request):
                 if not user_acl.enable_reload:
                     return render(request, 'access_denied.html', {'page_title': 'Access Denied'})
 
-                config_path = os.path.join(config_dir, filename)
-                with open(config_path, 'r') as f:
-                    lines = f.readlines()
-                filtered_lines = []
-                for line in lines:
-                    stripped_line = line.strip()
-                    if stripped_line.startswith("Address") or stripped_line.startswith("PostUp") or stripped_line.startswith("PostDown"):
-                        continue
-                    filtered_lines.append(line)
+                success, message = func_reload_wireguard_interface(interface_name, config_dir=config_dir)
 
-                temp_config_path = f"/tmp/wgreload_{interface_name}.conf"
-                with open(temp_config_path, 'w') as f:
-                    f.writelines(filtered_lines)
-
-                reload_command = f"wg syncconf {interface_name} {temp_config_path}"
-                result = subprocess.run(reload_command, shell=True, capture_output=True, text=True)
-                os.remove(temp_config_path)
-
-                if result.returncode != 0:
-                    messages.warning(request, _('Error reloading') + f" {interface_name}|{result.stderr}")
+                if not success:
+                    messages.warning(request, _('Error reloading') + f" {interface_name}|{message}")
                     error_count += 1
                 else:
                     interface_count += 1

@@ -3570,7 +3570,7 @@ msgstr "Manage Peer Schedule Profile"
 
 #: wireguard_tools/views.py:242
 msgid "Export successful!|WireGuard configuration files have been exported to /etc/wireguard/."
-msgstr "Export successful!|WireGuard configuration files have been exported to /etc/wireguard/."
+msgstr "エクスポート成功|WireGuard 設定ファイルを /etc/wireguard/ にエクスポートしました。"
 
 #: wireguard_tools/views.py:244
 msgid "Export successful!|WireGuard configuration files have been exported to /etc/wireguard/. Don't forget to restart the interfaces."
@@ -3578,7 +3578,7 @@ msgstr "Export successful!|WireGuard configuration files have been exported to /
 
 #: wireguard_tools/views.py:346
 msgid "Error reloading"
-msgstr "Error reloading"
+msgstr "再読み込みエラー"
 
 #: wireguard_tools/views.py:358
 msgid "Error stopping"
@@ -3590,11 +3590,11 @@ msgstr "Error starting"
 
 #: wireguard_tools/views.py:370
 msgid "WARNING|Please note that the interface was reloaded, not restarted. Double-check if the the peers are working as expected. If you find any issues, please report them."
-msgstr "WARNING|Please note that the interface was reloaded, not restarted. Double-check if the the peers are working as expected. If you find any issues, please report them."
+msgstr "警告|インターフェースは再起動ではなく再読み込みされました。ピアが想定通り動作しているか確認してください。問題がある場合は報告してください。"
 
 #: wireguard_tools/views.py:371
 msgid "WireGuard reloaded|The WireGuard service has been reloaded."
-msgstr "WireGuard reloaded|The WireGuard service has been reloaded."
+msgstr "WireGuard を再読み込みしました|WireGuard サービスを再読み込みしました。"
 
 #: wireguard_tools/views.py:373
 msgid "WireGuard restarted|The WireGuard service has been restarted."
@@ -3602,7 +3602,7 @@ msgstr "WireGuard restarted|The WireGuard service has been restarted."
 
 #: wireguard_tools/views.py:376
 msgid "Errors encountered|Error processing one or more interfaces."
-msgstr "Errors encountered|Error processing one or more interfaces."
+msgstr "エラーが発生しました|1つ以上のインターフェースの処理中にエラーが発生しました。"
 
 #: wireguard_tools/views.py:379
 msgid "No interfaces found|No WireGuard interfaces were found to process."
