@@ -164,6 +164,11 @@ class PeerSuspensionForm(forms.ModelForm):
     class Meta:
         model = PeerScheduling
         fields = ['next_manual_suspend_at', 'next_manual_unsuspend_at', 'manual_suspend_reason']
+        labels = {
+            'next_manual_suspend_at': _('Scheduled suspension time'),
+            'next_manual_unsuspend_at': _('Scheduled reactivation time'),
+            'manual_suspend_reason': _('Suspension reason'),
+        }
         widgets = {
             'next_manual_suspend_at': forms.DateTimeInput(attrs={'type': 'datetime-local'}, format='%Y-%m-%dT%H:%M'),
             'next_manual_unsuspend_at': forms.DateTimeInput(attrs={'type': 'datetime-local'}, format='%Y-%m-%dT%H:%M'),

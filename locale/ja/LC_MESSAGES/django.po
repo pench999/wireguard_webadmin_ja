@@ -3414,7 +3414,7 @@ msgstr "今すぐ停止"
 
 #: wireguard_peer/forms.py:139
 msgid "Schedule"
-msgstr "スケジュール"
+msgstr "スケジュール設定"
 
 #: wireguard_peer/forms.py:143
 msgid "Clear Schedule"
@@ -3526,39 +3526,39 @@ msgstr "ルートテンプレートを適用しました。"
 
 #: wireguard_peer/views.py:379
 msgid "Peer suspension/unsuspension scheduled successfully."
-msgstr "Peer suspension/unsuspension scheduled successfully."
+msgstr "ピアの停止/再有効化スケジュールを設定しました。"
 
 #: wireguard_peer/views.py:381
 msgid "Error scheduling peer suspension/unsuspension. Please correct the errors below."
-msgstr "Error scheduling peer suspension/unsuspension. Please correct the errors below."
+msgstr "ピアの停止/再有効化スケジュール設定でエラーが発生しました。以下の内容を修正してください。"
 
 #: wireguard_peer/views.py:388
 msgid "Schedule cleared successfully."
-msgstr "Schedule cleared successfully."
+msgstr "スケジュールをクリアしました。"
 
 #: wireguard_peer/views.py:402
 msgid "Peer suspended successfully."
-msgstr "Peer suspended successfully."
+msgstr "ピアを停止しました。"
 
 #: wireguard_peer/views.py:404
 msgid "Peer suspended, but failed to reload WireGuard interface: "
-msgstr "Peer suspended, but failed to reload WireGuard interface: "
+msgstr "ピアは停止しましたが、WireGuard インターフェースの再読み込みに失敗しました: "
 
 #: wireguard_peer/views.py:414
 msgid "Peer reactivated successfully."
-msgstr "Peer reactivated successfully."
+msgstr "ピアを再有効化しました。"
 
 #: wireguard_peer/views.py:416
 msgid "Peer reactivated, but failed to reload WireGuard interface: "
-msgstr "Peer reactivated, but failed to reload WireGuard interface: "
+msgstr "ピアは再有効化しましたが、WireGuard インターフェースの再読み込みに失敗しました: "
 
 #: wireguard_peer/views.py:419
 msgid "Invalid action."
-msgstr "Invalid action."
+msgstr "無効な操作です。"
 
 #: wireguard_peer/views.py:424
 msgid "Suspend / Reactivate Peer"
-msgstr "Suspend / Reactivate Peer"
+msgstr "ピアの停止 / 再有効化"
 
 #: wireguard_peer/views.py:447
 msgid "Peer scheduling profile updated successfully."
@@ -3953,3 +3953,12 @@ msgstr "このクライアントは VPN をデフォルトゲートウェイと�
 #: templates/accounts/logout.html templates/accounts/login.html accounts/views.py
 msgid "Login disabled|Login form is disabled. Check integration settings."
 msgstr "ログインは無効です|ログインフォームは無効です。連携設定を確認してください。"
+#: wireguard_peer/forms.py wireguard_peer/views.py
+msgid "Scheduled suspension time"
+msgstr "停止予定時刻"
+#: wireguard_peer/forms.py wireguard_peer/views.py
+msgid "Scheduled reactivation time"
+msgstr "再有効化予定時刻"
+#: wireguard_peer/forms.py wireguard_peer/views.py
+msgid "Suspension reason"
+msgstr "停止理由"
