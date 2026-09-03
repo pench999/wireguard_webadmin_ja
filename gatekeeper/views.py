@@ -1,0 +1,469 @@
+import io
+
+import pyotp
+import qrcode
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
+from django.utils.translation import gettext as _
+
+from app_gateway.setup_defaults import create_default_entries
+from gatekeeper.forms import GatekeeperUserForm, GatekeeperGroupForm, AuthMethodForm, AuthMethodAllowedDomainForm, \
+    AuthMethodAllowedEmailForm, GatekeeperIPAddressForm
+from gatekeeper.models import GatekeeperUser, GatekeeperGroup, AuthMethod, AuthMethodAllowedDomain, \
+    AuthMethodAllowedEmail, GatekeeperIPAddress
+from user_manager.models import UserAcl
+
+
+@login_required
+def view_gatekeeper_list(request):
+    """Main list view containing tabs for Users, Groups, and Auth Methods"""
+    if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=20).exists():
+        return render(request, 'access_denied.html', {'page_title': _('Access Denied')})
+
+    create_default_entries()
+    active_tab = request.GET.get('tab', 'auth_methods')
+    auth_methods = AuthMethod.objects.all().order_by('name')
+    users = GatekeeperUser.objects.all().prefetch_related('groups').order_by('username')
+    groups = GatekeeperGroup.objects.all().order_by('name')
+    auth_domains = AuthMethodAllowedDomain.objects.all().order_by('domain')
+    auth_emails = AuthMethodAllowedEmail.objects.all().order_by('email')
+    auth_ips = GatekeeperIPAddress.objects.all().order_by('address')
+    
+    context = {
+        'users': users,
+        'groups': groups,
+        'auth_methods': auth_methods,
+        'auth_domains': auth_domains,
+        'auth_emails': auth_emails,
+        'auth_ips': auth_ips,
+        'active_tab': active_tab,
+        'caddy_enabled': settings.CADDY_ENABLED,
+    }
+    return render(request, 'gatekeeper/gatekeeper_list.html', context)
+
+
+@login_required
+def view_manage_gatekeeper_user(request):
+    if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=50).exists():
+        return render(request, 'access_denied.html', {'page_title': _('Access Denied')})
+
+    gatekeeper_user_uuid = request.GET.get('uuid')
+    
+    if gatekeeper_user_uuid:
+        gatekeeper_user = get_object_or_404(GatekeeperUser, uuid=gatekeeper_user_uuid)
+        title = _('Edit Gatekeeper User')
+    else:
+        gatekeeper_user = None
+        title = _('Create Gatekeeper User')
+
+    cancel_url = reverse('gatekeeper_list') + '?tab=users'
+
+    form = GatekeeperUserForm(request.POST or None, instance=gatekeeper_user, cancel_url=cancel_url)
+    if form.is_valid():
+        form.save()
+        messages.success(request, _('Gatekeeper User saved successfully.'))
+        return redirect(cancel_url)
+
+    form_description = {
+        'size': 'col-lg-6',
+        'content': _('''
+        <h4>Gatekeeper User</h4>
+        <p>Gatekeeper users are used for authenticating against protected applications managed by this gateway.</p>
+
+        <h5>Password</h5>
+        <p>Required when creating a user. When editing, leave both password fields blank to keep the current password.
+        Passwords are stored using <strong>Argon2id</strong> hashing.</p>
+
+        <h5>TOTP Secret</h5>
+        <p>Optional per-user TOTP secret. When set, this user will authenticate using their own secret instead of the
+        global TOTP secret configured on the Authentication Method. Use the buttons below the field to generate a
+        random secret and scan the QR code with your authenticator app. Validate the secret by entering the current
+        6-digit PIN before saving.</p>
+        ''')
+    }
+
+    context = {
+        'form': form,
+        'form_size': 'col-lg-6',
+        'title': title,
+        'page_title': title,
+        'form_description': form_description,
+    }
+    return render(request, 'gatekeeper/gatekeeper_user_form.html', context)
+
+
+@login_required
+def view_delete_gatekeeper_user(request):
+    if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=50).exists():
+        return render(request, 'access_denied.html', {'page_title': _('Access Denied')})
+
+    gatekeeper_user = get_object_or_404(GatekeeperUser, uuid=request.GET.get('uuid'))
+    
+    cancel_url = reverse('gatekeeper_list') + '?tab=users'
+
+    if request.method == 'POST':
+        gatekeeper_user.delete()
+        messages.success(request, _('Gatekeeper User deleted successfully.'))
+        return redirect(cancel_url)
+
+    context = {
+        'gatekeeper_user': gatekeeper_user,
+        'title': _('Delete Gatekeeper User'),
+        'cancel_url': cancel_url,
+        'text': _('Are you sure you want to delete the user "%(username)s"?') % {'username': gatekeeper_user.username}
+    }
+    return render(request, 'generic_delete_confirmation.html', context)
+
+
+@login_required
+def view_manage_gatekeeper_group(request):
+    if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=50).exists():
+        return render(request, 'access_denied.html', {'page_title': _('Access Denied')})
+
+    gatekeeper_group_uuid = request.GET.get('uuid')
+    
+    if gatekeeper_group_uuid:
+        gatekeeper_group = get_object_or_404(GatekeeperGroup, uuid=gatekeeper_group_uuid)
+        title = _('Edit Gatekeeper Group')
+    else:
+        gatekeeper_group = None
+        title = _('Create Gatekeeper Group')
+
+    cancel_url = reverse('gatekeeper_list') + '?tab=groups'
+
+    form = GatekeeperGroupForm(request.POST or None, instance=gatekeeper_group, cancel_url=cancel_url)
+    if form.is_valid():
+        form.save()
+        messages.success(request, _('Gatekeeper Group saved successfully.'))
+        return redirect(cancel_url)
+
+    context = {
+        'form': form,
+        'title': title,
+        'page_title': title,
+    }
+    return render(request, 'generic_form.html', context)
+
+
+@login_required
+def view_delete_gatekeeper_group(request):
+    if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=50).exists():
+        return render(request, 'access_denied.html', {'page_title': _('Access Denied')})
+
+    gatekeeper_group = get_object_or_404(GatekeeperGroup, uuid=request.GET.get('uuid'))
+    
+    cancel_url = reverse('gatekeeper_list') + '?tab=groups'
+
+    if request.method == 'POST':
+        gatekeeper_group.delete()
+        messages.success(request, _('Gatekeeper Group deleted successfully.'))
+        return redirect(cancel_url)
+
+    context = {
+        'gatekeeper_group': gatekeeper_group,
+        'title': _('Delete Gatekeeper Group'),
+        'cancel_url': cancel_url,
+        'text': _('Are you sure you want to delete the group "%(name)s"?') % {'name': gatekeeper_group.name}
+    }
+    return render(request, 'generic_delete_confirmation.html', context)
+
+
+@login_required
+def view_manage_auth_method(request):
+    if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=50).exists():
+        return render(request, 'access_denied.html', {'page_title': _('Access Denied')})
+
+    auth_method_uuid = request.GET.get('uuid')
+    
+    if auth_method_uuid:
+        auth_method = get_object_or_404(AuthMethod, uuid=auth_method_uuid)
+        title = _('Edit Authentication Method')
+    else:
+        auth_method = None
+        title = _('Create Authentication Method')
+
+    cancel_url = reverse('gatekeeper_list') + '?tab=auth_methods'
+
+    form = AuthMethodForm(request.POST or None, instance=auth_method, cancel_url=cancel_url)
+    if form.is_valid():
+        form.save()
+        messages.success(request, _('Authentication Method saved successfully.'))
+        return redirect(cancel_url)
+
+    form_description = {
+        'size': '',
+        'content': _('''
+        <h4>Authentication Types</h4>
+        <p>Select how users will authenticate through this method.</p>
+        
+        <h5>Local Password</h5>
+        <p>Users will authenticate using a standard username and password stored locally. Only one of this type can be created.</p>
+        
+        <h5>OIDC (OpenID Connect)</h5>
+        <p>Users will authenticate via an external identity provider (like Keycloak or Google). Requires Provider URL, Client ID, and Client Secret.</p>
+        
+        <h5>TOTP (Time-Based One-Time Password)</h5>
+        <p>Users will need to enter a rotating token from an authenticator app. If a user does not have a personal TOTP configured, the <strong>Global TOTP Secret</strong> will be used instead. </p>
+        ''')
+    }
+
+    context = {
+        'form': form,
+        'title': title,
+        'page_title': title,
+        'form_description': form_description,
+    }
+    return render(request, 'gatekeeper/gatekeeper_auth_method_form.html', context)
+
+
+@login_required
+def view_delete_auth_method(request):
+    if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=50).exists():
+        return render(request, 'access_denied.html', {'page_title': _('Access Denied')})
+
+    auth_method = get_object_or_404(AuthMethod, uuid=request.GET.get('uuid'))
+    
+    cancel_url = reverse('gatekeeper_list') + '?tab=auth_methods'
+
+    from app_gateway.models import AccessPolicy
+    policies_using = AccessPolicy.objects.filter(methods=auth_method)
+    if policies_using.exists():
+        policy_names = ', '.join(str(p) for p in policies_using)
+        messages.error(request, _(
+            'Cannot delete authentication method "%(method)s" because it is used by the following policies: %(policies)s.'
+        ) % {'method': str(auth_method), 'policies': policy_names})
+        return redirect(cancel_url)
+
+    if request.method == 'POST':
+        auth_method.delete()
+        messages.success(request, _('Authentication Method deleted successfully.'))
+        return redirect(cancel_url)
+
+    context = {
+        'auth_method': auth_method,
+        'title': _('Delete Authentication Method'),
+        'cancel_url': cancel_url,
+        'text': _('Are you sure you want to delete the authentication method "%(name)s"?') % {'name': str(auth_method)}
+    }
+    return render(request, 'generic_delete_confirmation.html', context)
+
+
+@login_required
+def view_generate_totp_qr(request):
+    if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=50).exists():
+        return HttpResponse("Access Denied", status=403)
+
+    if request.method != 'POST':
+        return HttpResponse("Method Not Allowed", status=405)
+
+    totp_secret = request.POST.get('secret')
+    issuer = request.POST.get('issuer', 'wireguard_webadmin')
+    name = request.POST.get('name', 'Gatekeeper')
+
+    if not totp_secret:
+        return HttpResponse("No secret provided", status=400)
+
+    try:
+        totp = pyotp.TOTP(totp_secret)
+        uri = totp.provisioning_uri(name=name, issuer_name=issuer)
+
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(uri)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+
+        response = HttpResponse(content_type="image/png")
+        img_io = io.BytesIO()
+        img.save(img_io, format='PNG')
+        img_io.seek(0)
+        response.write(img_io.getvalue())
+        return response
+    except Exception:
+        return HttpResponse("Error generating QR code", status=500)
+
+
+@login_required
+def view_manage_auth_domain(request):
+    if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=50).exists():
+        return render(request, 'access_denied.html', {'page_title': _('Access Denied')})
+
+    auth_domain_uuid = request.GET.get('uuid')
+    
+    if auth_domain_uuid:
+        auth_domain = get_object_or_404(AuthMethodAllowedDomain, uuid=auth_domain_uuid)
+        title = _('Edit Allowed Domain')
+    else:
+        auth_domain = None
+        title = _('Add Allowed Domain')
+
+    cancel_url = reverse('gatekeeper_list') + '?tab=allowed_identities'
+
+    form = AuthMethodAllowedDomainForm(request.POST or None, instance=auth_domain, cancel_url=cancel_url)
+    if form.is_valid():
+        form.save()
+        messages.success(request, _('Allowed Domain saved successfully.'))
+        return redirect(cancel_url)
+
+    context = {
+        'form': form,
+        'title': title,
+        'page_title': title,
+    }
+    return render(request, 'generic_form.html', context)
+
+
+@login_required
+def view_delete_auth_domain(request):
+    if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=50).exists():
+        return render(request, 'access_denied.html', {'page_title': _('Access Denied')})
+
+    auth_domain = get_object_or_404(AuthMethodAllowedDomain, uuid=request.GET.get('uuid'))
+    
+    cancel_url = reverse('gatekeeper_list') + '?tab=allowed_identities'
+
+    if request.method == 'POST':
+        auth_domain.delete()
+        messages.success(request, _('Allowed Domain deleted successfully.'))
+        return redirect(cancel_url)
+
+    context = {
+        'auth_domain': auth_domain,
+        'title': _('Delete Allowed Domain'),
+        'cancel_url': cancel_url,
+        'text': _('Are you sure you want to delete the allowed domain "%(domain)s"?') % {'domain': auth_domain.domain}
+    }
+    return render(request, 'generic_delete_confirmation.html', context)
+
+
+@login_required
+def view_manage_auth_email(request):
+    if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=50).exists():
+        return render(request, 'access_denied.html', {'page_title': _('Access Denied')})
+
+    auth_email_uuid = request.GET.get('uuid')
+    
+    if auth_email_uuid:
+        auth_email = get_object_or_404(AuthMethodAllowedEmail, uuid=auth_email_uuid)
+        title = _('Edit Allowed Email')
+    else:
+        auth_email = None
+        title = _('Add Allowed Email')
+
+    cancel_url = reverse('gatekeeper_list') + '?tab=allowed_identities'
+
+    form = AuthMethodAllowedEmailForm(request.POST or None, instance=auth_email, cancel_url=cancel_url)
+    if form.is_valid():
+        form.save()
+        messages.success(request, _('Allowed Email saved successfully.'))
+        return redirect(cancel_url)
+
+    context = {
+        'form': form,
+        'title': title,
+        'page_title': title,
+    }
+    return render(request, 'generic_form.html', context)
+
+
+@login_required
+def view_delete_auth_email(request):
+    if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=50).exists():
+        return render(request, 'access_denied.html', {'page_title': _('Access Denied')})
+
+    auth_email = get_object_or_404(AuthMethodAllowedEmail, uuid=request.GET.get('uuid'))
+    
+    cancel_url = reverse('gatekeeper_list') + '?tab=allowed_identities'
+
+    if request.method == 'POST':
+        auth_email.delete()
+        messages.success(request, _('Allowed Email deleted successfully.'))
+        return redirect(cancel_url)
+
+    context = {
+        'auth_email': auth_email,
+        'title': _('Delete Allowed Email'),
+        'cancel_url': cancel_url,
+        'text': _('Are you sure you want to delete the allowed email "%(email)s"?') % {'email': auth_email.email}
+    }
+    return render(request, 'generic_delete_confirmation.html', context)
+
+
+@login_required
+def view_manage_gatekeeper_ip(request):
+    if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=50).exists():
+        return render(request, 'access_denied.html', {'page_title': _('Access Denied')})
+
+    gatekeeper_ip_uuid = request.GET.get('uuid')
+    
+    if gatekeeper_ip_uuid:
+        gatekeeper_ip = get_object_or_404(GatekeeperIPAddress, uuid=gatekeeper_ip_uuid)
+        title = _('Edit IP Address')
+    else:
+        gatekeeper_ip = None
+        title = _('Add IP Address')
+
+    cancel_url = reverse('gatekeeper_list') + '?tab=ip_addresses'
+
+    form = GatekeeperIPAddressForm(request.POST or None, instance=gatekeeper_ip, cancel_url=cancel_url)
+    if form.is_valid():
+        form.save()
+        messages.success(request, _('IP Address saved successfully.'))
+        return redirect(cancel_url)
+
+    form_description = {
+        'size': 'col-lg-6',
+        'content': _('''
+        <h5>IP Address List</h5>
+        <p>Manage specific IP addresses or networks that are allowed or denied access when using the IP Address List authentication method.</p>
+        
+        <h5>IP Address & Prefix</h5>
+        <p>Enter a single IP address (e.g., 192.168.1.50) or a network address. Use the prefix length for CIDR notation (e.g., 24 for a /24 network). Leave prefix blank for a single host (/32 for IPv4, /128 for IPv6).</p>
+        
+        <h5>Action</h5>
+        <p><strong>Allow</strong>: Grants access to the specified IP/network.<br>
+        <strong>Deny</strong>: Specifically blocks access from the specified IP/network.</p>
+        
+        <h5>Description</h5>
+        <p>An optional note to help identify this entry (e.g., "Office Network", "Blocked Attacker").</p>
+        ''')
+    }
+
+    context = {
+        'form': form,
+        'title': title,
+        'page_title': title,
+        'form_description': form_description,
+    }
+    return render(request, 'generic_form.html', context)
+
+
+@login_required
+def view_delete_gatekeeper_ip(request):
+    if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=50).exists():
+        return render(request, 'access_denied.html', {'page_title': _('Access Denied')})
+
+    gatekeeper_ip = get_object_or_404(GatekeeperIPAddress, uuid=request.GET.get('uuid'))
+    
+    cancel_url = reverse('gatekeeper_list') + '?tab=ip_addresses'
+
+    if request.method == 'POST':
+        gatekeeper_ip.delete()
+        messages.success(request, _('IP Address deleted successfully.'))
+        return redirect(cancel_url)
+
+    context = {
+        'gatekeeper_ip': gatekeeper_ip,
+        'title': _('Delete IP Address'),
+        'cancel_url': cancel_url,
+        'text': _('Are you sure you want to delete the IP address "%(address)s"?') % {'address': gatekeeper_ip.address}
+    }
+    return render(request, 'generic_delete_confirmation.html', context)

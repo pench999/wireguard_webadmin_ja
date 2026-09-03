@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}You're signed in — Gatekeeper{% endblock %}
+{% block content %}
+    <h1 class="card-title">You're signed in</h1>
+    <p class="card-subtitle">Active session details</p>
+    <table class="info-table">
+        {% if session.username %}
+        <tr>
+            <td>Username</td>
+            <td>{{ session.username }}</td>
+        </tr>
+        {% endif %}
+        {% if session.email %}
+        <tr>
+            <td>E-mail</td>
+            <td>{{ session.email }}</td>
+        </tr>
+        {% endif %}
+        <tr>
+            <td>Verified via</td>
+            <td>
+                {% for factor in session.auth_factors %}
+                <span class="badge">{{ factor }}</span>
+                {% endfor %}
+            </td>
+        </tr>
+        {% if session.groups %}
+        <tr>
+            <td>Groups</td>
+            <td>
+                {% for group in session.groups %}
+                <span class="badge">{{ group }}</span>
+                {% endfor %}
+            </td>
+        </tr>
+        {% endif %}
+        <tr>
+            <td>Expires</td>
+            <td>{{ session.expires_at.strftime('%Y-%m-%d %H:%M UTC') }}</td>
+        </tr>
+    </table>
+    <hr>
+    <form method="post" action="{{ external_path }}/logout">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="next" value="/">
+        <button class="btn btn-danger" type="submit">Sign out</button>
+    </form>
+{% endblock %}

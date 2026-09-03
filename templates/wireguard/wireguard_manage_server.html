@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-xl-6">
+            <div class="card card-primary card-outline">
+                {% if page_title %}
+                    <div class="card-header">
+                        <h3 class="card-title">{{ page_title }}</h3>
+                    </div>
+                {% endif %}
+                <div class="card-body row">
+                    <div class="col-lg-12">
+                        {% crispy form %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-6">
+            <div class="card card-primary card-outline">
+                <div class="card-body row">
+                    <div class="col-lg-12">
+                        <h5>{% trans "Display Name" %}</h5>
+                        <p>
+                            {% blocktrans %}
+                                Optional name used only for display in the web interface.
+                            {% endblocktrans %}
+                        </p>
+                        <h5>{% trans "Web Refresh Interval" %}</h5>
+                        <p>
+                            {% blocktrans %}
+                                Interval used to refresh WireGuard status information in the web UI.
+                            {% endblocktrans %}
+                        </p>
+                        <h5>{% trans "Public Address" %}</h5>
+                        <p>
+                            {% blocktrans %}
+                                Public hostname or IP address and UDP port used by peers to connect.
+                                <br>
+                                The <b>listen port</b> must be exposed and mapped in your Docker compose (YAML) file.
+                            {% endblocktrans %}
+                        </p>
+                        <h5>{% trans "Interface Keys" %}</h5>
+                        <p>
+                            {% blocktrans %}
+                                WireGuard private and public keys for this interface.
+                                <br>
+                                The private key must remain secret.
+                                Changing it requires updating all peer configurations.
+                            {% endblocktrans %}
+                        </p>
+                        <h5>{% trans "Internal Network" %}</h5>
+                        <p>
+                            {% blocktrans %}
+                                Internal IP address and netmask used by the WireGuard interface.
+                            {% endblocktrans %}
+                        </p>
+                        <h5>{% trans "DNS Configuration" %}</h5>
+                        <p>
+                            {% blocktrans %}
+                                DNS servers pushed to peers.
+                                <br>
+                                Using the internal IP as primary DNS enables internal name resolution
+                                and DNS filtering.
+                            {% endblocktrans %}
+                        </p>
+                        <h5>{% trans "Enforce Route Policy" %}</h5>
+                        <p>
+                            {% blocktrans %}
+                                Enforces routing rules defined by routing templates using firewall rules.
+                                <br>
+                                Peers with a default route (0.0.0.0/0) are not restricted.
+                                <br><br>
+                                Note: depending on the number of routes and peers, this option may generate
+                                a large number of firewall rules.
+                            {% endblocktrans %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block custom_page_scripts %}
+    <script>
+        function openCommandDialog(element) {
+            var command = element.getAttribute('data-command');
+            var confirmation = prompt("{{ delete_confirmation_message }}");
+            if (confirmation) {
+                var url = "?uuid={{ instance.uuid }}&action=delete&confirmation=" + encodeURIComponent(confirmation);
+                window.location.href = url;
+            }
+        }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let passwordInput = document.getElementById('id_private_key');
+
+            if (passwordInput) {
+                let groupDiv = passwordInput.parentNode;
+                if (!groupDiv.classList.contains('input-group')) {
+                    let newGroup = document.createElement('div');
+                    newGroup.className = 'input-group';
+
+                    passwordInput.parentNode.insertBefore(newGroup, passwordInput);
+                    newGroup.appendChild(passwordInput);
+
+                    let appendDiv = document.createElement('div');
+                    appendDiv.className = 'input-group-append';
+
+                    let btn = document.createElement('button');
+                    btn.className = 'btn btn-outline-secondary toggle-password-btn';
+                    btn.type = 'button';
+                    btn.innerHTML = '<i class="fas fa-eye"></i>';
+
+                    appendDiv.appendChild(btn);
+                    newGroup.appendChild(appendDiv);
+
+                    btn.addEventListener('click', function () {
+                        let passStatus = passwordInput.getAttribute('type') === 'password';
+                        passwordInput.setAttribute('type', passStatus ? 'text' : 'password');
+                        this.innerHTML = passStatus ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+                    });
+                }
+            }
+        });
+    </script>
+{% endblock %}

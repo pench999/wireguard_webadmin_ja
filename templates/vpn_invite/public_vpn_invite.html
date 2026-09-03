@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex, noarchive">
+    <title>{% if authenticated %}VPN Invite{% else %}Authentication Required{% endif %}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .error {
+            color: red;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        form {
+            margin-top: 20px;
+            text-align: center;
+        }
+        form label,
+        form input[type="password"],
+        form button[type="submit"] {
+            display: block;
+            margin: 0 auto 15px auto; /* superior: 0, horizontal: auto, inferior: 15px */
+        }
+        label {
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="password"] {
+            width: 80%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            color: #fff;
+        }
+        .btn-primary {
+            background-color: #007BFF;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .instructions {
+            margin-top: 20px;
+            line-height: 1.6;
+            color: #333;
+            text-align: center;
+        }
+        {% if authenticated %}
+            .download-buttons, .button-group, .qr-code {
+                text-align: center;
+                margin-top: 20px;
+            }
+            .download-buttons a {
+                display: inline-block;
+                margin: 5px;
+                padding: 10px 15px;
+                text-decoration: none;
+                border-radius: 4px;
+                color: white;
+                background-color: #28a745;
+            }
+            .qr-code {
+                display: none;
+                margin-top: 20px;
+            }
+            .qr-code img {
+                max-width: 100%;
+                height: auto;
+            }
+        {% endif %}
+    </style>
+</head>
+<body>
+<div class="container">
+    {% if not authenticated %}
+        <h1>Authentication Required</h1>
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <label for="password">Enter Password:</label>
+            <input type="password" name="password" id="password" required>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    {% else %}
+        <h1>VPN Configuration</h1>
+        <div class="instructions">
+            {{ invite_settings.download_instructions|safe }}
+        </div>
+        <div class="download-buttons">
+            {% if invite_settings.download_1_enabled and invite_settings.download_1_url %}
+                <a href="{{ invite_settings.download_1_url }}" target="_blank">{{ invite_settings.download_1_label }}</a>
+            {% endif %}
+            {% if invite_settings.download_2_enabled and invite_settings.download_2_url %}
+                <a href="{{ invite_settings.download_2_url }}" target="_blank">{{ invite_settings.download_2_label }}</a>
+            {% endif %}
+            {% if invite_settings.download_3_enabled and invite_settings.download_3_url %}
+                <a href="{{ invite_settings.download_3_url }}" target="_blank">{{ invite_settings.download_3_label }}</a>
+            {% endif %}
+            {% if invite_settings.download_4_enabled and invite_settings.download_4_url %}
+                <a href="{{ invite_settings.download_4_url }}" target="_blank">{{ invite_settings.download_4_label }}</a>
+            {% endif %}
+            {% if invite_settings.download_5_enabled and invite_settings.download_5_url %}
+                <a href="{{ invite_settings.download_5_url }}" target="_blank">{{ invite_settings.download_5_label }}</a>
+            {% endif %}
+        </div>
+        {% if cluster_settings and servers|length > 1 %}
+        <div style="text-align: center; margin-bottom: 15px;">
+            <label for="server_select">Server:</label>
+            <select id="server_select" style="padding: 5px; border-radius: 4px; border: 1px solid #ccc;">
+                {% for server in servers %}
+                <option value="{{ server.uuid }}">{{ server.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+        <div class="button-group">
+            <a href="/invite/download_config/?token={{ peer_invite.uuid }}&password={{ password }}" target="_blank" class="btn btn-primary" id="downloadConfigButton">Download Config</a>
+            <a href="#" id="viewQrButton" class="btn btn-secondary"{% if not peer_invite.peer.private_key %} style="opacity: 0.5; cursor: not-allowed;"{% endif %}>View QR Code</a>
+        </div>
+        <div class="qr-code" id="qrCodeContainer">
+            <!-- QR Code will be loaded here when the button is clicked -->
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    setTimeout(function() {
+        window.location.href = "/invite/?token={{ peer_invite.uuid }}";
+    }, 300 * 1000);
+</script>
+
+{% if authenticated %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var viewQrButton = document.getElementById("viewQrButton");
+            var downloadConfigButton = document.getElementById("downloadConfigButton");
+            var qrCodeContainer = document.getElementById("qrCodeContainer");
+            var hasPrivateKey = {% if peer_invite.peer.private_key %}true{% else %}false{% endif %};
+
+            viewQrButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            if (!hasPrivateKey) {
+                return false;
+            }
+            if (qrCodeContainer.style.display === "none" || qrCodeContainer.style.display === "") {
+                // Always refresh image on click to ensure current server selection is respected
+                qrCodeContainer.innerHTML = '';
+
+                var img = document.createElement("img");
+                var server = document.getElementById("server_select") ? document.getElementById("server_select").value : "";
+                var url = "/invite/download_config/?token={{ peer_invite.uuid }}&password={{ password }}&format=qrcode";
+                if (server) {
+                    url += "&worker=" + encodeURIComponent(server);
+                }
+                img.src = url;
+                img.alt = "QR Code";
+                qrCodeContainer.appendChild(img);
+
+                qrCodeContainer.style.display = "block";
+            } else {
+                qrCodeContainer.style.display = "none";
+            }
+        });
+
+        downloadConfigButton.addEventListener("click", function (event) {
+            if (!hasPrivateKey) {
+                if (!confirm("This configuration does not contain a private key. You must add the private key manually in your client before using it.")) {
+                    event.preventDefault();
+                    return false;
+                }
+            }
+            var server = document.getElementById("server_select") ? document.getElementById("server_select").value : "";
+            var url = "/invite/download_config/?token={{ peer_invite.uuid }}&password={{ password }}";
+            if (server) {
+                url += "&worker=" + encodeURIComponent(server);
+            }
+            this.href = url;
+            });
+
+        // Update href immediately if dropdown changes (optional, but good for UX)
+        var serverSelect = document.getElementById("server_select");
+        if (serverSelect) {
+            serverSelect.addEventListener("change", function () {
+                var server = this.value;
+                var url = "/invite/download_config/?token={{ peer_invite.uuid }}&password={{ password }}";
+                if (server) {
+                    url += "&server=" + encodeURIComponent(server);
+                }
+                downloadConfigButton.href = url;
+
+                // If QR code is visible, reload it
+                if (qrCodeContainer.style.display === "block") {
+                    viewQrButton.click(); // Hide
+                    setTimeout(function () { viewQrButton.click(); }, 100); // Show again
+                }
+            });
+        }
+        });
+    </script>
+{% endif %}
+</body>
+</html>

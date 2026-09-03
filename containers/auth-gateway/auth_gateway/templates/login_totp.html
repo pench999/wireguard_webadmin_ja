@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Verification required — Gatekeeper{% endblock %}
+{% block content %}
+    <h1 class="card-title">Verification required</h1>
+    <p class="card-subtitle">Enter your security code to access <strong>{{ application_name }}</strong></p>
+    {% if error %}
+    <div class="alert alert-error">{{ error }}</div>
+    {% endif %}
+    <form method="post" action="{{ external_path }}/login/totp" class="stack">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="next" value="{{ next }}">
+        <label class="field">
+            <span>Security code</span>
+            <input type="text" name="token" inputmode="text" autocomplete="off" autofocus required>
+        </label>
+        <button class="btn btn-primary" type="submit">Verify</button>
+    </form>
+{% endblock %}

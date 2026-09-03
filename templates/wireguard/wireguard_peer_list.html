@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block page_custom_head %}
+    {% include 'wireguard/peer_list/custom_styles.html' %}
+{% endblock %}
+
+
+{% block content %}
+    {% if wireguard_instances %}
+        <div class="card card-primary card-outline">
+            <div class="card-body">
+                <ul class="nav nav-tabs" role="tablist">
+                    {% for wgconf in wireguard_instances %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if wgconf == current_instance %}active{% endif %}"
+                               href="{% url 'wireguard_peer_list' %}?uuid={{ wgconf.uuid }}" role="tab">
+                                wg{{ wgconf.instance_id }} {% if wgconf.name %}({{ wgconf.name }}){% endif %}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="tab-content" id="custom-content-below-tabContent">
+                    <div class="tab-pane fade show active" id="custom-content-below-home"
+                         role="tabpanel" aria-labelledby="custom-content-below-home-tab">
+                        <div class="row" style="padding-top: 15px">
+                            {% include 'wireguard/peer_list/peer_data.html' %}
+                        </div>
+                        {% if add_peer_enabled %}
+                            <a class="btn btn-primary"
+                               href="{% url 'wireguard_peer_create' %}?instance={{ current_instance.uuid }}"
+                               onclick="return confirm('{% trans 'Are you sure you want to create a new peer?' %}');">
+                                {% trans 'Create Peer' %}
+                            </a>
+                        {% else %}
+                            <a class="btn btn-primary disabled" href="">{% trans 'Create Peer' %}</a>
+                        {% endif %}
+                        <button id="toggleExtraInfo" class="btn btn-outline-primary">{% trans 'Show extras' %}</button>
+                        {% if show_only_disabled_peers %}
+                            <a class="btn btn-outline-secondary"
+                               href="{% url 'wireguard_peer_list' %}?uuid={{ current_instance.uuid }}">
+                            {% trans 'Enabled Peers' %}
+                            </a>
+                        {% else %}
+                            <a class="btn btn-outline-secondary"
+                               href="{% url 'wireguard_peer_list' %}?uuid={{ current_instance.uuid }}&peer_status=disabled">
+                            {% trans 'Disabled Peers' %}
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        {% include 'wireguard/peer_list/peer_preview_modal.html' %}
+
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            <h4 class="alert-heading">{% trans 'No WireGuard Instances Found' %}</h4>
+            <p>
+                {% trans 'There are no WireGuard instances configured. You can add a new instance by clicking the button below.' %}
+            </p>
+        </div>
+        <p>
+            <a href="/server/manage/?action=create" class="btn btn-primary">{% trans 'Add WireGuard Instance' %}</a>
+        </p>
+    {% endif %}
+{% endblock %}
+
+
+{% block custom_page_scripts %}
+
+    {% include 'wireguard/peer_list/script_peer_charts_init.html' %}
+    {% include 'wireguard/peer_list/script_peer_modal.html' %}
+    {% if not show_only_disabled_peers %}
+        {% include 'wireguard/peer_list/script_wireguard_status_update.html' %}
+    {% endif %}
+    {% include 'wireguard/peer_list/script_peer_extras_toggle.html' %}
+    {% include 'wireguard/peer_list/script_vpn_invite.html' %}
+
+{% endblock %}

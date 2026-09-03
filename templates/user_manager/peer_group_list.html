@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>{% trans 'Name' %}</th>
+            <th>{% trans 'Peers' %}</th>
+            <th>{% trans 'Server Instance' %}</th>
+            <th>{% trans 'Users' %}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for peer_group in peer_group_list %}
+        <tr>
+            <td>{{ peer_group.name }}</td>
+            <td>
+                {% for peer in peer_group.peer.all %}
+                    <a href="/peer/manage/?peer={{ peer.uuid }}">{{ peer }}</a>{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for instance in peer_group.server_instance.all %}
+                    <a href="/peer/list/?uuid={{ instance.uuid }}">{{ instance }}</a>{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% for user_acl in peer_group.useracl_set.all %}
+                    <a href="/user/manage/?uuid={{ user_acl.uuid }}">{{ user_acl.user.username }}</a>{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </td>
+            <td style="width: 1%; white-space: nowrap;">
+                <a href="/user/peer-group/manage/?uuid={{ peer_group.uuid }}" title="{% trans 'Edit' %}"><i class="far fa-edit"></i></a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+
+    {% include "user_manager/list_buttons.html" %}
+
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1>Database settings updated</h1>
+    <p>The following modifications have been applied to your database:</p>
+    <table class="table table-bordered">
+        <th>Patch</th>
+        <th>Field</th>
+        <th>Value</th>
+        <th>Objects</th>
+        <th>Reason</th>
+        <thead>
+        </thead>
+        <tbody>
+        {% for update in update_list  %}
+            <tr>
+                <td>{{ update.patch_version}}</td>
+                <td>{{ update.field }}</td>
+                <td>{{ update.new_value }}</td>
+                <td>
+                    <ul>
+                        {% for object in update.object_list %}<li>{{ object }}</li>{% endfor %}
+                    </ul>
+                </td>
+                <td>{{ update.reason|safe }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+
+{% endblock %}

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+{% load i18n %}
+{% load custom_tags %}
+{% tag_webadmin_version as webadmin_version %}
+{% get_current_language as CURRENT_LANGUAGE %}
+<html lang="{{ CURRENT_LANGUAGE }}">
+
+<head>
+    {% include 'template_parts/base_head.html' %}
+    {% block page_custom_head %}{% endblock %}
+</head>
+
+<body class="hold-transition sidebar-mini layout-boxed {% if request.COOKIES.sidebarState == 'collapsed' %}sidebar-collapse{% endif %} {% if request.COOKIES.darkMode == 'dark' %}dark-mode{% endif %}">
+<script>
+(function() {
+    var m = document.cookie.match(/(?:^|; )darkMode=([^;]*)/);
+    if (!m && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark-mode');
+    }
+})();
+</script>
+{% include 'template_parts/dark_mode_active_sync.html' %}
+<div class="wrapper">
+
+    <!-- Preloader -->
+    <div class="preloader flex-column justify-content-center align-items-center">
+    </div>
+
+    {% include 'template_parts/base_navbar.html' %}
+
+    <!-- Main Sidebar Container -->
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+        <!-- Brand Logo -->
+        <a href="/" class="brand-link">
+            <span class="brand-text font-weight-light">wireguard-webadmin</span>
+        </a>
+
+        {% include 'template_parts/base_sidebar.html' %}
+
+    </aside>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        {% include 'template_parts/base_content_header.html' %}
+        {% include 'template_parts/base_generic_modal.html' %}
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+
+                {% include 'template_parts/base_pending_changes_warning.html' %}
+                {% block content %}{% endblock %}
+
+            </div><!-- /.container-fluid -->
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    {% include 'template_parts/base_footer.html' %}
+
+</div>
+<!-- ./wrapper -->
+
+{% include 'template_parts/base_scripts.html' %}
+{% include 'template_parts/base_messages.html' %}
+{% block custom_page_scripts %}{% endblock %}
+
+</body>
+</html>

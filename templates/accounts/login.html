@@ -1,0 +1,54 @@
+{% extends "base_login.html" %}
+{% load i18n %}
+
+{% block content %}
+    <div class="register-box">
+        <div class="register-logo">
+            <a href="/"><b>wireguard-webadmin</b></a>
+        </div>
+        <div class="card">
+            <div class="card-body register-card-body">
+                <form action="/accounts/login/" method="post">
+                    {% csrf_token %}
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="{% trans 'Username' %}" name="username">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-user"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <input type="password" class="form-control" placeholder="{% trans 'Password' %}" name="password">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button type="submit" class="btn btn-primary btn-block">{% trans 'Login' %}</button>
+                        </div>
+                        <div class="col-md-3">
+                            <a class="btn btn-outline-primary btn-block" href="/change_language/" title="{% trans 'Change Language' %}">
+                                <i class="fas fa-language"></i>
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a class="btn btn-outline-primary btn-block" href="#" id="darkModeToggle" title="{% trans 'Toggle Dark Mode' %}">
+                                <i class="fas {% if request.COOKIES.darkMode == 'dark' %}fa-sun{% else %}fa-moon{% endif %}" id="darkModeIcon"></i>
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.querySelector('input[name="username"]').addEventListener('input', function() {
+            this.value = this.value.toLowerCase().replace(/\s/g, '');
+        });
+    </script>
+{% endblock %}

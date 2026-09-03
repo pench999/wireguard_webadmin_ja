@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+{% include 'app_gateway/caddy_disabled_alert.html' %}
+<div class="card card-primary card-outline">
+    <div class="card-body">
+
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link {% if active_tab == 'applications' or active_tab == 'hosts' %}active{% endif %}"
+                   href="{% url 'app_gateway_list' %}?tab=applications" role="tab">
+                    {% trans 'Applications' %}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if active_tab == 'policies' %}active{% endif %}"
+                   href="{% url 'app_gateway_list' %}?tab=policies" role="tab">
+                    {% trans 'Access Policies' %}
+                </a>
+            </li>
+        </ul>
+
+        <div class="tab-content mt-4">
+
+            {% if active_tab == 'applications' or active_tab == 'hosts' %}
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="btn-group">
+                        <a href="{% url 'app_gateway_list' %}?tab=applications"
+                           class="btn {% if active_tab == 'applications' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            {% trans 'Applications' %}
+                        </a>
+                        <a href="{% url 'app_gateway_list' %}?tab=hosts"
+                           class="btn {% if active_tab == 'hosts' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            {% trans 'Hosts' %}
+                        </a>
+                    </div>
+                    {% if active_tab == 'applications' %}
+                    <div>
+                        {% if caddy_enabled %}
+                        <form method="post" action="{% url 'export_caddy_config' %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-secondary">
+                                <i class="fas fa-file-export"></i> {% trans 'Export Configuration' %}
+                            </button>
+                        </form>
+                        {% else %}
+                        <button type="button" class="btn btn-outline-secondary" disabled
+                                title="{% trans 'Export is not available because Caddy is not enabled.' %}">
+                            <i class="fas fa-file-export"></i> {% trans 'Export Configuration' %}
+                        </button>
+                        {% endif %}
+                        <a href="{% url 'manage_application' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-plus"></i> {% trans 'Add Application' %}
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if active_tab == 'applications' %}
+                    {% if applications %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>{% trans 'Name' %}</th>
+                                        <th>{% trans 'Upstream' %}</th>
+                                        <th>{% trans 'Hosts' %}</th>
+                                        <th>{% trans 'Routes' %}</th>
+                                        <th>{% trans 'Default Policy' %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for app in applications %}
+                                        <tr>
+                                            <td>
+                                                <a href="{% url 'view_application' %}?uuid={{ app.uuid }}">
+                                                    <strong>{{ app }}</strong>
+                                                </a>
+                                            </td>
+                                            <td><code>{{ app.upstream }}</code></td>
+                                            <td>{{ app.hosts.count }}</td>
+                                            <td>{{ app.routes.count }}</td>
+                                            <td>
+                                                {% if app.default_policy_config %}
+                                                    {{ app.default_policy_config.default_policy }}
+                                                {% else %}
+                                                    {% trans 'Default (Deny)' %}
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            {% trans 'No Applications found.' %}
+                        </div>
+                    {% endif %}
+
+                {% elif active_tab == 'hosts' %}
+
+                    {% if hosts %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>{% trans 'Hostname' %}</th>
+                                        <th>{% trans 'Application' %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for host in hosts %}
+                                        <tr>
+                                            <td>{{ host.hostname }}</td>
+                                            <td>
+                                                <a href="{% url 'view_application' %}?uuid={{ host.application.uuid }}">
+                                                    {{ host.application }}
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            {% trans 'No Hosts found.' %}
+                        </div>
+                    {% endif %}
+                {% endif %}
+
+            {% elif active_tab == 'policies' %}
+                <div class="mb-3">
+                    <a href="{% url 'select_policy_type' %}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-plus"></i> {% trans 'Add Access Policy' %}
+                    </a>
+                </div>
+
+                {% if access_policies %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>{% trans 'Name' %}</th>
+                                    <th>{% trans 'Policy Type' %}</th>
+                                    <th>{% trans 'Groups' %}</th>
+                                    <th>{% trans 'Auth Methods' %}</th>
+                                    <th>{% trans 'Actions' %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for policy in access_policies %}
+                                    <tr>
+                                        <td>{{ policy.display_name|default:policy.name }}</td>
+                                        <td>{{ policy.get_policy_type_display }}</td>
+                                        <td>{{ policy.groups.count }}</td>
+                                        <td>{{ policy.methods.count }}</td>
+                                        <td style="width: 15%">
+                                            <a href="{% url 'manage_access_policy' %}?uuid={{ policy.uuid }}"
+                                               class="btn btn-sm btn-info" title="{% trans 'Edit' %}">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'delete_access_policy' %}?uuid={{ policy.uuid }}"
+                                               class="btn btn-sm btn-danger" title="{% trans 'Delete' %}">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        {% trans 'No Access Policies found.' %}
+                    </div>
+                {% endif %}
+
+                {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}
