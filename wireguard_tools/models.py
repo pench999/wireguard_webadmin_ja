@@ -34,6 +34,9 @@ class AuditLog(models.Model):
         ('peer_ip_deleted', 'Peer IP deleted'),
         ('peer_route_template_applied', 'Peer route template applied'),
         ('peer_route_template_unlinked', 'Peer route template unlinked'),
+        ('peer_connected', 'Peer connected'),
+        ('peer_disconnected', 'Peer disconnected'),
+        ('peer_handshake_updated', 'Peer handshake updated'),
         ('wireguard_config_exported', 'WireGuard config exported'),
         ('wireguard_reloaded', 'WireGuard reloaded'),
         ('wireguard_restarted', 'WireGuard restarted'),
@@ -65,3 +68,25 @@ class AuditLog(models.Model):
 
     def __str__(self):
         return f'{self.created:%Y-%m-%d %H:%M:%S} {self.username} {self.action} {self.object_name}'
+
+
+class PeerConnectionState(models.Model):
+    peer = models.OneToOneField('wireguard.Peer', on_delete=models.CASCADE, related_name='connection_state')
+    is_connected = models.BooleanField(default=False)
+    last_handshake = models.DateTimeField(blank=True, null=True)
+    transfer_rx = models.BigIntegerField(default=0)
+    transfer_tx = models.BigIntegerField(default=0)
+    last_event_at = models.DateTimeField(blank=True, null=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=('is_connected',)),
+            models.Index(fields=('last_handshake',)),
+        ]
+
+    def __str__(self):
+        return f'{self.peer} connected={self.is_connected}'

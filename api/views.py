@@ -30,6 +30,7 @@ from wgwadmlibrary.tools import create_peer_invite, get_peer_invite_data, send_e
     user_has_access_to_peer
 from wireguard.models import Peer, PeerStatus, WebadminSettings, WireGuardInstance
 from wireguard_tools.functions import func_reload_wireguard_interface
+from wireguard_tools.models import AuditLog, PeerConnectionState
 from wireguard_tools.views import export_wireguard_configuration
 
 
@@ -346,6 +347,116 @@ def _latest_handshake_as_int(peer_info) -> int:
         return 0
 
 
+def _peer_inactive_seconds() -> int:
+    try:
+        return int(getattr(settings, 'WIREGUARD_PEER_INACTIVE_SECONDS', 300))
+    except:
+        return 300
+
+
+def _record_peer_connection_audit(peer, action, details):
+    AuditLog.objects.create(
+        username='system',
+        action=action,
+        object_type='Peer',
+        object_uuid=str(peer.uuid),
+        object_name=str(peer)[:255],
+        wireguard_instance=f'wg{peer.wireguard_instance.instance_id}',
+        details=details,
+    )
+
+
+def func_update_peer_connection_audit(wireguard_status_data: Dict[str, Any]) -> None:
+    inactive_after = _peer_inactive_seconds()
+    now = timezone.now()
+    seen_peer_ids = set()
+
+    if not isinstance(wireguard_status_data, dict):
+        return
+
+    for interface, peers in wireguard_status_data.items():
+        if not isinstance(peers, dict):
+            continue
+
+        for peer_public_key, peer_info in peers.items():
+            if not isinstance(peer_info, dict):
+                continue
+
+            peer = Peer.objects.filter(public_key=peer_public_key).select_related('wireguard_instance').first()
+            if not peer:
+                continue
+
+            latest_handshake_timestamp = _latest_handshake_as_int(peer_info)
+            if latest_handshake_timestamp > 0:
+                last_handshake_time = datetime.datetime.fromtimestamp(latest_handshake_timestamp, tz=pytz.utc)
+            else:
+                last_handshake_time = None
+
+            transfer = peer_info.get('transfer') or {}
+            transfer_rx = int(transfer.get('rx') or 0)
+            transfer_tx = int(transfer.get('tx') or 0)
+            is_connected = bool(
+                last_handshake_time and
+                now - last_handshake_time <= datetime.timedelta(seconds=inactive_after)
+            )
+
+            state, created = PeerConnectionState.objects.get_or_create(peer=peer)
+            seen_peer_ids.add(peer.pk)
+            previous_connected = state.is_connected
+            previous_handshake = state.last_handshake
+            previous_rx = state.transfer_rx
+            previous_tx = state.transfer_tx
+
+            details = {
+                'interface': interface,
+                'inactive_after_seconds': inactive_after,
+                'latest_handshake': last_handshake_time.isoformat() if last_handshake_time else '',
+                'previous_handshake': previous_handshake.isoformat() if previous_handshake else '',
+                'transfer_rx': transfer_rx,
+                'transfer_tx': transfer_tx,
+                'previous_transfer_rx': previous_rx,
+                'previous_transfer_tx': previous_tx,
+                'endpoint': peer_info.get('endpoints', ''),
+                'event_source': 'wireguard_status_cache',
+                'event_is_estimated': True,
+            }
+
+            if is_connected and not previous_connected:
+                _record_peer_connection_audit(peer, 'peer_connected', details)
+                state.last_event_at = now
+            elif not is_connected and previous_connected:
+                _record_peer_connection_audit(peer, 'peer_disconnected', details)
+                state.last_event_at = now
+            elif (
+                is_connected and
+                previous_handshake and
+                last_handshake_time and
+                last_handshake_time != previous_handshake
+            ):
+                _record_peer_connection_audit(peer, 'peer_handshake_updated', details)
+
+            state.is_connected = is_connected
+            state.last_handshake = last_handshake_time
+            state.transfer_rx = transfer_rx
+            state.transfer_tx = transfer_tx
+            state.save()
+
+    for state in PeerConnectionState.objects.filter(is_connected=True).exclude(peer_id__in=seen_peer_ids).select_related('peer', 'peer__wireguard_instance'):
+        details = {
+            'inactive_after_seconds': inactive_after,
+            'latest_handshake': state.last_handshake.isoformat() if state.last_handshake else '',
+            'transfer_rx': state.transfer_rx,
+            'transfer_tx': state.transfer_tx,
+            'event_source': 'wireguard_status_cache',
+            'event_is_estimated': True,
+            'reason': 'peer_not_seen_in_wireguard_dump',
+        }
+        _record_peer_connection_audit(state.peer, 'peer_disconnected', details)
+        state.is_connected = False
+        state.last_event_at = now
+        state.save()
+
+
 def func_concatenate_cluster_wireguard_status_cache() -> None:
     start_time = time.monotonic()
 
@@ -426,6 +537,7 @@ def cron_refresh_wireguard_status_cache(request):
         return JsonResponse(data)
     start_time = time.monotonic()
     wireguard_status_data = func_process_wireguard_status()
+    func_update_peer_connection_audit(wireguard_status_data)
     end_time = time.monotonic()
     processing_time_ms = int((end_time - start_time) * 1000)
     WireguardStatusCache.objects.create(data=wireguard_status_data, processing_time_ms=processing_time_ms, cache_type='master')

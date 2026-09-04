@@ -73,6 +73,15 @@ if [ -n "${WIREGUARD_STATUS_CACHE_REFRESH_INTERVAL:-}" ]; then
     esac
 fi
 
+if [ -n "${WIREGUARD_PEER_INACTIVE_SECONDS:-}" ]; then
+    if [[ "${WIREGUARD_PEER_INACTIVE_SECONDS}" =~ ^[0-9]+$ ]] && [ "${WIREGUARD_PEER_INACTIVE_SECONDS}" -ge 60 ]; then
+        echo "WIREGUARD_PEER_INACTIVE_SECONDS = ${WIREGUARD_PEER_INACTIVE_SECONDS}" >> /app/wireguard_webadmin/production_settings.py
+    else
+        echo "Error: Invalid WIREGUARD_PEER_INACTIVE_SECONDS value: ${WIREGUARD_PEER_INACTIVE_SECONDS}. Must be an integer of at least 60 seconds."
+        exit 1
+    fi
+fi
+
 if [[ "${DISABLE_AUTO_APPLY,,}" == "true" ]]; then
     echo "AUTO_APPLY = False" >> /app/wireguard_webadmin/production_settings.py
 fi
