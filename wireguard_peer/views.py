@@ -15,6 +15,7 @@ from wgwadmlibrary.tools import check_sort_order_conflict, deduplicate_sort_orde
 from wireguard.models import Peer, PeerAllowedIP, WireGuardInstance
 from wireguard_peer.forms import PeerAllowedIPForm, PeerNameForm, PeerKeepaliveForm, PeerKeysForm, PeerSuspensionForm, \
     PeerScheduleProfileForm
+from wireguard_tools.audit import write_audit_log
 from wireguard_tools.functions import func_reload_wireguard_interface
 from wireguard_tools.views import export_wireguard_configuration
 from .functions import func_create_new_peer
@@ -159,6 +160,9 @@ def view_wireguard_peer_create(request):
 
         new_peer, message = func_create_new_peer(current_instance)
         if new_peer:
+            write_audit_log(request, 'peer_created', new_peer, details={
+                'instance': f'wg{current_instance.instance_id}',
+            })
             messages.success(request, _('Peer created|Peer created successfully.'))
             if not _auto_apply(request, new_peer.wireguard_instance):
                 new_peer.wireguard_instance.pending_changes = True
@@ -186,7 +190,13 @@ def view_wireguard_peer_manage(request):
         if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=30).exists():
             return render(request, 'access_denied.html', {'page_title': 'アクセス拒否'})
         if request.GET.get('confirmation') == 'delete':
+            peer_details = {
+                'peer_uuid': str(current_peer.uuid),
+                'peer_name': str(current_peer),
+                'instance': f'wg{current_instance.instance_id}',
+            }
             current_peer.delete()
+            write_audit_log(request, 'peer_deleted', details=peer_details, wireguard_instance=current_instance)
             messages.success(request, _('Peer deleted|Peer deleted successfully.'))
             if not _auto_apply(request, current_instance):
                 current_instance.pending_changes = True
@@ -237,7 +247,12 @@ def view_wireguard_peer_edit_field(request):
 
     form = FormClass(request.POST or None, instance=current_peer)
     if form.is_valid():
+        changed_fields = list(form.changed_data)
         form.save()
+        write_audit_log(request, 'peer_updated', current_peer, details={
+            'group': group,
+            'changed_fields': changed_fields,
+        })
         if group != 'name' and not _auto_apply(request, current_peer.wireguard_instance):
             current_peer.wireguard_instance.pending_changes = True
             current_peer.wireguard_instance.save()
@@ -282,7 +297,14 @@ def view_manage_ip_address(request):
         if request.GET.get('action') == 'delete':
             if request.GET.get('confirmation') == 'delete':
                 is_server_side = current_ip.config_file == 'server'
+                ip_details = {
+                    'allowed_ip': current_ip.allowed_ip,
+                    'netmask': current_ip.netmask,
+                    'config_file': current_ip.config_file,
+                    'priority': current_ip.priority,
+                }
                 current_ip.delete()
+                write_audit_log(request, 'peer_ip_deleted', current_peer, details=ip_details)
                 messages.success(request, _('IP address deleted|IP address deleted successfully.'))
                 if is_server_side and not _auto_apply(request, current_peer.wireguard_instance):
                     current_peer.wireguard_instance.pending_changes = True
@@ -301,11 +323,25 @@ def view_manage_ip_address(request):
     if request.method == 'POST':
         form = PeerAllowedIPForm(request.POST or None, instance=current_ip, current_peer=current_peer, config_file=config_file)
         if form.is_valid():
+            is_new_ip = current_ip is None
+            changed_fields = list(form.changed_data)
             this_form = form.save(commit=False)
             if not current_ip:
                 this_form.peer = current_peer
             this_form.config_file = config_file
             this_form.save()
+            write_audit_log(
+                request,
+                'peer_ip_added' if is_new_ip else 'peer_ip_updated',
+                current_peer,
+                details={
+                    'allowed_ip': this_form.allowed_ip,
+                    'netmask': this_form.netmask,
+                    'config_file': this_form.config_file,
+                    'priority': this_form.priority,
+                    'changed_fields': changed_fields,
+                }
+            )
             if config_file == 'server' and not _auto_apply(request, current_peer.wireguard_instance):
                 current_peer.wireguard_instance.pending_changes = True
                 current_peer.wireguard_instance.save()
@@ -340,8 +376,12 @@ def view_apply_route_template(request):
     
     if request.method == 'POST':
         if request.POST.get('action') == 'unlink':
+            previous_template = str(current_peer.routing_template) if current_peer.routing_template else ''
             current_peer.routing_template = None
             current_peer.save()
+            write_audit_log(request, 'peer_route_template_unlinked', current_peer, details={
+                'previous_template': previous_template,
+            })
             current_peer.wireguard_instance.pending_changes = True
             current_peer.wireguard_instance.save()
             messages.success(request, _('Route template unlinked successfully.'))
@@ -359,6 +399,10 @@ def view_apply_route_template(request):
 
             current_peer.routing_template = selected_template
             current_peer.save()
+            write_audit_log(request, 'peer_route_template_applied', current_peer, details={
+                'template_uuid': str(selected_template.uuid),
+                'template_name': str(selected_template),
+            })
             current_peer.wireguard_instance.pending_changes = True
             current_peer.wireguard_instance.save()
             messages.success(request, _('Route template applied successfully.'))
@@ -393,7 +437,13 @@ def view_wireguard_peer_suspend(request):
 
         if action == 'schedule':
             if form.is_valid():
+                changed_fields = list(form.changed_data)
                 form.save()
+                write_audit_log(request, 'peer_suspend_schedule_updated', current_peer, details={
+                    'changed_fields': changed_fields,
+                    'next_manual_suspend_at': str(peer_scheduling.next_manual_suspend_at),
+                    'next_manual_unsuspend_at': str(peer_scheduling.next_manual_unsuspend_at),
+                })
                 messages.success(request, _('Peer suspension/unsuspension scheduled successfully.'))
             else:
                 messages.error(request, _('Error scheduling peer suspension/unsuspension. Please correct the errors below.'))
@@ -403,6 +453,7 @@ def view_wireguard_peer_suspend(request):
             peer_scheduling.next_manual_unsuspend_at = None
             peer_scheduling.manual_suspend_reason = None
             peer_scheduling.save()
+            write_audit_log(request, 'peer_suspend_schedule_cleared', current_peer)
             messages.success(request, _('Schedule cleared successfully.'))
 
         elif action == 'suspend_now':
@@ -413,6 +464,9 @@ def view_wireguard_peer_suspend(request):
             current_peer.suspended = True
             current_peer.suspend_reason = manual_suspend_reason
             current_peer.save()
+            write_audit_log(request, 'peer_suspended', current_peer, details={
+                'reason': manual_suspend_reason,
+            })
 
             export_wireguard_configuration(current_peer.wireguard_instance)
             success, message = func_reload_wireguard_interface(current_peer.wireguard_instance)
@@ -425,6 +479,7 @@ def view_wireguard_peer_suspend(request):
             current_peer.suspended = False
             current_peer.suspend_reason = ''
             current_peer.save()
+            write_audit_log(request, 'peer_reactivated', current_peer)
 
             export_wireguard_configuration(current_peer.wireguard_instance)
             success, message = func_reload_wireguard_interface(current_peer.wireguard_instance)
@@ -461,7 +516,12 @@ def view_wireguard_peer_schedule_profile(request):
     form = PeerScheduleProfileForm(request.POST or None, instance=peer_scheduling, peer=current_peer)
 
     if form.is_valid():
+        changed_fields = list(form.changed_data)
         form.save()
+        write_audit_log(request, 'peer_schedule_profile_updated', current_peer, details={
+            'changed_fields': changed_fields,
+            'profile': str(peer_scheduling.profile) if peer_scheduling.profile else '',
+        })
         messages.success(request, _('Peer scheduling profile updated successfully.'))
         if not peer_scheduling.profile and current_peer.disabled_by_schedule:
             current_peer.disabled_by_schedule = False

@@ -23,6 +23,7 @@ from user_manager.models import UserAcl
 from vpn_invite.models import PeerInvite
 from wgwadmlibrary.tools import user_has_access_to_peer
 from wireguard.models import Peer, PeerAllowedIP, WireGuardInstance
+from wireguard_tools.audit import write_audit_log
 from wireguard_tools.functions import func_reload_wireguard_interface
 
 
@@ -238,6 +239,9 @@ def view_export_wireguard_configs(request):
 
     export_wireguard_configuration()
     export_firewall_configuration()
+    write_audit_log(request, 'wireguard_config_exported', details={
+        'action': request.GET.get('action', ''),
+    })
 
     if request.GET.get('action') == 'update_and_restart' or request.GET.get('action') == 'update_and_reload':
         messages.success(request, _("Export successful!|WireGuard configuration files have been exported to /etc/wireguard/."))
@@ -328,9 +332,16 @@ def restart_wireguard_interfaces(request):
                 success, message = func_reload_wireguard_interface(interface_name, config_dir=config_dir)
 
                 if not success:
+                    write_audit_log(request, 'wireguard_reload_failed', details={
+                        'interface': interface_name,
+                        'message': message,
+                    })
                     messages.warning(request, _('Error reloading') + f" {interface_name}|{message}")
                     error_count += 1
                 else:
+                    write_audit_log(request, 'wireguard_reloaded', details={
+                        'interface': interface_name,
+                    })
                     interface_count += 1
 
             else:
@@ -340,14 +351,27 @@ def restart_wireguard_interfaces(request):
                 stop_command = f"wg-quick down {interface_name}"
                 stop_result = subprocess.run(stop_command, shell=True, capture_output=True, text=True)
                 if stop_result.returncode != 0:
+                    write_audit_log(request, 'wireguard_restart_failed', details={
+                        'interface': interface_name,
+                        'phase': 'stop',
+                        'stderr': stop_result.stderr,
+                    })
                     messages.warning(request, _("Error stopping") + f" {interface_name}|{stop_result.stderr}")
                     error_count += 1
                 start_command = f"wg-quick up {interface_name}"
                 start_result = subprocess.run(start_command, shell=True, capture_output=True, text=True)
                 if start_result.returncode != 0:
+                    write_audit_log(request, 'wireguard_restart_failed', details={
+                        'interface': interface_name,
+                        'phase': 'start',
+                        'stderr': start_result.stderr,
+                    })
                     messages.warning(request, _("Error starting") + f" {interface_name}|{start_result.stderr}")
                     error_count += 1
                 else:
+                    write_audit_log(request, 'wireguard_restarted', details={
+                        'interface': interface_name,
+                    })
                     interface_count += 1
 
     if interface_count > 0 and error_count == 0:
@@ -367,4 +391,3 @@ def restart_wireguard_interfaces(request):
             wireguard_instancee.pending_changes = False
             wireguard_instancee.save()
     return redirect("/status/")
-
