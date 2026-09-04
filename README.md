@@ -27,12 +27,19 @@ wireguard_webadmin は、単なる WireGuard 管理パネルではありませ�
 
 ## クイックインストール
 
+日本語版を利用する場合は、このフォークを clone して起動してください。
+
 ```bash
-mkdir wireguard_webadmin && cd wireguard_webadmin
-wget -O docker-compose.yml https://raw.githubusercontent.com/eduardogsilva/wireguard_webadmin/main/docker-compose-caddy.yml
-# .env の SERVER_ADDRESS を環境に合わせて編集
-docker compose up -d
+git clone https://github.com/pench999/wireguard_webadmin_ja.git wireguard_webadmin
+cd wireguard_webadmin
+
+cp .env.example .env
+nano .env
+
+docker compose -f docker-compose-caddy.yml up -d
 ```
+
+`.env` の `SERVER_ADDRESS` は、利用者がアクセスするサーバーのIPアドレスまたはDNS名に変更してください。Caddyを使わず既存のリバースプロキシ配下で動かす場合は、`docker-compose-no-caddy.yml` を使います。
 
 詳細な手順、アップグレードガイド、設定のヒントは **[wireguard-webadmin.com](https://wireguard-webadmin.com/)** を参照してください。
 
