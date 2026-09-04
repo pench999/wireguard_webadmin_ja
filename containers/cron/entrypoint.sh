@@ -20,6 +20,7 @@ cat <<EOF > /etc/cron.d/cron_tasks
 */10 * * * * root sleep 15  ; /cron_runner.sh update_peer_latest_handshake >> /var/log/cron.log 2>&1
 * * * * *    root sleep 10  ; /cron_runner.sh peer_scheduler               >> /var/log/cron.log 2>&1
 * * * * *    root sleep 30  ; /cron_runner.sh calculate_peer_schedules     >> /var/log/cron.log 2>&1
+37 3 * * *   root             /cron_runner.sh cleanup_audit_logs           >> /var/log/cron.log 2>&1
 EOF
 
 CMD="echo -n cron_refresh_wireguard_status_cache ; /cron_runner.sh refresh_wireguard_status_cache >> /var/log/cron.log 2>&1"

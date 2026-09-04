@@ -82,6 +82,15 @@ if [ -n "${WIREGUARD_PEER_INACTIVE_SECONDS:-}" ]; then
     fi
 fi
 
+if [ -n "${AUDIT_LOG_RETENTION_DAYS:-}" ]; then
+    if [[ "${AUDIT_LOG_RETENTION_DAYS}" =~ ^[0-9]+$ ]] && [ "${AUDIT_LOG_RETENTION_DAYS}" -ge 1 ]; then
+        echo "AUDIT_LOG_RETENTION_DAYS = ${AUDIT_LOG_RETENTION_DAYS}" >> /app/wireguard_webadmin/production_settings.py
+    else
+        echo "Error: Invalid AUDIT_LOG_RETENTION_DAYS value: ${AUDIT_LOG_RETENTION_DAYS}. Must be a positive integer."
+        exit 1
+    fi
+fi
+
 if [[ "${DISABLE_AUTO_APPLY,,}" == "true" ]]; then
     echo "AUTO_APPLY = False" >> /app/wireguard_webadmin/production_settings.py
 fi

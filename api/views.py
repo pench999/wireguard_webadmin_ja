@@ -14,6 +14,7 @@ from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
+from django.db import connection
 from django.db.models import Q
 from django.http import HttpResponseForbidden
 from django.http import JsonResponse
@@ -427,14 +428,6 @@ def func_update_peer_connection_audit(wireguard_status_data: Dict[str, Any]) -> 
             elif not is_connected and previous_connected:
                 _record_peer_connection_audit(peer, 'peer_disconnected', details)
                 state.last_event_at = now
-            elif (
-                is_connected and
-                previous_handshake and
-                last_handshake_time and
-                last_handshake_time != previous_handshake
-            ):
-                _record_peer_connection_audit(peer, 'peer_handshake_updated', details)
-
             state.is_connected = is_connected
             state.last_handshake = last_handshake_time
             state.transfer_rx = transfer_rx
@@ -857,6 +850,33 @@ def cron_update_peer_latest_handshake(request):
                     #    debug_information.append(f'No changes for {peer.public_key}')
 
     return JsonResponse({'status': 'success'})
+
+
+def cron_cleanup_audit_logs(request):
+    api_key = get_api_key('cron_key')
+    if api_key and api_key == request.GET.get('cron_key'):
+        pass
+    else:
+        return HttpResponseForbidden()
+
+    retention_days = int(getattr(settings, 'AUDIT_LOG_RETENTION_DAYS', 90))
+    cutoff = timezone.now() - datetime.timedelta(days=retention_days)
+    old_deleted, _ = AuditLog.objects.filter(created__lt=cutoff).delete()
+    handshake_deleted, _ = AuditLog.objects.filter(action='peer_handshake_updated').delete()
+
+    vacuum_executed = False
+    if connection.vendor == 'sqlite':
+        with connection.cursor() as cursor:
+            cursor.execute('VACUUM')
+        vacuum_executed = True
+
+    return JsonResponse({
+        'status': 'success',
+        'retention_days': retention_days,
+        'old_deleted': old_deleted,
+        'peer_handshake_updated_deleted': handshake_deleted,
+        'vacuum_executed': vacuum_executed,
+    })
 
 
 def cron_check_updates(request):

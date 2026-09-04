@@ -2,7 +2,8 @@ from django.urls import path, include
 
 from api.views import api_instance_info, api_peer_invite, api_peer_list, cron_check_updates, \
     cron_update_peer_latest_handshake, peer_info, routerfleet_get_user_token, \
-    wireguard_status, cron_refresh_wireguard_status_cache, cron_calculate_peer_schedules, cron_peer_scheduler
+    wireguard_status, cron_refresh_wireguard_status_cache, cron_calculate_peer_schedules, cron_peer_scheduler, \
+    cron_cleanup_audit_logs
 
 urlpatterns = [
     path('v2/', include('api_v2.urls_api')),
@@ -17,5 +18,6 @@ urlpatterns = [
     path('cron/calculate_peer_schedules/', cron_calculate_peer_schedules, name='cron_calculate_peer_schedules'),
     path('cron/refresh_wireguard_status_cache/', cron_refresh_wireguard_status_cache, name='cron_refresh_wireguard_status_cache'),
     path('cron/check_updates/', cron_check_updates, name='cron_check_updates'),
+    path('cron/cleanup_audit_logs/', cron_cleanup_audit_logs, name='cron_cleanup_audit_logs'),
     path('cron/update_peer_latest_handshake/', cron_update_peer_latest_handshake, name='cron_update_peer_latest_handshake'),
 ]
