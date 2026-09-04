@@ -36,10 +36,20 @@ cd wireguard_webadmin
 cp .env.example .env
 nano .env
 
-docker compose -f docker-compose-caddy.yml up -d
+docker compose -f docker-compose-caddy.yml up -d --build
 ```
 
 `.env` の `SERVER_ADDRESS` は、利用者がアクセスするサーバーのIPアドレスまたはDNS名に変更してください。Caddyを使わず既存のリバースプロキシ配下で動かす場合は、`docker-compose-no-caddy.yml` を使います。
+
+日本語版では、このリポジトリ内のソースコードから Docker イメージをビルドします。`--build` を付けずに起動すると、古いローカルイメージが再利用されて翻訳や修正が反映されない場合があります。
+
+すでに起動済みの環境を日本語版へ更新する場合は、リポジトリを更新してからコンテナを再作成してください。
+
+```bash
+cd wireguard_webadmin
+git pull
+docker compose -f docker-compose-caddy.yml up -d --build --force-recreate
+```
 
 詳細な手順、アップグレードガイド、設定のヒントは **[wireguard-webadmin.com](https://wireguard-webadmin.com/)** を参照してください。
 

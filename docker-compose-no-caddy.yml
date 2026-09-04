@@ -3,7 +3,9 @@ services:
   wireguard-webadmin:
     container_name: wireguard-webadmin
     restart: unless-stopped
-    image: eduardosilva/wireguard_webadmin:latest
+    build:
+      context: .
+    image: wireguard_webadmin_ja/wireguard-webadmin:latest
     environment:
       - SERVER_ADDRESS=${SERVER_ADDRESS}
       - DEBUG_MODE=${DEBUG_MODE}
@@ -14,7 +16,7 @@ services:
       - WIREGUARD_STATUS_CACHE_WEB_LOAD_PREVIOUS_COUNT=${WIREGUARD_STATUS_CACHE_WEB_LOAD_PREVIOUS_COUNT}
       - WIREGUARD_STATUS_CACHE_REFRESH_INTERVAL=${WIREGUARD_STATUS_CACHE_REFRESH_INTERVAL}
       - WIREGUARD_PEER_INACTIVE_SECONDS=${WIREGUARD_PEER_INACTIVE_SECONDS}
-      - AUDIT_LOG_RETENTION_DAYS=${AUDIT_LOG_RETENTION_DAYS}
+      - AUDIT_LOG_RETENTION_DAYS=${AUDIT_LOG_RETENTION_DAYS:-90}
       - VPN_CLIENTS_CAN_ACCESS_DJANGO=${VPN_CLIENTS_CAN_ACCESS_DJANGO}
       - WIREGUARD_MTU=${WIREGUARD_MTU}
       - DISABLE_AUTO_APPLY=${DISABLE_AUTO_APPLY}
@@ -43,7 +45,10 @@ services:
   wireguard-webadmin-cron:
     container_name: wireguard-webadmin-cron
     restart: unless-stopped
-    image: eduardosilva/wireguard_webadmin_cron:latest
+    build:
+      context: ./containers/cron
+      dockerfile: Dockerfile-cron
+    image: wireguard_webadmin_ja/wireguard-webadmin-cron:latest
     environment:
       - TZ=${TIMEZONE}
       - WIREGUARD_STATUS_CACHE_REFRESH_INTERVAL=${WIREGUARD_STATUS_CACHE_REFRESH_INTERVAL}
@@ -55,7 +60,10 @@ services:
   wireguard-webadmin-rrdtool:
     container_name: wireguard-webadmin-rrdtool
     restart: unless-stopped
-    image: eduardosilva/wireguard_webadmin_rrdtool:latest
+    build:
+      context: ./containers/rrdtool
+      dockerfile: Dockerfile-rrdtool
+    image: wireguard_webadmin_ja/wireguard-webadmin-rrdtool:latest
     volumes:
       - app_secrets:/app_secrets/
       - rrd_data:/rrd_data/
@@ -67,7 +75,10 @@ services:
   wireguard-webadmin-dns:
     container_name: wireguard-webadmin-dns
     restart: unless-stopped
-    image: eduardosilva/wireguard_webadmin_dns:latest
+    build:
+      context: ./containers/dnsmasq
+      dockerfile: Dockerfile-dnsmasq
+    image: wireguard_webadmin_ja/wireguard-webadmin-dns:latest
     environment:
       - TZ=${TIMEZONE}
     volumes:
