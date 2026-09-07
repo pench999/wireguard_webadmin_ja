@@ -9,7 +9,9 @@ import qrcode
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Prefetch
+from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
+from django.db.models import Prefetch, Q
 from django.http import HttpResponse
 from django.shortcuts import Http404, get_object_or_404, redirect, render
 from django.utils import timezone
@@ -25,6 +27,67 @@ from wgwadmlibrary.tools import user_has_access_to_peer
 from wireguard.models import Peer, PeerAllowedIP, WireGuardInstance
 from wireguard_tools.audit import write_audit_log
 from wireguard_tools.functions import func_reload_wireguard_interface
+from wireguard_tools.models import AuditLog
+
+
+AUDIT_ACTION_LABELS = {
+    'peer_created': _('ピア作成'),
+    'peer_updated': _('ピア更新'),
+    'peer_deleted': _('ピア削除'),
+    'peer_suspended': _('ピア無効化'),
+    'peer_reactivated': _('ピア再有効化'),
+    'peer_suspend_schedule_updated': _('ピア停止スケジュール更新'),
+    'peer_suspend_schedule_cleared': _('ピア停止スケジュール解除'),
+    'peer_schedule_profile_updated': _('ピアスケジュールプロファイル更新'),
+    'peer_ip_added': _('ピアIP追加'),
+    'peer_ip_updated': _('ピアIP更新'),
+    'peer_ip_deleted': _('ピアIP削除'),
+    'peer_route_template_applied': _('ルーティングテンプレート適用'),
+    'peer_route_template_unlinked': _('ルーティングテンプレート解除'),
+    'peer_connected': _('ピア接続'),
+    'peer_disconnected': _('ピア切断'),
+    'peer_handshake_updated': _('ハンドシェイク更新'),
+    'wireguard_config_exported': _('WireGuard設定出力'),
+    'wireguard_reloaded': _('WireGuardリロード'),
+    'wireguard_restarted': _('WireGuard再起動'),
+    'wireguard_reload_failed': _('WireGuardリロード失敗'),
+    'wireguard_restart_failed': _('WireGuard再起動失敗'),
+}
+
+
+@login_required
+def audit_log_list(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
+    logs = AuditLog.objects.select_related('user').all()
+    query = request.GET.get('q', '').strip()
+    action = request.GET.get('action', '').strip()
+
+    if query:
+        logs = logs.filter(
+            Q(username__icontains=query)
+            | Q(object_name__icontains=query)
+            | Q(object_type__icontains=query)
+            | Q(wireguard_instance__icontains=query)
+            | Q(ip_address__icontains=query)
+        )
+
+    if action:
+        logs = logs.filter(action=action)
+
+    paginator = Paginator(logs, 50)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    for log in page_obj:
+        log.action_label = AUDIT_ACTION_LABELS.get(log.action, log.get_action_display())
+
+    return render(request, 'wireguard_tools/audit_log_list.html', {
+        'page_title': _('監査ログ'),
+        'page_obj': page_obj,
+        'action_choices': [(value, AUDIT_ACTION_LABELS.get(value, label)) for value, label in AuditLog.ACTION_CHOICES],
+        'selected_action': action,
+        'query': query,
+    })
 
 
 def clean_command_field(command_field):
