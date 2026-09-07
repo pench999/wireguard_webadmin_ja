@@ -104,7 +104,7 @@ if [ -n "${WIREGUARD_MTU:-}" ]; then
     fi
 fi
 
-if [[ "${DEV_MODE,,}" != "true" ]]; then
+if [[ "${ENABLE_DJANGO_ADMIN,,}" != "true" ]]; then
     sed -i "/^    path('admin\/', admin.site.urls),/s/^    /    # /" /app/wireguard_webadmin/urls.py
 fi
 
