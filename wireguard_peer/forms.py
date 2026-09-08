@@ -51,7 +51,7 @@ class PeerKeepaliveForm(PeerModelForm):
 class PeerKeysForm(PeerModelForm):
     public_key = forms.CharField(label=_('Public Key'), required=True)
     private_key = forms.CharField(label=_('Private Key'), required=False)
-    pre_shared_key = forms.CharField(label=_('Pre-Shared Key'), required=True)
+    pre_shared_key = forms.CharField(label=_('Pre-Shared Key'), required=False)
 
     class Meta:
         model = Peer

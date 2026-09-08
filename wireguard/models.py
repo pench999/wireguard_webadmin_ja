@@ -189,7 +189,7 @@ class WireGuardInstance(models.Model):
 class Peer(models.Model):
     name = models.CharField(max_length=100, blank=True, null=True)
     public_key = models.CharField(max_length=100)
-    pre_shared_key = models.CharField(max_length=100)
+    pre_shared_key = models.CharField(max_length=100, blank=True)
     private_key = models.CharField(max_length=100, blank=True, null=True)
     persistent_keepalive = models.IntegerField(default=25)
     wireguard_instance = models.ForeignKey(WireGuardInstance, on_delete=models.CASCADE)
@@ -374,4 +374,3 @@ class PeerGroup(models.Model):
 
     def __str__(self):
         return self.name
-
