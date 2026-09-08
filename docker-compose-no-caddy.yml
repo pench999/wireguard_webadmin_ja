@@ -10,7 +10,7 @@ services:
       - SERVER_ADDRESS=${SERVER_ADDRESS}
       - DEBUG_MODE=${DEBUG_MODE}
       - COMPOSE_VERSION=c2g
-      - TZ=${TIMEZONE}
+      - TZ=${TIMEZONE:-Asia/Tokyo}
       - EXTRA_ALLOWED_HOSTS=${EXTRA_ALLOWED_HOSTS}
       - WIREGUARD_STATUS_CACHE_ENABLED=${WIREGUARD_STATUS_CACHE_ENABLED}
       - WIREGUARD_STATUS_CACHE_WEB_LOAD_PREVIOUS_COUNT=${WIREGUARD_STATUS_CACHE_WEB_LOAD_PREVIOUS_COUNT}
@@ -51,7 +51,7 @@ services:
       dockerfile: Dockerfile-cron
     image: wireguard_webadmin_ja/wireguard-webadmin-cron:latest
     environment:
-      - TZ=${TIMEZONE}
+      - TZ=${TIMEZONE:-Asia/Tokyo}
       - WIREGUARD_STATUS_CACHE_REFRESH_INTERVAL=${WIREGUARD_STATUS_CACHE_REFRESH_INTERVAL}
     volumes:
       - app_secrets:/app_secrets/
@@ -69,7 +69,7 @@ services:
       - app_secrets:/app_secrets/
       - rrd_data:/rrd_data/
     environment:
-      - TZ=${TIMEZONE}
+      - TZ=${TIMEZONE:-Asia/Tokyo}
     depends_on:
       - wireguard-webadmin
 
@@ -81,7 +81,7 @@ services:
       dockerfile: Dockerfile-dnsmasq
     image: wireguard_webadmin_ja/wireguard-webadmin-dns:latest
     environment:
-      - TZ=${TIMEZONE}
+      - TZ=${TIMEZONE:-Asia/Tokyo}
     volumes:
       - dnsmasq_conf:/etc/dnsmasq/
 
