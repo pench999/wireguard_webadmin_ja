@@ -1,6 +1,62 @@
 {% extends "base.html" %}
 {% load i18n %}
 
+{% block page_custom_head %}
+<style>
+    .audit-log-table {
+        table-layout: fixed;
+        min-width: 1180px;
+        font-size: 0.875rem;
+    }
+
+    .audit-log-table th,
+    .audit-log-table td {
+        vertical-align: top;
+    }
+
+    .audit-log-date {
+        width: 145px;
+        white-space: nowrap;
+    }
+
+    .audit-log-user {
+        width: 110px;
+    }
+
+    .audit-log-action {
+        width: 180px;
+        white-space: nowrap;
+    }
+
+    .audit-log-target {
+        width: 210px;
+    }
+
+    .audit-log-instance {
+        width: 130px;
+        white-space: nowrap;
+    }
+
+    .audit-log-ip {
+        width: 115px;
+        white-space: nowrap;
+    }
+
+    .audit-log-details {
+        width: auto;
+    }
+
+    .audit-log-table pre {
+        max-height: 8rem;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-size: 0.78rem;
+        line-height: 1.35;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="card card-primary card-outline">
     <div class="card-header">
@@ -30,25 +86,25 @@
         </form>
 
         <div class="table-responsive">
-            <table class="table table-striped table-bordered table-sm">
+            <table class="table table-striped table-bordered table-sm audit-log-table">
                 <thead>
                     <tr>
-                        <th>{% trans '日時' %}</th>
-                        <th>{% trans 'ユーザー' %}</th>
-                        <th>{% trans '操作' %}</th>
-                        <th>{% trans '対象' %}</th>
-                        <th>{% trans 'インスタンス' %}</th>
-                        <th>{% trans 'IPアドレス' %}</th>
-                        <th>{% trans '詳細' %}</th>
+                        <th class="audit-log-date">{% trans '日時' %}</th>
+                        <th class="audit-log-user">{% trans 'ユーザー' %}</th>
+                        <th class="audit-log-action">{% trans '操作' %}</th>
+                        <th class="audit-log-target">{% trans '対象' %}</th>
+                        <th class="audit-log-instance">{% trans 'インスタンス' %}</th>
+                        <th class="audit-log-ip">{% trans 'IPアドレス' %}</th>
+                        <th class="audit-log-details">{% trans '詳細' %}</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for log in page_obj %}
                     <tr>
-                        <td style="white-space: nowrap;">{{ log.created|date:"Y-m-d H:i:s" }}</td>
-                        <td>{{ log.username|default:"-" }}</td>
-                        <td>{{ log.action_label }}</td>
-                        <td>
+                        <td class="audit-log-date">{{ log.created|date:"Y-m-d H:i:s" }}</td>
+                        <td class="audit-log-user">{{ log.username|default:"-" }}</td>
+                        <td class="audit-log-action">{{ log.action_label }}</td>
+                        <td class="audit-log-target">
                             {% if log.object_name %}
                                 {{ log.object_name }}
                             {% else %}
@@ -58,11 +114,11 @@
                                 <br><small class="text-muted">{{ log.object_type }}</small>
                             {% endif %}
                         </td>
-                        <td>{{ log.wireguard_instance|default:"-" }}</td>
-                        <td>{{ log.ip_address|default:"-" }}</td>
-                        <td>
+                        <td class="audit-log-instance">{{ log.wireguard_instance|default:"-" }}</td>
+                        <td class="audit-log-ip">{{ log.ip_address|default:"-" }}</td>
+                        <td class="audit-log-details">
                             {% if log.details %}
-                                <pre class="mb-0 small" style="white-space: pre-wrap;">{{ log.details }}</pre>
+                                <pre class="mb-0">{{ log.details }}</pre>
                             {% else %}
                                 -
                             {% endif %}
