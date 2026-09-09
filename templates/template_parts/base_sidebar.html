@@ -90,7 +90,7 @@
                 </a>
             </li>
 
-            {% if request.user.is_superuser %}
+            {% if request.user.is_superuser or user_acl.enable_audit_log %}
             <li class="nav-item">
                 <a href="{% url 'audit_log_list' %}" class="nav-link {% if '/tools/audit_logs/' in request.path %}active{% endif %}">
                     <i class="fas fa-clipboard-list nav-icon"></i>

@@ -57,7 +57,10 @@ AUDIT_ACTION_LABELS = {
 
 @login_required
 def audit_log_list(request):
-    if not request.user.is_superuser:
+    if not (
+            request.user.is_superuser
+            or UserAcl.objects.filter(user=request.user, enable_audit_log=True).exists()
+    ):
         raise PermissionDenied
 
     logs = AuditLog.objects.select_related('user').all()

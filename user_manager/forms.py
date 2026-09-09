@@ -17,6 +17,7 @@ class UserAclForm(forms.Form):
     enable_reload = forms.BooleanField(required=False, label=_("Reload WireGuard"))
     enable_restart = forms.BooleanField(required=False, label=_("Restart WireGuard"))
     enable_enhanced_filter = forms.BooleanField(required=False, label=_("Enhanced Filter"))
+    enable_audit_log = forms.BooleanField(required=False, label=_("監査ログ"))
     user_level = forms.ChoiceField(choices=UserAcl.user_level.field.choices, required=True, label=_("User Level"))
     peer_groups = forms.ModelMultipleChoiceField(
         queryset=PeerGroup.objects.all(),
@@ -37,6 +38,7 @@ class UserAclForm(forms.Form):
             self.fields['enable_reload'].initial = self.instance.useracl.enable_reload
             self.fields['enable_restart'].initial = self.instance.useracl.enable_restart
             self.fields['enable_enhanced_filter'].initial = self.instance.useracl.enable_enhanced_filter
+            self.fields['enable_audit_log'].initial = self.instance.useracl.enable_audit_log
         else:
             self.fields['password1'].required = True
             self.fields['password2'].required = True
@@ -44,6 +46,7 @@ class UserAclForm(forms.Form):
             self.fields['enable_reload'].initial = True
             self.fields['enable_restart'].initial = True
             self.fields['enable_enhanced_filter'].initial = False
+            self.fields['enable_audit_log'].initial = False
 
         delete_label = _("Delete")
         back_label = _("Back")
@@ -94,6 +97,10 @@ class UserAclForm(forms.Form):
                 css_class='form-row'
             ),
             Row(
+                Column('enable_audit_log', css_class='form-group col-md-12 mb-0'),
+                css_class='form-row'
+            ),
+            Row(
                 Column(
                     Submit('submit', _('Save'), css_class='btn btn-success'),
                     HTML(f' <a class="btn btn-secondary" href="/user/list/">{back_label}</a> '),
@@ -137,6 +144,7 @@ class UserAclForm(forms.Form):
         enable_reload = self.cleaned_data.get('enable_reload', False)
         enable_restart = self.cleaned_data.get('enable_restart', False)
         enable_enhanced_filter = self.cleaned_data.get('enable_enhanced_filter', False)
+        enable_audit_log = self.cleaned_data.get('enable_audit_log', False)
 
         if self.instance:
             user = self.instance
@@ -156,7 +164,8 @@ class UserAclForm(forms.Form):
                 'enable_console': enable_console,
                 'enable_reload': enable_reload,
                 'enable_restart': enable_restart,
-                'enable_enhanced_filter': enable_enhanced_filter
+                'enable_enhanced_filter': enable_enhanced_filter,
+                'enable_audit_log': enable_audit_log
             }
         )
         
@@ -228,4 +237,3 @@ class PeerGroupForm(forms.ModelForm):
             peer_group.save()
 
         return peer_group
-

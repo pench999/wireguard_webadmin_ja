@@ -21,6 +21,7 @@ class UserAcl(models.Model):
     enable_enhanced_filter = models.BooleanField(default=False)
     enable_reload = models.BooleanField(default=True)
     enable_restart = models.BooleanField(default=True)
+    enable_audit_log = models.BooleanField(default=False)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
