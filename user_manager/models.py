@@ -10,6 +10,7 @@ from wireguard.models import PeerGroup
 class UserAcl(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     user_level = models.PositiveIntegerField(default=0, choices=(
+        (0, _('VPNユーザー')),
         (10, _('Debugging Analyst')),
         (20, _('View Only')),
         (30, _('Peer Manager')),
