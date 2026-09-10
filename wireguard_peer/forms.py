@@ -6,6 +6,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Button, Field
 from crispy_forms.layout import HTML, Layout, Row, Submit, Div
 from django import forms
+from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.urls import reverse_lazy
 from django.utils import timezone
@@ -56,6 +57,19 @@ class PeerKeysForm(PeerModelForm):
     class Meta:
         model = Peer
         fields = ['public_key', 'private_key', 'pre_shared_key']
+
+
+class PeerMfaOwnerForm(PeerModelForm):
+    mfa_owner = forms.ModelChoiceField(
+        label=_('MFA認証ユーザー'),
+        queryset=User.objects.filter(is_active=True).order_by('username'),
+        required=False,
+        help_text=_('このピアのVPN接続をMFAで有効化できるユーザーです。未設定の場合は管理者のみ有効化できます。')
+    )
+
+    class Meta:
+        model = Peer
+        fields = ['mfa_owner']
         
 
 class PeerAllowedIPForm(forms.ModelForm):

@@ -16,7 +16,7 @@ from wgwadmlibrary.tools import check_sort_order_conflict, deduplicate_sort_orde
     user_allowed_instances, user_allowed_peers, user_has_access_to_instance, user_has_access_to_peer
 from wireguard.models import Peer, PeerAllowedIP, WireGuardInstance
 from wireguard_peer.forms import PeerAllowedIPForm, PeerNameForm, PeerKeepaliveForm, PeerKeysForm, PeerSuspensionForm, \
-    PeerScheduleProfileForm
+    PeerScheduleProfileForm, PeerMfaOwnerForm
 from user_manager.forms import PeerMfaUnlockForm
 from user_manager.models import UserMfaSettings
 from wireguard_tools.audit import write_audit_log
@@ -35,6 +35,15 @@ def _auto_apply(request, instance):
     else:
         messages.warning(request, _('Auto-apply failed for wg%(id)s: ') % {'id': instance.instance_id} + message)
     return True
+
+
+def _user_can_unlock_peer_mfa(user, peer):
+    if user.is_superuser:
+        return True
+    user_acl = UserAcl.objects.filter(user=user).first()
+    if user_acl and user_acl.user_level >= 50:
+        return True
+    return bool(peer.mfa_owner_id and peer.mfa_owner_id == user.id)
 
 
 @login_required
@@ -261,7 +270,9 @@ def view_wireguard_peer_manage(request):
 def view_wireguard_peer_mfa_unlock(request):
     user_acl = get_object_or_404(UserAcl, user=request.user)
     current_peer = get_object_or_404(Peer, uuid=request.GET.get('peer'))
-    if not user_has_access_to_peer(user_acl, current_peer):
+    if not user_has_access_to_peer(user_acl, current_peer) and current_peer.mfa_owner_id != request.user.id:
+        raise Http404
+    if not _user_can_unlock_peer_mfa(request.user, current_peer):
         raise Http404
     if not current_peer.mfa_required:
         messages.info(request, _('This peer does not require MFA.'))
@@ -296,11 +307,14 @@ def view_wireguard_peer_mfa_unlock(request):
                 messages.success(request, _('VPN接続を一時的に有効化しました。'))
             else:
                 messages.error(request, _('MFA認証は成功しましたが、WireGuardのリロードに失敗しました: ') + message)
-            return redirect('/peer/manage/?peer=' + str(current_peer.uuid))
+            if user_acl.user_level >= 20:
+                return redirect('/peer/manage/?peer=' + str(current_peer.uuid))
+            return redirect('/peer/mfa_unlock/?peer=' + str(current_peer.uuid))
 
-    return render(request, 'generic_form.html', {
+    return render(request, 'wireguard/peer_mfa_unlock.html', {
         'page_title': _('VPN接続のMFA認証'),
         'form': form,
+        'current_peer': current_peer,
         'form_description': {
             'size': 'col-lg-6',
             'content': _('認証アプリの6桁コードを入力すると、このピアを指定時間だけWireGuard設定へ反映します。'),
@@ -322,7 +336,8 @@ def view_wireguard_peer_edit_field(request):
     form_classes = {
         'name': PeerNameForm,
         'keepalive': PeerKeepaliveForm,
-        'keys': PeerKeysForm
+        'keys': PeerKeysForm,
+        'mfa_owner': PeerMfaOwnerForm,
     }
     
     if group not in form_classes:
@@ -351,6 +366,8 @@ def view_wireguard_peer_edit_field(request):
         page_title = _('Edit Keepalive')
     elif group == 'keys':
         page_title = _('Edit Keys')
+    elif group == 'mfa_owner':
+        page_title = _('MFA認証ユーザー')
 
     context = {
         'page_title': page_title,

@@ -1,0 +1,22 @@
+{% extends "base_mfa.html" %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block content %}
+<div class="mfa-shell">
+    <div class="mfa-card">
+        <div class="mfa-card-header">
+            <h1>{% trans 'VPN接続のMFA認証' %}</h1>
+            <p>{% trans '認証アプリの6桁コードを入力すると、VPN接続を一時的に有効化します。' %}</p>
+        </div>
+        <div class="mfa-peer">
+            <span>{% trans '対象ピア' %}</span>
+            <strong>{{ current_peer }}</strong>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            {% crispy form %}
+        </form>
+    </div>
+</div>
+{% endblock %}

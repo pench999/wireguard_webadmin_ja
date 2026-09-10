@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+{% load i18n %}
+{% load custom_tags %}
+{% get_current_language as CURRENT_LANGUAGE %}
+<html lang="{{ CURRENT_LANGUAGE }}">
+
+<head>
+    {% include 'template_parts/base_head.html' %}
+    <style>
+        body {
+            min-height: 100vh;
+            background: #f3f5f7;
+        }
+        .mfa-shell {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .mfa-card {
+            width: 100%;
+            max-width: 480px;
+            background: #fff;
+            border: 1px solid #d9dee3;
+            border-radius: 8px;
+            padding: 28px;
+            box-shadow: 0 8px 24px rgba(25, 35, 45, 0.08);
+        }
+        .mfa-card-header h1 {
+            font-size: 24px;
+            line-height: 1.35;
+            margin: 0 0 8px;
+        }
+        .mfa-card-header p {
+            color: #59636e;
+            margin: 0 0 20px;
+        }
+        .mfa-peer {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 12px 0;
+            margin-bottom: 18px;
+            border-top: 1px solid #e5e9ed;
+            border-bottom: 1px solid #e5e9ed;
+        }
+        .mfa-peer span {
+            color: #59636e;
+        }
+        .mfa-peer strong {
+            text-align: right;
+            word-break: break-word;
+        }
+        .mfa-card .btn {
+            margin-top: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    {% block content %}{% endblock %}
+    {% include 'template_parts/base_scripts.html' %}
+    {% include 'template_parts/base_messages.html' %}
+    {% block custom_page_scripts %}{% endblock %}
+</body>
+</html>
