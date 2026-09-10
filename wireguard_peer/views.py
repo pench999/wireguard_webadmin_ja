@@ -49,6 +49,33 @@ def _user_can_unlock_peer_mfa(user, peer):
     return bool(peer.assigned_user_id and peer.assigned_user_id == user.id)
 
 
+def _user_can_admin_bypass_peer_mfa(user):
+    if user.is_superuser:
+        return True
+    user_acl = UserAcl.objects.filter(user=user).first()
+    return bool(user_acl and user_acl.user_level >= 50)
+
+
+def _unlock_peer_mfa(request, peer, bypass_mfa=False):
+    unlock_minutes = peer.mfa_unlock_minutes
+    now = timezone.now()
+    if peer.mfa_lock_mode == 'disconnect':
+        peer.mfa_unlocked_until = now + timezone.timedelta(days=3650)
+    else:
+        peer.mfa_unlocked_until = now + timezone.timedelta(minutes=unlock_minutes)
+    peer.mfa_last_verified_at = now
+    peer.save()
+    write_audit_log(request, 'peer_mfa_unlocked', peer, details={
+        'lock_mode': peer.mfa_lock_mode,
+        'unlock_minutes': unlock_minutes,
+        'disconnect_grace_seconds': peer.mfa_disconnect_grace_seconds,
+        'unlocked_until': str(peer.mfa_unlocked_until),
+        'bypass_mfa': bypass_mfa,
+    })
+    export_wireguard_configuration(peer.wireguard_instance)
+    return func_reload_wireguard_interface(peer.wireguard_instance)
+
+
 def _user_vpn_peer_or_404(request):
     return get_object_or_404(Peer, uuid=request.GET.get('peer'), assigned_user=request.user)
 
@@ -337,38 +364,36 @@ def view_wireguard_peer_mfa_unlock(request):
         messages.info(request, _('This peer does not require MFA.'))
         return redirect('/peer/manage/?peer=' + str(current_peer.uuid))
 
-    mfa_settings = UserMfaSettings.objects.filter(user=request.user, totp_enabled=True).first()
-    if not mfa_settings:
-        messages.warning(request, _('VPN接続を有効化するには、先にMFAを設定してください。'))
-        return redirect('/user/mfa/setup/')
-
     user_acl = UserAcl.objects.filter(user=request.user).first()
     use_portal_return = bool(current_peer.assigned_user_id == request.user.id and (not user_acl or user_acl.user_level < 20))
     back_url = '/vpn/' if use_portal_return else f'/peer/manage/?peer={current_peer.uuid}'
-    form = PeerMfaUnlockForm(request.POST or None, peer=current_peer, back_url=back_url)
-    if form.is_valid():
+    admin_bypass = _user_can_admin_bypass_peer_mfa(request.user)
+    form = None
+
+    if admin_bypass:
+        if request.method == 'POST':
+            success, message = _unlock_peer_mfa(request, current_peer, bypass_mfa=True)
+            if success:
+                messages.success(request, _('管理者権限でVPN接続を一時的に有効化しました。'))
+            else:
+                messages.error(request, _('VPN接続の有効化は完了しましたが、WireGuardのリロードに失敗しました: ') + message)
+            return redirect('/peer/manage/?peer=' + str(current_peer.uuid))
+    else:
+        mfa_settings = UserMfaSettings.objects.filter(user=request.user, totp_enabled=True).first()
+        if not mfa_settings:
+            messages.warning(request, _('VPN接続を有効化するには、先にMFAを設定してください。'))
+            return redirect('/user/mfa/setup/')
+
+        form = PeerMfaUnlockForm(request.POST or None, peer=current_peer, back_url=back_url)
+
+    if form and form.is_valid():
         import pyotp
         totp = pyotp.TOTP(mfa_settings.totp_secret)
         if not totp.verify(form.cleaned_data['totp_pin'], valid_window=1):
             write_audit_log(request, 'vpn_mfa_failed', current_peer)
             messages.error(request, _('MFA認証に失敗しました。'))
         else:
-            unlock_minutes = current_peer.mfa_unlock_minutes
-            now = timezone.now()
-            if current_peer.mfa_lock_mode == 'disconnect':
-                current_peer.mfa_unlocked_until = now + timezone.timedelta(days=3650)
-            else:
-                current_peer.mfa_unlocked_until = now + timezone.timedelta(minutes=unlock_minutes)
-            current_peer.mfa_last_verified_at = now
-            current_peer.save()
-            write_audit_log(request, 'peer_mfa_unlocked', current_peer, details={
-                'lock_mode': current_peer.mfa_lock_mode,
-                'unlock_minutes': unlock_minutes,
-                'disconnect_grace_seconds': current_peer.mfa_disconnect_grace_seconds,
-                'unlocked_until': str(current_peer.mfa_unlocked_until),
-            })
-            export_wireguard_configuration(current_peer.wireguard_instance)
-            success, message = func_reload_wireguard_interface(current_peer.wireguard_instance)
+            success, message = _unlock_peer_mfa(request, current_peer)
             if success:
                 messages.success(request, _('VPN接続を一時的に有効化しました。'))
             else:
@@ -382,6 +407,7 @@ def view_wireguard_peer_mfa_unlock(request):
         'form': form,
         'current_peer': current_peer,
         'unlock_minutes': current_peer.mfa_unlock_minutes,
+        'admin_bypass': admin_bypass,
         'form_description': {
             'size': 'col-lg-6',
             'content': _('認証アプリの6桁コードを入力すると、このピアを管理者が設定した時間だけWireGuard設定へ反映します。'),

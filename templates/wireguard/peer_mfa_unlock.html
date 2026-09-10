@@ -7,20 +7,43 @@
     <div class="mfa-card">
         <div class="mfa-card-header">
             <h1>{% trans 'VPN接続のMFA認証' %}</h1>
-            <p>{% trans '認証アプリの6桁コードを入力すると、VPN接続を一時的に有効化します。' %}</p>
+            {% if admin_bypass %}
+                <p>{% trans '管理者権限により、MFAコードなしでVPN接続を有効化できます。' %}</p>
+            {% else %}
+                <p>{% trans '認証アプリの6桁コードを入力すると、VPN接続を一時的に有効化します。' %}</p>
+            {% endif %}
         </div>
         <div class="mfa-peer">
             <span>{% trans '対象ピア' %}</span>
             <strong>{{ current_peer }}</strong>
         </div>
         <div class="mfa-peer">
-            <span>{% trans '接続許可時間' %}</span>
-            <strong>{{ unlock_minutes }}{% trans '分' %}</strong>
+            <span>{% trans 'MFAロック方式' %}</span>
+            <strong>{{ current_peer.get_mfa_lock_mode_display }}</strong>
         </div>
-        <form method="post">
-            {% csrf_token %}
-            {% crispy form %}
-        </form>
+        {% if current_peer.mfa_lock_mode == 'disconnect' %}
+            <div class="mfa-peer">
+                <span>{% trans '再ロック条件' %}</span>
+                <strong>{% blocktrans with seconds=current_peer.mfa_disconnect_grace_seconds %}切断検知から{{ seconds }}秒後{% endblocktrans %}</strong>
+            </div>
+        {% else %}
+            <div class="mfa-peer">
+                <span>{% trans '接続許可時間' %}</span>
+                <strong>{{ unlock_minutes }}{% trans '分' %}</strong>
+            </div>
+        {% endif %}
+        {% if admin_bypass %}
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">{% trans 'VPN接続を有効化' %}</button>
+                <a class="btn btn-secondary" href="/peer/manage/?peer={{ current_peer.uuid }}">{% trans '戻る' %}</a>
+            </form>
+        {% else %}
+            <form method="post">
+                {% csrf_token %}
+                {% crispy form %}
+            </form>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
