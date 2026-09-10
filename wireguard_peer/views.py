@@ -19,7 +19,7 @@ from wgwadmlibrary.tools import check_sort_order_conflict, deduplicate_sort_orde
     user_allowed_instances, user_allowed_peers, user_has_access_to_instance, user_has_access_to_peer
 from wireguard.models import Peer, PeerAllowedIP, WireGuardInstance
 from wireguard_peer.forms import PeerAllowedIPForm, PeerNameForm, PeerKeepaliveForm, PeerKeysForm, PeerSuspensionForm, \
-    PeerScheduleProfileForm, PeerAssignedUserForm
+    PeerScheduleProfileForm, PeerAssignedUserForm, PeerMfaUnlockMinutesForm
 from user_manager.forms import PeerMfaUnlockForm
 from user_manager.models import UserMfaSettings
 from wireguard_tools.audit import write_audit_log
@@ -342,11 +342,10 @@ def view_wireguard_peer_mfa_unlock(request):
         messages.warning(request, _('VPN接続を有効化するには、先にMFAを設定してください。'))
         return redirect('/user/mfa/setup/')
 
-    initial = {'unlock_minutes': mfa_settings.default_unlock_minutes}
     user_acl = UserAcl.objects.filter(user=request.user).first()
     use_portal_return = bool(current_peer.assigned_user_id == request.user.id and (not user_acl or user_acl.user_level < 20))
     back_url = '/vpn/' if use_portal_return else f'/peer/manage/?peer={current_peer.uuid}'
-    form = PeerMfaUnlockForm(request.POST or None, initial=initial, peer=current_peer, back_url=back_url)
+    form = PeerMfaUnlockForm(request.POST or None, peer=current_peer, back_url=back_url)
     if form.is_valid():
         import pyotp
         totp = pyotp.TOTP(mfa_settings.totp_secret)
@@ -354,7 +353,7 @@ def view_wireguard_peer_mfa_unlock(request):
             write_audit_log(request, 'vpn_mfa_failed', current_peer)
             messages.error(request, _('MFA認証に失敗しました。'))
         else:
-            unlock_minutes = form.cleaned_data['unlock_minutes']
+            unlock_minutes = current_peer.mfa_unlock_minutes
             now = timezone.now()
             current_peer.mfa_unlocked_until = now + timezone.timedelta(minutes=unlock_minutes)
             current_peer.mfa_last_verified_at = now
@@ -377,9 +376,10 @@ def view_wireguard_peer_mfa_unlock(request):
         'page_title': _('VPN接続のMFA認証'),
         'form': form,
         'current_peer': current_peer,
+        'unlock_minutes': current_peer.mfa_unlock_minutes,
         'form_description': {
             'size': 'col-lg-6',
-            'content': _('認証アプリの6桁コードを入力すると、このピアを指定時間だけWireGuard設定へ反映します。'),
+            'content': _('認証アプリの6桁コードを入力すると、このピアを管理者が設定した時間だけWireGuard設定へ反映します。'),
         },
     })
 
@@ -400,6 +400,7 @@ def view_wireguard_peer_edit_field(request):
         'keepalive': PeerKeepaliveForm,
         'keys': PeerKeysForm,
         'assigned_user': PeerAssignedUserForm,
+        'mfa_unlock_minutes': PeerMfaUnlockMinutesForm,
     }
     
     if group not in form_classes:
@@ -430,6 +431,8 @@ def view_wireguard_peer_edit_field(request):
         page_title = _('Edit Keys')
     elif group == 'assigned_user':
         page_title = _('割当ユーザー')
+    elif group == 'mfa_unlock_minutes':
+        page_title = _('MFA接続許可時間')
 
     context = {
         'page_title': page_title,

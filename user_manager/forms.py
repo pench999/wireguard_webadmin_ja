@@ -212,12 +212,6 @@ class PeerMfaUnlockForm(forms.Form):
         max_length=6,
         min_length=6,
     )
-    unlock_minutes = forms.IntegerField(
-        label=_('有効化時間(分)'),
-        min_value=5,
-        max_value=1440,
-        initial=480,
-    )
 
     def __init__(self, *args, **kwargs):
         peer = kwargs.pop('peer', None)
@@ -229,7 +223,6 @@ class PeerMfaUnlockForm(forms.Form):
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
             'totp_pin',
-            'unlock_minutes',
             Row(
                 Column(
                     Submit('submit', _('VPN接続を有効化'), css_class='btn btn-primary'),

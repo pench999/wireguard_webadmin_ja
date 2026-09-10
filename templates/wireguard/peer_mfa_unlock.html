@@ -13,6 +13,10 @@
             <span>{% trans '対象ピア' %}</span>
             <strong>{{ current_peer }}</strong>
         </div>
+        <div class="mfa-peer">
+            <span>{% trans '接続許可時間' %}</span>
+            <strong>{{ unlock_minutes }}{% trans '分' %}</strong>
+        </div>
         <form method="post">
             {% csrf_token %}
             {% crispy form %}

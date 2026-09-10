@@ -101,6 +101,9 @@
                                         {% trans '未設定' %}
                                     {% endif %}
                                 </small>
+                                <small class="text-muted">
+                                    {% trans 'MFA接続許可時間' %}: {{ current_peer.mfa_unlock_minutes }}{% trans '分' %}
+                                </small>
                             </div>
                             <div>
                                 {% if current_peer.mfa_required %}
@@ -120,6 +123,9 @@
                                     {% endif %}
                                     <a href="{% url 'wireguard_peer_edit_field' %}?peer={{ current_peer.uuid }}&group=assigned_user" class="btn btn-outline-secondary btn-xs">
                                         {% trans '割当ユーザーを設定' %}
+                                    </a>
+                                    <a href="{% url 'wireguard_peer_edit_field' %}?peer={{ current_peer.uuid }}&group=mfa_unlock_minutes" class="btn btn-outline-secondary btn-xs">
+                                        {% trans '許可時間を設定' %}
                                     </a>
                                 {% endif %}
                             </div>

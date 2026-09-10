@@ -211,6 +211,7 @@ class Peer(models.Model):
         null=True,
         related_name='assigned_peers'
     )
+    mfa_unlock_minutes = models.PositiveIntegerField(default=120)
     mfa_unlocked_until = models.DateTimeField(blank=True, null=True)
     mfa_last_verified_at = models.DateTimeField(blank=True, null=True)
 

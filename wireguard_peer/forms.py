@@ -70,6 +70,20 @@ class PeerAssignedUserForm(PeerModelForm):
     class Meta:
         model = Peer
         fields = ['assigned_user']
+
+
+class PeerMfaUnlockMinutesForm(PeerModelForm):
+    mfa_unlock_minutes = forms.IntegerField(
+        label=_('MFA接続許可時間(分)'),
+        required=True,
+        min_value=5,
+        max_value=1440,
+        help_text=_('MFA認証に成功した後、このピアをWireGuard設定へ反映しておく時間です。')
+    )
+
+    class Meta:
+        model = Peer
+        fields = ['mfa_unlock_minutes']
         
 
 class PeerAllowedIPForm(forms.ModelForm):
