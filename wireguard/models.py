@@ -35,6 +35,11 @@ NETMASK_CHOICES = (
         (32, '/32 (255.255.255.255)'),
     )
 
+MFA_LOCK_MODE_CHOICES = (
+    ('time', '時間でロック'),
+    ('disconnect', '切断検知でロック'),
+)
+
 
 class WebadminSettings(models.Model):
     name = models.CharField(default='webadmin_settings', max_length=20, unique=True)
@@ -212,6 +217,8 @@ class Peer(models.Model):
         related_name='assigned_peers'
     )
     mfa_unlock_minutes = models.PositiveIntegerField(default=120)
+    mfa_lock_mode = models.CharField(max_length=16, choices=MFA_LOCK_MODE_CHOICES, default='time')
+    mfa_disconnect_grace_seconds = models.PositiveIntegerField(default=300)
     mfa_unlocked_until = models.DateTimeField(blank=True, null=True)
     mfa_last_verified_at = models.DateTimeField(blank=True, null=True)
 
@@ -233,6 +240,8 @@ class Peer(models.Model):
     def mfa_unlocked(self) -> bool:
         if not self.mfa_required:
             return True
+        if self.mfa_lock_mode == 'disconnect':
+            return bool(self.mfa_unlocked_until)
         return bool(self.mfa_unlocked_until and self.mfa_unlocked_until > timezone.now())
 
     @property

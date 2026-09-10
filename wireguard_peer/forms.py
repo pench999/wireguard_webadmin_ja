@@ -13,7 +13,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from scheduler.models import PeerScheduling
-from wireguard.models import NETMASK_CHOICES, Peer, PeerAllowedIP
+from wireguard.models import MFA_LOCK_MODE_CHOICES, NETMASK_CHOICES, Peer, PeerAllowedIP
 
 
 class PeerModelForm(forms.ModelForm):
@@ -84,6 +84,26 @@ class PeerMfaUnlockMinutesForm(PeerModelForm):
     class Meta:
         model = Peer
         fields = ['mfa_unlock_minutes']
+
+
+class PeerMfaLockModeForm(PeerModelForm):
+    mfa_lock_mode = forms.ChoiceField(
+        label=_('MFAロック方式'),
+        choices=MFA_LOCK_MODE_CHOICES,
+        required=True,
+        help_text=_('時間でロックするか、切断検知でロックするかを選択します。')
+    )
+    mfa_disconnect_grace_seconds = forms.IntegerField(
+        label=_('MFA切断猶予秒数'),
+        required=True,
+        min_value=60,
+        max_value=86400,
+        help_text=_('切断検知でロックする場合、最終ハンドシェイクからこの秒数を超えると切断扱いにします。')
+    )
+
+    class Meta:
+        model = Peer
+        fields = ['mfa_lock_mode', 'mfa_disconnect_grace_seconds']
         
 
 class PeerAllowedIPForm(forms.ModelForm):

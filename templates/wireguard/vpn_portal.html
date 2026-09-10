@@ -188,7 +188,9 @@
                             <span>{% trans 'MFA' %}</span>
                             {% if peer.mfa_required %}
                                 {% trans '必要' %}
-                                {% if peer.mfa_unlocked_until %}
+                                {% if peer.mfa_lock_mode == 'disconnect' %}
+                                    / {% trans '切断後に再認証' %}
+                                {% elif peer.mfa_unlocked_until %}
                                     / {% trans '有効期限' %}: {{ peer.mfa_unlocked_until|date:"Y-m-d H:i" }}
                                 {% endif %}
                             {% else %}

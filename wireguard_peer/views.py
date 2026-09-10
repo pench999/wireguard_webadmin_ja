@@ -19,7 +19,7 @@ from wgwadmlibrary.tools import check_sort_order_conflict, deduplicate_sort_orde
     user_allowed_instances, user_allowed_peers, user_has_access_to_instance, user_has_access_to_peer
 from wireguard.models import Peer, PeerAllowedIP, WireGuardInstance
 from wireguard_peer.forms import PeerAllowedIPForm, PeerNameForm, PeerKeepaliveForm, PeerKeysForm, PeerSuspensionForm, \
-    PeerScheduleProfileForm, PeerAssignedUserForm, PeerMfaUnlockMinutesForm
+    PeerScheduleProfileForm, PeerAssignedUserForm, PeerMfaUnlockMinutesForm, PeerMfaLockModeForm
 from user_manager.forms import PeerMfaUnlockForm
 from user_manager.models import UserMfaSettings
 from wireguard_tools.audit import write_audit_log
@@ -355,11 +355,16 @@ def view_wireguard_peer_mfa_unlock(request):
         else:
             unlock_minutes = current_peer.mfa_unlock_minutes
             now = timezone.now()
-            current_peer.mfa_unlocked_until = now + timezone.timedelta(minutes=unlock_minutes)
+            if current_peer.mfa_lock_mode == 'disconnect':
+                current_peer.mfa_unlocked_until = now + timezone.timedelta(days=3650)
+            else:
+                current_peer.mfa_unlocked_until = now + timezone.timedelta(minutes=unlock_minutes)
             current_peer.mfa_last_verified_at = now
             current_peer.save()
             write_audit_log(request, 'peer_mfa_unlocked', current_peer, details={
+                'lock_mode': current_peer.mfa_lock_mode,
                 'unlock_minutes': unlock_minutes,
+                'disconnect_grace_seconds': current_peer.mfa_disconnect_grace_seconds,
                 'unlocked_until': str(current_peer.mfa_unlocked_until),
             })
             export_wireguard_configuration(current_peer.wireguard_instance)
@@ -401,6 +406,7 @@ def view_wireguard_peer_edit_field(request):
         'keys': PeerKeysForm,
         'assigned_user': PeerAssignedUserForm,
         'mfa_unlock_minutes': PeerMfaUnlockMinutesForm,
+        'mfa_lock_mode': PeerMfaLockModeForm,
     }
     
     if group not in form_classes:
@@ -433,6 +439,8 @@ def view_wireguard_peer_edit_field(request):
         page_title = _('割当ユーザー')
     elif group == 'mfa_unlock_minutes':
         page_title = _('MFA接続許可時間')
+    elif group == 'mfa_lock_mode':
+        page_title = _('MFAロック方式')
 
     context = {
         'page_title': page_title,

@@ -367,10 +367,29 @@ def _record_peer_connection_audit(peer, action, details):
     )
 
 
+def _lock_peer_mfa_after_disconnect(peer, details, interfaces):
+    if not (
+        peer.mfa_required and
+        peer.mfa_lock_mode == 'disconnect' and
+        peer.mfa_unlocked_until
+    ):
+        return
+
+    peer.mfa_unlocked_until = None
+    peer.save(update_fields=['mfa_unlocked_until', 'updated'])
+    interfaces.add(peer.wireguard_instance)
+    _record_peer_connection_audit(peer, 'peer_mfa_locked', {
+        **details,
+        'reason': 'MFA disconnect lock',
+        'lock_mode': 'disconnect',
+    })
+
+
 def func_update_peer_connection_audit(wireguard_status_data: Dict[str, Any]) -> None:
     inactive_after = _peer_inactive_seconds()
     now = timezone.now()
     seen_peer_ids = set()
+    interfaces_to_reload = set()
 
     if not isinstance(wireguard_status_data, dict):
         return
@@ -396,9 +415,13 @@ def func_update_peer_connection_audit(wireguard_status_data: Dict[str, Any]) -> 
             transfer = peer_info.get('transfer') or {}
             transfer_rx = int(transfer.get('rx') or 0)
             transfer_tx = int(transfer.get('tx') or 0)
+            peer_inactive_after = inactive_after
+            if peer.mfa_required and peer.mfa_lock_mode == 'disconnect':
+                peer_inactive_after = peer.mfa_disconnect_grace_seconds
+
             is_connected = bool(
                 last_handshake_time and
-                now - last_handshake_time <= datetime.timedelta(seconds=inactive_after)
+                now - last_handshake_time <= datetime.timedelta(seconds=peer_inactive_after)
             )
 
             state, created = PeerConnectionState.objects.get_or_create(peer=peer)
@@ -410,7 +433,7 @@ def func_update_peer_connection_audit(wireguard_status_data: Dict[str, Any]) -> 
 
             details = {
                 'interface': interface,
-                'inactive_after_seconds': inactive_after,
+                'inactive_after_seconds': peer_inactive_after,
                 'latest_handshake': last_handshake_time.isoformat() if last_handshake_time else '',
                 'previous_handshake': previous_handshake.isoformat() if previous_handshake else '',
                 'transfer_rx': transfer_rx,
@@ -427,6 +450,7 @@ def func_update_peer_connection_audit(wireguard_status_data: Dict[str, Any]) -> 
                 state.last_event_at = now
             elif not is_connected and previous_connected:
                 _record_peer_connection_audit(peer, 'peer_disconnected', details)
+                _lock_peer_mfa_after_disconnect(peer, details, interfaces_to_reload)
                 state.last_event_at = now
             state.is_connected = is_connected
             state.last_handshake = last_handshake_time
@@ -445,9 +469,14 @@ def func_update_peer_connection_audit(wireguard_status_data: Dict[str, Any]) -> 
             'reason': 'peer_not_seen_in_wireguard_dump',
         }
         _record_peer_connection_audit(state.peer, 'peer_disconnected', details)
+        _lock_peer_mfa_after_disconnect(state.peer, details, interfaces_to_reload)
         state.is_connected = False
         state.last_event_at = now
         state.save()
+
+    for wireguard_instance in interfaces_to_reload:
+        export_wireguard_configuration(wireguard_instance)
+        func_reload_wireguard_interface(wireguard_instance)
 
 
 def func_concatenate_cluster_wireguard_status_cache() -> None:
@@ -679,7 +708,7 @@ def cron_peer_scheduler(request):
     expired_mfa_peers = (
         Peer.objects
         .select_related('wireguard_instance')
-        .filter(mfa_required=True, mfa_unlocked_until__isnull=False, mfa_unlocked_until__lte=now)
+        .filter(mfa_required=True, mfa_lock_mode='time', mfa_unlocked_until__isnull=False, mfa_unlocked_until__lte=now)
     )
     for peer in expired_mfa_peers:
         peer.mfa_unlocked_until = None
