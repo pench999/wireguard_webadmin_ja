@@ -3,6 +3,7 @@ import uuid
 from typing import Optional
 
 from django.db import models
+from django.utils import timezone
 
 from wireguard_tools.networks import normalize_cidr_list, normalize_cidr_pairs, safe_network_cidr
 
@@ -201,6 +202,9 @@ class Peer(models.Model):
     disabled_by_schedule = models.BooleanField(default=False)
     suspended = models.BooleanField(default=False)
     suspend_reason = models.TextField(blank=True, null=True)
+    mfa_required = models.BooleanField(default=False)
+    mfa_unlocked_until = models.DateTimeField(blank=True, null=True)
+    mfa_last_verified_at = models.DateTimeField(blank=True, null=True)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -214,7 +218,13 @@ class Peer(models.Model):
 
     @property
     def enabled(self) -> bool:
-        return not self.disabled_by_schedule and not self.suspended
+        return not self.disabled_by_schedule and not self.suspended and self.mfa_unlocked
+
+    @property
+    def mfa_unlocked(self) -> bool:
+        if not self.mfa_required:
+            return True
+        return bool(self.mfa_unlocked_until and self.mfa_unlocked_until > timezone.now())
 
     @property
     def announced_networks(self):

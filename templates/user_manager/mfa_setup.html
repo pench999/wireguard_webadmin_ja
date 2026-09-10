@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card card-primary card-outline">
+            <div class="card-header">
+                <h3 class="card-title">{% trans 'MFA設定' %}</h3>
+            </div>
+            <div class="card-body">
+                {% if mfa_settings.totp_enabled %}
+                    <p class="text-success">
+                        <i class="fas fa-check-circle"></i> {% trans 'MFAは設定済みです。' %}
+                    </p>
+                    <a class="btn btn-outline-danger" href="{% url 'user_mfa_disable' %}">
+                        {% trans 'MFAを無効化' %}
+                    </a>
+                {% else %}
+                    <p>{% trans '認証アプリでQRコードを読み取り、表示された6桁のコードを入力してください。' %}</p>
+                    <div class="text-center mb-3">
+                        <img src="{% url 'user_mfa_qrcode' %}" alt="{% trans 'MFA QRコード' %}" class="img-fluid" style="max-width: 220px;">
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        {% crispy form %}
+                        <button type="submit" class="btn btn-primary">
+                            {% trans 'MFAを有効化' %}
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card card-primary card-outline">
+            <div class="card-body">
+                <h5>{% trans 'VPN接続前MFAについて' %}</h5>
+                <p>{% trans 'MFA必須に設定されたピアは、認証が成功した時間帯だけWireGuard設定へ反映されます。' %}</p>
+                <p>{% trans '認証アプリには Google Authenticator、Microsoft Authenticator、1Password などを利用できます。' %}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

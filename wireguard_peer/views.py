@@ -1,9 +1,11 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from cluster.models import ClusterSettings, Worker
@@ -15,6 +17,8 @@ from wgwadmlibrary.tools import check_sort_order_conflict, deduplicate_sort_orde
 from wireguard.models import Peer, PeerAllowedIP, WireGuardInstance
 from wireguard_peer.forms import PeerAllowedIPForm, PeerNameForm, PeerKeepaliveForm, PeerKeysForm, PeerSuspensionForm, \
     PeerScheduleProfileForm
+from user_manager.forms import PeerMfaUnlockForm
+from user_manager.models import UserMfaSettings
 from wireguard_tools.audit import write_audit_log
 from wireguard_tools.functions import func_reload_wireguard_interface
 from wireguard_tools.views import export_wireguard_configuration
@@ -186,6 +190,36 @@ def view_wireguard_peer_manage(request):
     if not user_has_access_to_peer(user_acl, current_peer):
         raise Http404
     current_instance = current_peer.wireguard_instance
+    if request.GET.get('action') == 'enable_mfa':
+        if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=30).exists():
+            return render(request, 'access_denied.html', {'page_title': 'アクセス拒否'})
+        current_peer.mfa_required = True
+        current_peer.mfa_unlocked_until = None
+        current_peer.save()
+        write_audit_log(request, 'peer_mfa_required_enabled', current_peer)
+        export_wireguard_configuration(current_instance)
+        success, message = func_reload_wireguard_interface(current_instance)
+        if success:
+            messages.success(request, _('このピアにMFA必須を設定しました。'))
+        else:
+            messages.error(request, _('MFA必須を設定しましたが、WireGuardのリロードに失敗しました: ') + message)
+        return redirect('/peer/manage/?peer=' + str(current_peer.uuid))
+
+    if request.GET.get('action') == 'disable_mfa':
+        if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=30).exists():
+            return render(request, 'access_denied.html', {'page_title': 'アクセス拒否'})
+        current_peer.mfa_required = False
+        current_peer.mfa_unlocked_until = None
+        current_peer.save()
+        write_audit_log(request, 'peer_mfa_required_disabled', current_peer)
+        export_wireguard_configuration(current_instance)
+        success, message = func_reload_wireguard_interface(current_instance)
+        if success:
+            messages.success(request, _('このピアのMFA必須を解除しました。'))
+        else:
+            messages.error(request, _('MFA必須を解除しましたが、WireGuardのリロードに失敗しました: ') + message)
+        return redirect('/peer/manage/?peer=' + str(current_peer.uuid))
+
     if request.GET.get('action') == 'delete':
         if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=30).exists():
             return render(request, 'access_denied.html', {'page_title': 'アクセス拒否'})
@@ -221,6 +255,57 @@ def view_wireguard_peer_manage(request):
         'peer_scheduling': peer_scheduling
         }
     return render(request, 'wireguard/wireguard_manage_peer.html', context)
+
+
+@login_required
+def view_wireguard_peer_mfa_unlock(request):
+    user_acl = get_object_or_404(UserAcl, user=request.user)
+    current_peer = get_object_or_404(Peer, uuid=request.GET.get('peer'))
+    if not user_has_access_to_peer(user_acl, current_peer):
+        raise Http404
+    if not current_peer.mfa_required:
+        messages.info(request, _('This peer does not require MFA.'))
+        return redirect('/peer/manage/?peer=' + str(current_peer.uuid))
+
+    mfa_settings = UserMfaSettings.objects.filter(user=request.user, totp_enabled=True).first()
+    if not mfa_settings:
+        messages.warning(request, _('VPN接続を有効化するには、先にMFAを設定してください。'))
+        return redirect('/user/mfa/setup/')
+
+    initial = {'unlock_minutes': mfa_settings.default_unlock_minutes}
+    form = PeerMfaUnlockForm(request.POST or None, initial=initial)
+    if form.is_valid():
+        import pyotp
+        totp = pyotp.TOTP(mfa_settings.totp_secret)
+        if not totp.verify(form.cleaned_data['totp_pin'], valid_window=1):
+            write_audit_log(request, 'vpn_mfa_failed', current_peer)
+            messages.error(request, _('MFA認証に失敗しました。'))
+        else:
+            unlock_minutes = form.cleaned_data['unlock_minutes']
+            now = timezone.now()
+            current_peer.mfa_unlocked_until = now + timezone.timedelta(minutes=unlock_minutes)
+            current_peer.mfa_last_verified_at = now
+            current_peer.save()
+            write_audit_log(request, 'peer_mfa_unlocked', current_peer, details={
+                'unlock_minutes': unlock_minutes,
+                'unlocked_until': str(current_peer.mfa_unlocked_until),
+            })
+            export_wireguard_configuration(current_peer.wireguard_instance)
+            success, message = func_reload_wireguard_interface(current_peer.wireguard_instance)
+            if success:
+                messages.success(request, _('VPN接続を一時的に有効化しました。'))
+            else:
+                messages.error(request, _('MFA認証は成功しましたが、WireGuardのリロードに失敗しました: ') + message)
+            return redirect('/peer/manage/?peer=' + str(current_peer.uuid))
+
+    return render(request, 'generic_form.html', {
+        'page_title': _('VPN接続のMFA認証'),
+        'form': form,
+        'form_description': {
+            'size': 'col-lg-6',
+            'content': _('認証アプリの6桁コードを入力すると、このピアを指定時間だけWireGuard設定へ反映します。'),
+        },
+    })
 
 
 @login_required

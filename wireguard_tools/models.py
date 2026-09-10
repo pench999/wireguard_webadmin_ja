@@ -42,6 +42,11 @@ class AuditLog(models.Model):
         ('wireguard_restarted', 'WireGuard restarted'),
         ('wireguard_reload_failed', 'WireGuard reload failed'),
         ('wireguard_restart_failed', 'WireGuard restart failed'),
+        ('vpn_mfa_failed', 'VPN MFA failed'),
+        ('peer_mfa_unlocked', 'Peer MFA unlocked'),
+        ('peer_mfa_locked', 'Peer MFA locked'),
+        ('peer_mfa_required_enabled', 'Peer MFA requirement enabled'),
+        ('peer_mfa_required_disabled', 'Peer MFA requirement disabled'),
     )
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)

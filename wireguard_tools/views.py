@@ -52,6 +52,11 @@ AUDIT_ACTION_LABELS = {
     'wireguard_restarted': _('WireGuard再起動'),
     'wireguard_reload_failed': _('WireGuardリロード失敗'),
     'wireguard_restart_failed': _('WireGuard再起動失敗'),
+    'vpn_mfa_failed': _('VPN MFA失敗'),
+    'peer_mfa_unlocked': _('MFAによるピア一時有効化'),
+    'peer_mfa_locked': _('MFAピアロック'),
+    'peer_mfa_required_enabled': _('ピアMFA必須化'),
+    'peer_mfa_required_disabled': _('ピアMFA必須解除'),
 }
 
 
@@ -254,9 +259,11 @@ def export_wireguard_configuration(instance_only: WireGuardInstance = None):
 
         config_lines.append("")
 
+        now = timezone.now()
         peers = (
             Peer.objects
             .filter(wireguard_instance=instance, suspended=False, disabled_by_schedule=False)
+            .filter(Q(mfa_required=False) | Q(mfa_unlocked_until__gt=now))
             .prefetch_related(
                 Prefetch(
                     "peerallowedip_set",

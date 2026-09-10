@@ -36,3 +36,17 @@ class AuthenticationToken(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     uuid = models.UUIDField(editable=False, default=uuid.uuid4)
+
+
+class UserMfaSettings(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='mfa_settings')
+    totp_secret = models.CharField(max_length=255, blank=True)
+    totp_enabled = models.BooleanField(default=False)
+    default_unlock_minutes = models.PositiveIntegerField(default=480)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    uuid = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+
+    def __str__(self):
+        return f'{self.user.username} MFA'

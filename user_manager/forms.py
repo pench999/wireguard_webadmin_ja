@@ -174,6 +174,36 @@ class UserAclForm(forms.Form):
         return user
 
 
+class UserMfaSetupForm(forms.Form):
+    totp_pin = forms.CharField(
+        label=_('認証コード'),
+        max_length=6,
+        min_length=6,
+        help_text=_('認証アプリに表示された6桁のコードを入力してください。'),
+    )
+
+
+class UserMfaDisableForm(forms.Form):
+    confirm = forms.BooleanField(
+        label=_('MFAを無効化します'),
+        required=True,
+    )
+
+
+class PeerMfaUnlockForm(forms.Form):
+    totp_pin = forms.CharField(
+        label=_('認証コード'),
+        max_length=6,
+        min_length=6,
+    )
+    unlock_minutes = forms.IntegerField(
+        label=_('有効化時間(分)'),
+        min_value=5,
+        max_value=1440,
+        initial=480,
+    )
+
+
 
 class PeerGroupForm(forms.ModelForm):
     class Meta:

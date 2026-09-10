@@ -630,6 +630,7 @@ def cron_peer_scheduler(request):
         'scheduled_peers_enabled': 0,
         'scheduled_peers_suspended': 0,
         'scheduled_peers_unsuspended': 0,
+        'mfa_peers_locked': 0,
     }
 
     interfaces = set()
@@ -674,6 +675,25 @@ def cron_peer_scheduler(request):
 
         peer_scheduling.peer.save()
         peer_scheduling.save()
+
+    expired_mfa_peers = (
+        Peer.objects
+        .select_related('wireguard_instance')
+        .filter(mfa_required=True, mfa_unlocked_until__isnull=False, mfa_unlocked_until__lte=now)
+    )
+    for peer in expired_mfa_peers:
+        peer.mfa_unlocked_until = None
+        peer.save()
+        data['mfa_peers_locked'] += 1
+        interfaces.add(peer.wireguard_instance)
+        AuditLog.objects.create(
+            action='peer_mfa_locked',
+            object_type=peer.__class__.__name__,
+            object_uuid=str(peer.uuid),
+            object_name=str(peer),
+            wireguard_instance=f'wg{peer.wireguard_instance.instance_id}',
+            details={'reason': 'MFA unlock expired'},
+        )
 
     errors = []
     for wireguard_instance in interfaces:

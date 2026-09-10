@@ -78,6 +78,43 @@
                         </div>
                     </div>
 
+                    <!-- MFA State -->
+                    <div class="form-group border-bottom pb-3">
+                        <label>{% trans 'VPN MFA' %}</label>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex flex-column">
+                                {% if current_peer.mfa_required %}
+                                    {% if current_peer.mfa_unlocked %}
+                                        <span class="text-success"><i class="fas fa-unlock"></i> {% trans 'MFA認証済み' %}</span>
+                                        <small class="text-muted">{% trans '有効期限' %}: {{ current_peer.mfa_unlocked_until|date:"Y-m-d H:i" }}</small>
+                                    {% else %}
+                                        <span class="text-warning"><i class="fas fa-lock"></i> {% trans 'MFA認証待ち' %}</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">{% trans 'MFA不要' %}</span>
+                                {% endif %}
+                            </div>
+                            <div>
+                                {% if current_peer.mfa_required %}
+                                    <a href="{% url 'wireguard_peer_mfa_unlock' %}?peer={{ current_peer.uuid }}" class="btn btn-outline-primary btn-xs">
+                                        {% trans 'VPN接続を有効化' %}
+                                    </a>
+                                {% endif %}
+                                {% if user_acl.user_level >= 30 %}
+                                    {% if current_peer.mfa_required %}
+                                        <a href="?peer={{ current_peer.uuid }}&action=disable_mfa" class="btn btn-outline-secondary btn-xs">
+                                            {% trans 'MFA必須を解除' %}
+                                        </a>
+                                    {% else %}
+                                        <a href="?peer={{ current_peer.uuid }}&action=enable_mfa" class="btn btn-outline-secondary btn-xs">
+                                            {% trans 'MFA必須にする' %}
+                                        </a>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Persistent Keepalive -->
                     <div class="form-group border-bottom pb-3">
                         <label>{% trans 'Persistent Keepalive' %}</label>
