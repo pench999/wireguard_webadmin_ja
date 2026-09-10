@@ -94,9 +94,9 @@
                                     <span class="text-muted">{% trans 'MFA不要' %}</span>
                                 {% endif %}
                                 <small class="text-muted">
-                                    {% trans '認証ユーザー' %}:
-                                    {% if current_peer.mfa_owner %}
-                                        {{ current_peer.mfa_owner.username }}
+                                    {% trans '割当ユーザー' %}:
+                                    {% if current_peer.assigned_user %}
+                                        {{ current_peer.assigned_user.username }}
                                     {% else %}
                                         {% trans '未設定' %}
                                     {% endif %}
@@ -118,8 +118,8 @@
                                             {% trans 'MFA必須にする' %}
                                         </a>
                                     {% endif %}
-                                    <a href="{% url 'wireguard_peer_edit_field' %}?peer={{ current_peer.uuid }}&group=mfa_owner" class="btn btn-outline-secondary btn-xs">
-                                        {% trans '認証ユーザーを設定' %}
+                                    <a href="{% url 'wireguard_peer_edit_field' %}?peer={{ current_peer.uuid }}&group=assigned_user" class="btn btn-outline-secondary btn-xs">
+                                        {% trans '割当ユーザーを設定' %}
                                     </a>
                                 {% endif %}
                             </div>

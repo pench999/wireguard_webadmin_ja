@@ -59,17 +59,17 @@ class PeerKeysForm(PeerModelForm):
         fields = ['public_key', 'private_key', 'pre_shared_key']
 
 
-class PeerMfaOwnerForm(PeerModelForm):
-    mfa_owner = forms.ModelChoiceField(
-        label=_('MFA認証ユーザー'),
+class PeerAssignedUserForm(PeerModelForm):
+    assigned_user = forms.ModelChoiceField(
+        label=_('割当ユーザー'),
         queryset=User.objects.filter(is_active=True).order_by('username'),
         required=False,
-        help_text=_('このピアのVPN接続をMFAで有効化できるユーザーです。未設定の場合は管理者のみ有効化できます。')
+        help_text=_('このピアを利用するユーザーです。未設定の場合、エンドユーザー用ポータルには表示されません。')
     )
 
     class Meta:
         model = Peer
-        fields = ['mfa_owner']
+        fields = ['assigned_user']
         
 
 class PeerAllowedIPForm(forms.ModelForm):

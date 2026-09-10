@@ -204,12 +204,12 @@ class Peer(models.Model):
     suspended = models.BooleanField(default=False)
     suspend_reason = models.TextField(blank=True, null=True)
     mfa_required = models.BooleanField(default=False)
-    mfa_owner = models.ForeignKey(
+    assigned_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        related_name='mfa_peers'
+        related_name='assigned_peers'
     )
     mfa_unlocked_until = models.DateTimeField(blank=True, null=True)
     mfa_last_verified_at = models.DateTimeField(blank=True, null=True)

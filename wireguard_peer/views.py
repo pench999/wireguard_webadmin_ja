@@ -16,7 +16,7 @@ from wgwadmlibrary.tools import check_sort_order_conflict, deduplicate_sort_orde
     user_allowed_instances, user_allowed_peers, user_has_access_to_instance, user_has_access_to_peer
 from wireguard.models import Peer, PeerAllowedIP, WireGuardInstance
 from wireguard_peer.forms import PeerAllowedIPForm, PeerNameForm, PeerKeepaliveForm, PeerKeysForm, PeerSuspensionForm, \
-    PeerScheduleProfileForm, PeerMfaOwnerForm
+    PeerScheduleProfileForm, PeerAssignedUserForm
 from user_manager.forms import PeerMfaUnlockForm
 from user_manager.models import UserMfaSettings
 from wireguard_tools.audit import write_audit_log
@@ -43,7 +43,7 @@ def _user_can_unlock_peer_mfa(user, peer):
     user_acl = UserAcl.objects.filter(user=user).first()
     if user_acl and user_acl.user_level >= 50:
         return True
-    return bool(peer.mfa_owner_id and peer.mfa_owner_id == user.id)
+    return bool(peer.assigned_user_id and peer.assigned_user_id == user.id)
 
 
 @login_required
@@ -270,7 +270,7 @@ def view_wireguard_peer_manage(request):
 def view_wireguard_peer_mfa_unlock(request):
     user_acl = get_object_or_404(UserAcl, user=request.user)
     current_peer = get_object_or_404(Peer, uuid=request.GET.get('peer'))
-    if not user_has_access_to_peer(user_acl, current_peer) and current_peer.mfa_owner_id != request.user.id:
+    if not user_has_access_to_peer(user_acl, current_peer) and current_peer.assigned_user_id != request.user.id:
         raise Http404
     if not _user_can_unlock_peer_mfa(request.user, current_peer):
         raise Http404
@@ -337,7 +337,7 @@ def view_wireguard_peer_edit_field(request):
         'name': PeerNameForm,
         'keepalive': PeerKeepaliveForm,
         'keys': PeerKeysForm,
-        'mfa_owner': PeerMfaOwnerForm,
+        'assigned_user': PeerAssignedUserForm,
     }
     
     if group not in form_classes:
@@ -366,8 +366,8 @@ def view_wireguard_peer_edit_field(request):
         page_title = _('Edit Keepalive')
     elif group == 'keys':
         page_title = _('Edit Keys')
-    elif group == 'mfa_owner':
-        page_title = _('MFA認証ユーザー')
+    elif group == 'assigned_user':
+        page_title = _('割当ユーザー')
 
     context = {
         'page_title': page_title,
