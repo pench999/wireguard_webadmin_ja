@@ -95,6 +95,8 @@ def legacy_view_wireguard_status(request):
 @login_required
 def view_wireguard_status(request):
     user_acl = get_object_or_404(UserAcl, user=request.user)
+    if user_acl.user_level < 20:
+        return redirect('/vpn/')
     page_title = _("WireGuard Status")
 
     if user_acl.peer_groups.exists():
@@ -181,7 +183,10 @@ def view_wireguard_manage_instance(request):
 
 @login_required
 def view_apply_db_patches(request):
-    if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=50).exists():
+    user_acl = get_object_or_404(UserAcl, user=request.user)
+    if user_acl.user_level < 20:
+        return redirect('/vpn/')
+    if user_acl.user_level < 50:
         return redirect('/status/')
     webadmin_settings, webadmin_settings_created = WebadminSettings.objects.get_or_create(name='webadmin_settings')
     update_applied = False

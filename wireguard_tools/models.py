@@ -65,10 +65,10 @@ class AuditLog(models.Model):
     class Meta:
         ordering = ('-created',)
         indexes = [
-            models.Index(fields=('created',)),
-            models.Index(fields=('action',)),
-            models.Index(fields=('username',)),
-            models.Index(fields=('object_type', 'object_uuid')),
+            models.Index(fields=('created',), name='wireguard_t_created_777495_idx'),
+            models.Index(fields=('action',), name='wireguard_t_action_16913b_idx'),
+            models.Index(fields=('username',), name='wireguard_t_usernam_11a996_idx'),
+            models.Index(fields=('object_type', 'object_uuid'), name='wireguard_t_object__1c821a_idx'),
         ]
 
     def __str__(self):
@@ -89,8 +89,8 @@ class PeerConnectionState(models.Model):
 
     class Meta:
         indexes = [
-            models.Index(fields=('is_connected',)),
-            models.Index(fields=('last_handshake',)),
+            models.Index(fields=('is_connected',), name='wireguard_t_is_conn_7b970c_idx'),
+            models.Index(fields=('last_handshake',), name='wireguard_t_last_ha_26034c_idx'),
         ]
 
     def __str__(self):

@@ -106,6 +106,8 @@ def view_vpn_portal_qrcode(request):
 @login_required
 def view_wireguard_peer_list(request):
     user_acl = get_object_or_404(UserAcl, user=request.user)
+    if user_acl.user_level < 20:
+        return redirect('/vpn/')
     wireguard_instances = user_allowed_instances(user_acl)
     if request.GET.get('peer_status', '') == 'disabled':
         page_title = _('Disabled WireGuard Peer List')
