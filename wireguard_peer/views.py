@@ -273,7 +273,7 @@ def view_wireguard_peer_mfa_unlock(request):
         return redirect('/user/mfa/setup/')
 
     initial = {'unlock_minutes': mfa_settings.default_unlock_minutes}
-    form = PeerMfaUnlockForm(request.POST or None, initial=initial)
+    form = PeerMfaUnlockForm(request.POST or None, initial=initial, peer=current_peer)
     if form.is_valid():
         import pyotp
         totp = pyotp.TOTP(mfa_settings.totp_secret)

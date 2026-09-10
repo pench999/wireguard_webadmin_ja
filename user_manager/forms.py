@@ -189,6 +189,22 @@ class UserMfaDisableForm(forms.Form):
         required=True,
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.layout = Layout(
+            'confirm',
+            Row(
+                Column(
+                    Submit('submit', _('無効化'), css_class='btn btn-danger'),
+                    HTML(' <a class="btn btn-secondary" href="/user/mfa/setup/">' + str(_('戻る')) + '</a>'),
+                    css_class='col-md-12'
+                ),
+                css_class='form-row'
+            )
+        )
+
 
 class PeerMfaUnlockForm(forms.Form):
     totp_pin = forms.CharField(
@@ -202,6 +218,25 @@ class PeerMfaUnlockForm(forms.Form):
         max_value=1440,
         initial=480,
     )
+
+    def __init__(self, *args, **kwargs):
+        peer = kwargs.pop('peer', None)
+        super().__init__(*args, **kwargs)
+        back_url = f'/peer/manage/?peer={peer.uuid}' if peer else '/peer/list/'
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.layout = Layout(
+            'totp_pin',
+            'unlock_minutes',
+            Row(
+                Column(
+                    Submit('submit', _('VPN接続を有効化'), css_class='btn btn-primary'),
+                    HTML(f' <a class="btn btn-secondary" href="{back_url}">{_("戻る")}</a>'),
+                    css_class='col-md-12'
+                ),
+                css_class='form-row'
+            )
+        )
 
 
 
