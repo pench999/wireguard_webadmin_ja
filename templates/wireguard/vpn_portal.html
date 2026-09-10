@@ -1,0 +1,247 @@
+{% extends "base_mfa.html" %}
+{% load i18n %}
+
+{% block page_custom_head %}
+<style>
+    .vpn-shell {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 32px 20px;
+    }
+    .vpn-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        align-items: flex-start;
+        margin-bottom: 24px;
+    }
+    .vpn-header h1 {
+        font-size: 26px;
+        line-height: 1.3;
+        margin: 0 0 6px;
+    }
+    .vpn-header p {
+        color: #59636e;
+        margin: 0;
+    }
+    .vpn-user-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+    .vpn-peer-list {
+        display: grid;
+        gap: 14px;
+    }
+    .vpn-peer {
+        background: #fff;
+        border: 1px solid #d9dee3;
+        border-radius: 8px;
+        padding: 18px;
+        box-shadow: 0 4px 14px rgba(25, 35, 45, 0.06);
+    }
+    .vpn-peer-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: flex-start;
+        margin-bottom: 12px;
+    }
+    .vpn-peer h2 {
+        font-size: 18px;
+        margin: 0 0 4px;
+        word-break: break-word;
+    }
+    .vpn-meta {
+        color: #59636e;
+        font-size: 13px;
+    }
+    .vpn-status {
+        white-space: nowrap;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 4px 8px;
+        border-radius: 6px;
+    }
+    .vpn-status-ready {
+        color: #155724;
+        background: #d4edda;
+    }
+    .vpn-status-waiting {
+        color: #856404;
+        background: #fff3cd;
+    }
+    .vpn-status-disabled {
+        color: #6c757d;
+        background: #eceff2;
+    }
+    .vpn-details {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin: 12px 0 16px;
+        color: #343a40;
+        font-size: 14px;
+    }
+    .vpn-details span {
+        color: #59636e;
+        display: block;
+        font-size: 12px;
+        margin-bottom: 2px;
+    }
+    .vpn-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    .vpn-empty {
+        background: #fff;
+        border: 1px solid #d9dee3;
+        border-radius: 8px;
+        padding: 24px;
+        color: #59636e;
+    }
+    .vpn-qr {
+        margin-top: 14px;
+        display: none;
+    }
+    .vpn-qr img {
+        width: 220px;
+        max-width: 100%;
+        border: 1px solid #d9dee3;
+        border-radius: 8px;
+        padding: 8px;
+        background: #fff;
+    }
+    @media (max-width: 720px) {
+        .vpn-header,
+        .vpn-peer-top {
+            display: block;
+        }
+        .vpn-user-actions {
+            justify-content: flex-start;
+            margin-top: 14px;
+        }
+        .vpn-status {
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .vpn-details {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="vpn-shell">
+    <div class="vpn-header">
+        <div>
+            <h1>{% trans 'VPNポータル' %}</h1>
+            <p>{% trans '自分に割り当てられたVPN設定を確認し、必要に応じてMFAで接続を有効化できます。' %}</p>
+        </div>
+        <div class="vpn-user-actions">
+            {% if mfa_settings %}
+                <a class="btn btn-outline-secondary btn-sm" href="{% url 'user_mfa_setup' %}">
+                    <i class="fas fa-user-shield"></i> {% trans 'MFA設定' %}
+                </a>
+            {% else %}
+                <a class="btn btn-primary btn-sm" href="{% url 'user_mfa_setup' %}">
+                    <i class="fas fa-user-shield"></i> {% trans 'MFAを設定' %}
+                </a>
+            {% endif %}
+            <a class="btn btn-outline-secondary btn-sm" href="/accounts/logout/">
+                <i class="fas fa-sign-out-alt"></i> {% trans 'ログアウト' %}
+            </a>
+        </div>
+    </div>
+
+    {% if peers %}
+        <div class="vpn-peer-list">
+            {% for peer in peers %}
+                <section class="vpn-peer">
+                    <div class="vpn-peer-top">
+                        <div>
+                            <h2>{{ peer }}</h2>
+                            <div class="vpn-meta">wg{{ peer.wireguard_instance.instance_id }} / {{ peer.wireguard_instance.hostname }}:{{ peer.wireguard_instance.listen_port }}</div>
+                        </div>
+                        {% if peer.suspended or peer.disabled_by_schedule %}
+                            <span class="vpn-status vpn-status-disabled">{% trans '無効' %}</span>
+                        {% elif peer.mfa_required and not peer.mfa_unlocked %}
+                            <span class="vpn-status vpn-status-waiting">{% trans 'MFA認証待ち' %}</span>
+                        {% else %}
+                            <span class="vpn-status vpn-status-ready">{% trans '接続可能' %}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="vpn-details">
+                        <div>
+                            <span>{% trans 'VPNアドレス' %}</span>
+                            {{ peer.main_addresses|join:", "|default:"-" }}
+                        </div>
+                        <div>
+                            <span>{% trans '通信先' %}</span>
+                            {{ peer.client_routes|join:", "|default:"0.0.0.0/0" }}
+                        </div>
+                        <div>
+                            <span>{% trans 'MFA' %}</span>
+                            {% if peer.mfa_required %}
+                                {% trans '必要' %}
+                                {% if peer.mfa_unlocked_until %}
+                                    / {% trans '有効期限' %}: {{ peer.mfa_unlocked_until|date:"Y-m-d H:i" }}
+                                {% endif %}
+                            {% else %}
+                                {% trans '不要' %}
+                            {% endif %}
+                        </div>
+                        <div>
+                            <span>{% trans '設定状態' %}</span>
+                            {% if peer.private_key %}
+                                {% trans '設定ファイルを取得できます' %}
+                            {% else %}
+                                {% trans '秘密鍵が未登録です' %}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="vpn-actions">
+                        {% if peer.mfa_required and not peer.mfa_unlocked %}
+                            <a class="btn btn-primary btn-sm" href="{% url 'wireguard_peer_mfa_unlock' %}?peer={{ peer.uuid }}">
+                                <i class="fas fa-lock-open"></i> {% trans 'VPN接続を有効化' %}
+                            </a>
+                        {% endif %}
+                        <a class="btn btn-outline-primary btn-sm" href="{% url 'vpn_portal_download_config' %}?peer={{ peer.uuid }}">
+                            <i class="fas fa-download"></i> {% trans '設定ファイル' %}
+                        </a>
+                        <button class="btn btn-outline-secondary btn-sm" type="button" data-qr-target="vpn-qr-{{ peer.uuid }}">
+                            <i class="fas fa-qrcode"></i> {% trans 'QRコード' %}
+                        </button>
+                    </div>
+                    <div class="vpn-qr" id="vpn-qr-{{ peer.uuid }}">
+                        <img src="{% url 'vpn_portal_qrcode' %}?peer={{ peer.uuid }}" alt="{% trans 'VPN設定QRコード' %}">
+                    </div>
+                </section>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="vpn-empty">
+            {% trans '現在、あなたに割り当てられているVPNピアはありません。管理者へ確認してください。' %}
+        </div>
+    {% endif %}
+</main>
+{% endblock %}
+
+{% block custom_page_scripts %}
+<script>
+    document.querySelectorAll('[data-qr-target]').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var target = document.getElementById(button.getAttribute('data-qr-target'));
+            if (!target) {
+                return;
+            }
+            target.style.display = target.style.display === 'block' ? 'none' : 'block';
+        });
+    });
+</script>
+{% endblock %}

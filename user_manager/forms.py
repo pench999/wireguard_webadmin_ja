@@ -221,8 +221,10 @@ class PeerMfaUnlockForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         peer = kwargs.pop('peer', None)
+        back_url = kwargs.pop('back_url', None)
         super().__init__(*args, **kwargs)
-        back_url = f'/peer/manage/?peer={peer.uuid}' if peer else '/peer/list/'
+        if not back_url:
+            back_url = f'/peer/manage/?peer={peer.uuid}' if peer else '/peer/list/'
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.layout = Layout(

@@ -85,6 +85,8 @@ def view_user_list(request):
 @login_required
 def view_user_mfa_setup(request):
     mfa_settings, created = UserMfaSettings.objects.get_or_create(user=request.user)
+    user_acl = UserAcl.objects.filter(user=request.user).first()
+    use_vpn_portal = bool(not user_acl or user_acl.user_level < 20)
     pending_secret = request.session.get('pending_mfa_totp_secret')
     if not pending_secret:
         pending_secret = pyotp.random_base32()
@@ -99,6 +101,8 @@ def view_user_mfa_setup(request):
             mfa_settings.save()
             request.session.pop('pending_mfa_totp_secret', None)
             messages.success(request, _('MFAを設定しました。'))
+            if use_vpn_portal:
+                return redirect('/vpn/')
             return redirect('/user/mfa/setup/')
         messages.error(request, _('認証コードが正しくありません。'))
 
@@ -106,6 +110,7 @@ def view_user_mfa_setup(request):
         'page_title': _('MFA設定'),
         'form': form,
         'mfa_settings': mfa_settings,
+        'base_template': 'base_mfa.html' if use_vpn_portal else 'base.html',
     })
 
 

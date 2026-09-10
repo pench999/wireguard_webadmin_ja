@@ -3,10 +3,13 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from io import BytesIO
+import re
+import qrcode
 
 from cluster.models import ClusterSettings, Worker
 from routing_templates.models import RoutingTemplate
@@ -21,7 +24,7 @@ from user_manager.forms import PeerMfaUnlockForm
 from user_manager.models import UserMfaSettings
 from wireguard_tools.audit import write_audit_log
 from wireguard_tools.functions import func_reload_wireguard_interface
-from wireguard_tools.views import export_wireguard_configuration
+from wireguard_tools.views import export_wireguard_configuration, generate_peer_config
 from .functions import func_create_new_peer
 
 
@@ -44,6 +47,60 @@ def _user_can_unlock_peer_mfa(user, peer):
     if user_acl and user_acl.user_level >= 50:
         return True
     return bool(peer.assigned_user_id and peer.assigned_user_id == user.id)
+
+
+def _user_vpn_peer_or_404(request):
+    return get_object_or_404(Peer, uuid=request.GET.get('peer'), assigned_user=request.user)
+
+
+@login_required
+def view_vpn_portal(request):
+    peers = (
+        Peer.objects
+        .filter(assigned_user=request.user)
+        .select_related('wireguard_instance')
+        .prefetch_related('peerallowedip_set')
+        .order_by('wireguard_instance__instance_id', 'sort_order', 'name')
+    )
+    mfa_settings = UserMfaSettings.objects.filter(user=request.user, totp_enabled=True).first()
+
+    return render(request, 'wireguard/vpn_portal.html', {
+        'page_title': _('VPNポータル'),
+        'peers': peers,
+        'mfa_settings': mfa_settings,
+    })
+
+
+@login_required
+def view_vpn_portal_download_config(request):
+    peer = _user_vpn_peer_or_404(request)
+    config_content = generate_peer_config(peer.uuid)
+    peer_filename = re.sub(r'[^a-zA-Z0-9]', '_', str(peer))
+    response = HttpResponse(config_content, content_type='text/plain')
+    response['Content-Disposition'] = f'attachment; filename="peer_{peer_filename}.conf"'
+    return response
+
+
+@login_required
+def view_vpn_portal_qrcode(request):
+    peer = _user_vpn_peer_or_404(request)
+    config_content = generate_peer_config(peer.uuid)
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(config_content)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color='black', back_color='white')
+
+    response = HttpResponse(content_type='image/png')
+    img_io = BytesIO()
+    img.save(img_io)
+    img_io.seek(0)
+    response.write(img_io.getvalue())
+    return response
 
 
 @login_required
@@ -284,7 +341,10 @@ def view_wireguard_peer_mfa_unlock(request):
         return redirect('/user/mfa/setup/')
 
     initial = {'unlock_minutes': mfa_settings.default_unlock_minutes}
-    form = PeerMfaUnlockForm(request.POST or None, initial=initial, peer=current_peer)
+    user_acl = UserAcl.objects.filter(user=request.user).first()
+    use_portal_return = bool(current_peer.assigned_user_id == request.user.id and (not user_acl or user_acl.user_level < 20))
+    back_url = '/vpn/' if use_portal_return else f'/peer/manage/?peer={current_peer.uuid}'
+    form = PeerMfaUnlockForm(request.POST or None, initial=initial, peer=current_peer, back_url=back_url)
     if form.is_valid():
         import pyotp
         totp = pyotp.TOTP(mfa_settings.totp_secret)
@@ -307,9 +367,9 @@ def view_wireguard_peer_mfa_unlock(request):
                 messages.success(request, _('VPN接続を一時的に有効化しました。'))
             else:
                 messages.error(request, _('MFA認証は成功しましたが、WireGuardのリロードに失敗しました: ') + message)
-            if user_acl.user_level >= 20:
+            if not use_portal_return:
                 return redirect('/peer/manage/?peer=' + str(current_peer.uuid))
-            return redirect('/peer/mfa_unlock/?peer=' + str(current_peer.uuid))
+            return redirect('/vpn/')
 
     return render(request, 'wireguard/peer_mfa_unlock.html', {
         'page_title': _('VPN接続のMFA認証'),

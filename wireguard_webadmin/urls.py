@@ -29,10 +29,10 @@ urlpatterns = [
     path('tools/', include('wireguard_tools.urls')),
     path('vpn_invite/', include('vpn_invite.urls')),
     path('invite/', include('vpn_invite_public.urls')),
+    path('vpn/', include('wireguard_peer.urls_vpn')),
 
     # Utilities / misc
     path('console/', include('console.urls')),
     path('rrd/', include('wgrrd.urls')),
     path('change_language/', include('intl_tools.urls')),
 ]
-
