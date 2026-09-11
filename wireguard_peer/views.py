@@ -417,6 +417,7 @@ def view_wireguard_peer_mfa_unlock(request):
         'current_peer': current_peer,
         'unlock_minutes': current_peer.mfa_unlock_minutes,
         'admin_bypass': admin_bypass,
+        'use_portal_return': use_portal_return,
         'form_description': {
             'size': 'col-lg-6',
             'content': _('認証アプリの6桁コードを入力すると、このピアを管理者が設定した時間だけWireGuard設定へ反映します。'),

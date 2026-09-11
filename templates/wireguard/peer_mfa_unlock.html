@@ -36,7 +36,6 @@
             <form method="post">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary">{% trans 'VPN接続を有効化' %}</button>
-                <a class="btn btn-secondary" href="/peer/manage/?peer={{ current_peer.uuid }}">{% trans '戻る' %}</a>
             </form>
         {% else %}
             <form method="post">
@@ -44,6 +43,20 @@
                 {% crispy form %}
             </form>
         {% endif %}
+        <div class="mfa-footer-actions">
+            {% if use_portal_return %}
+                <a class="btn btn-outline-secondary btn-sm" href="/vpn/">
+                    <i class="fas fa-arrow-left"></i> {% trans 'VPNポータルに戻る' %}
+                </a>
+            {% else %}
+                <a class="btn btn-outline-secondary btn-sm" href="/peer/manage/?peer={{ current_peer.uuid }}">
+                    <i class="fas fa-arrow-left"></i> {% trans 'ピア設定に戻る' %}
+                </a>
+            {% endif %}
+            <a class="btn btn-outline-secondary btn-sm" href="/accounts/logout/">
+                <i class="fas fa-sign-out-alt"></i> {% trans 'ログアウト' %}
+            </a>
+        </div>
     </div>
 </div>
 {% endblock %}
