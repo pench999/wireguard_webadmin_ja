@@ -151,6 +151,9 @@
                     <i class="fas fa-user-shield"></i> {% trans 'MFAを設定' %}
                 </a>
             {% endif %}
+            <a class="btn btn-outline-secondary btn-sm" href="{% url 'user_password_change' %}">
+                <i class="fas fa-key"></i> {% trans 'パスワード変更' %}
+            </a>
             <a class="btn btn-outline-secondary btn-sm" href="/accounts/logout/">
                 <i class="fas fa-sign-out-alt"></i> {% trans 'ログアウト' %}
             </a>

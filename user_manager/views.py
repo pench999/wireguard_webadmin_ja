@@ -4,6 +4,7 @@ import pyotp
 import qrcode
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.sessions.models import Session
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -11,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 
 from user_manager.models import UserAcl, UserMfaSettings
 from wireguard.models import PeerGroup
-from .forms import PeerGroupForm, UserMfaDisableForm, UserMfaSetupForm
+from .forms import PeerGroupForm, UserMfaDisableForm, UserMfaSetupForm, UserPasswordChangeForm
 from .forms import UserAclForm
 
 
@@ -146,6 +147,24 @@ def view_user_mfa_disable(request):
     return render(request, 'generic_form.html', {
         'page_title': _('MFA無効化'),
         'form': form,
+    })
+
+
+@login_required
+def view_user_password_change(request):
+    user_acl = UserAcl.objects.filter(user=request.user).first()
+    use_vpn_portal = bool(not user_acl or user_acl.user_level < 20)
+    back_url = '/vpn/' if use_vpn_portal else '/status/'
+    form = UserPasswordChangeForm(request.user, request.POST or None, back_url=back_url)
+    if form.is_valid():
+        form.save()
+        update_session_auth_hash(request, form.user)
+        messages.success(request, _('パスワードを変更しました。'))
+        return redirect(back_url)
+    return render(request, 'user_manager/password_change.html', {
+        'page_title': _('パスワード変更'),
+        'form': form,
+        'base_template': 'base_mfa.html' if use_vpn_portal else 'base.html',
     })
 
 
