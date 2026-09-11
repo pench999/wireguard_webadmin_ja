@@ -62,9 +62,9 @@ class PeerKeysForm(PeerModelForm):
 class PeerAssignedUserForm(PeerModelForm):
     assigned_user = forms.ModelChoiceField(
         label=_('割当ユーザー'),
-        queryset=User.objects.filter(is_active=True).order_by('username'),
+        queryset=User.objects.filter(is_active=True, useracl__user_level=0).order_by('username'),
         required=False,
-        help_text=_('このピアを利用するユーザーです。未設定の場合、エンドユーザー用ポータルには表示されません。')
+        help_text=_('このピアを利用するVPNユーザーです。管理者などVPNユーザー以外は割り当てできません。未設定の場合、エンドユーザー用ポータルには表示されません。')
     )
 
     class Meta:
