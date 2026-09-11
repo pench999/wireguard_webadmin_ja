@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext_lazy as _
 
 from user_manager.models import UserAcl, UserMfaSettings
+from wireguard_tools.audit import write_audit_log
 from wireguard.models import PeerGroup
 from .forms import PeerGroupForm, UserMfaDisableForm, UserMfaSetupForm, UserPasswordChangeForm
 from .forms import UserAclForm
@@ -77,6 +78,15 @@ def view_peer_group_manage(request):
 def view_user_list(request):
     if not UserAcl.objects.filter(user=request.user).filter(user_level__gte=50).exists():
         return render(request, 'access_denied.html', {'page_title': 'Access Denied'})
+    if request.GET.get('action') == 'allow_mfa_reset':
+        target_acl = get_object_or_404(UserAcl, uuid=request.GET.get('uuid'))
+        target_mfa, created = UserMfaSettings.objects.get_or_create(user=target_acl.user)
+        target_mfa.reset_allowed = True
+        target_mfa.save()
+        write_audit_log(request, 'user_mfa_reset_allowed', target_acl.user, details={'target_user': target_acl.user.username})
+        messages.success(request, _('MFA再設定を許可しました: ') + target_acl.user.username)
+        return redirect('/user/list/')
+
     page_title = _('User Manager')
     user_acl_list = UserAcl.objects.all().order_by('user__username')
     context = {'page_title': page_title, 'user_acl_list': user_acl_list}
@@ -88,6 +98,19 @@ def view_user_mfa_setup(request):
     mfa_settings, created = UserMfaSettings.objects.get_or_create(user=request.user)
     user_acl = UserAcl.objects.filter(user=request.user).first()
     use_vpn_portal = bool(not user_acl or user_acl.user_level < 20)
+    reset_allowed = bool(mfa_settings.reset_allowed)
+    can_configure_mfa = bool(not mfa_settings.totp_enabled or reset_allowed)
+
+    if not can_configure_mfa:
+        return render(request, 'user_manager/mfa_setup.html', {
+            'page_title': _('MFA設定'),
+            'form': None,
+            'mfa_settings': mfa_settings,
+            'reset_allowed': reset_allowed,
+            'can_configure_mfa': can_configure_mfa,
+            'base_template': 'base_mfa.html' if use_vpn_portal else 'base.html',
+        })
+
     pending_secret = request.session.get('pending_mfa_totp_secret')
     if not pending_secret:
         pending_secret = pyotp.random_base32()
@@ -99,11 +122,13 @@ def view_user_mfa_setup(request):
         if totp.verify(form.cleaned_data['totp_pin'], valid_window=1):
             mfa_settings.totp_secret = pending_secret
             mfa_settings.totp_enabled = True
+            mfa_settings.reset_allowed = False
             mfa_settings.save()
             request.session.pop('pending_mfa_totp_secret', None)
+            write_audit_log(request, 'user_mfa_configured', request.user, details={'reset': reset_allowed})
             messages.success(request, _('MFAを設定しました。'))
             if use_vpn_portal:
-                return redirect('/vpn/')
+                return redirect('/vpn/?setup=1')
             return redirect('/user/mfa/setup/')
         messages.error(request, _('認証コードが正しくありません。'))
 
@@ -111,6 +136,8 @@ def view_user_mfa_setup(request):
         'page_title': _('MFA設定'),
         'form': form,
         'mfa_settings': mfa_settings,
+        'reset_allowed': reset_allowed,
+        'can_configure_mfa': can_configure_mfa,
         'base_template': 'base_mfa.html' if use_vpn_portal else 'base.html',
     })
 
@@ -136,6 +163,11 @@ def view_user_mfa_qrcode(request):
 @login_required
 def view_user_mfa_disable(request):
     mfa_settings = get_object_or_404(UserMfaSettings, user=request.user)
+    user_acl = UserAcl.objects.filter(user=request.user).first()
+    is_admin = bool(request.user.is_superuser or (user_acl and user_acl.user_level >= 50))
+    if mfa_settings.totp_enabled and not mfa_settings.reset_allowed and not is_admin:
+        messages.warning(request, _('MFAの無効化または再設定は管理者の許可が必要です。'))
+        return redirect('/user/mfa/setup/')
     form = UserMfaDisableForm(request.POST or None)
     if form.is_valid():
         mfa_settings.totp_secret = ''

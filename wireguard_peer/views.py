@@ -90,11 +90,20 @@ def view_vpn_portal(request):
         .order_by('wireguard_instance__instance_id', 'sort_order', 'name')
     )
     mfa_settings = UserMfaSettings.objects.filter(user=request.user, totp_enabled=True).first()
+    setup_mode = request.GET.get('setup') == '1'
+
+    if not mfa_settings and peers.filter(mfa_required=True).exists():
+        return redirect('/user/mfa/setup/')
+
+    locked_mfa_peers = [peer for peer in peers if peer.mfa_required and not peer.mfa_unlocked]
+    if mfa_settings and not setup_mode and len(locked_mfa_peers) == 1:
+        return redirect('/peer/mfa_unlock/?peer=' + str(locked_mfa_peers[0].uuid))
 
     return render(request, 'wireguard/vpn_portal.html', {
         'page_title': _('VPNポータル'),
         'peers': peers,
         'mfa_settings': mfa_settings,
+        'setup_mode': setup_mode,
     })
 
 

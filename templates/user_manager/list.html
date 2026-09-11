@@ -9,6 +9,7 @@
             <th>{% trans 'User Level' %}</th>
             <th>{% trans 'Peer Groups' %}</th>
             <th colspan="5">{% trans 'Permissions' %}</th>
+            <th>{% trans 'MFA' %}</th>
             <th><i class="far fa-edit"></i></th>
         </tr>
     </thead>
@@ -52,6 +53,20 @@
             <td style="width: 1%; white-space: nowrap;">
                 {% if user_acl.enable_audit_log %}
                 <i class="fas fa-clipboard-list" title="{% trans '監査ログの閲覧を許可' %}"></i>
+                {% endif %}
+            </td>
+
+            <td style="width: 1%; white-space: nowrap;">
+                {% if user_acl.user.mfa_settings.totp_enabled %}
+                    {% if user_acl.user.mfa_settings.reset_allowed %}
+                        <span class="badge badge-warning">{% trans '再設定許可中' %}</span>
+                    {% else %}
+                        <a class="btn btn-sm btn-outline-warning" href="/user/list/?action=allow_mfa_reset&uuid={{ user_acl.uuid }}">
+                            {% trans '再設定許可' %}
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <span class="text-muted">{% trans '未設定' %}</span>
                 {% endif %}
             </td>
 

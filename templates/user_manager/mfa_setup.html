@@ -10,14 +10,19 @@
                 <h3 class="card-title">{% trans 'MFA設定' %}</h3>
             </div>
             <div class="card-body">
-                {% if mfa_settings.totp_enabled %}
+                {% if mfa_settings.totp_enabled and not can_configure_mfa %}
                     <p class="text-success">
                         <i class="fas fa-check-circle"></i> {% trans 'MFAは設定済みです。' %}
                     </p>
-                    <a class="btn btn-outline-danger" href="{% url 'user_mfa_disable' %}">
-                        {% trans 'MFAを無効化' %}
-                    </a>
+                    <p class="text-muted">
+                        {% trans 'セキュリティ保護のため、MFAの再設定は管理者の許可が必要です。再設定が必要な場合は管理者へ依頼してください。' %}
+                    </p>
                 {% else %}
+                    {% if mfa_settings.totp_enabled and reset_allowed %}
+                        <p class="text-warning">
+                            <i class="fas fa-exclamation-triangle"></i> {% trans '管理者によりMFA再設定が許可されています。新しい認証アプリで登録し直してください。' %}
+                        </p>
+                    {% endif %}
                     <p>{% trans '認証アプリでQRコードを読み取り、表示された6桁のコードを入力してください。' %}</p>
                     <div class="text-center mb-3">
                         <img src="{% url 'user_mfa_qrcode' %}" alt="{% trans 'MFA QRコード' %}" class="img-fluid" style="max-width: 220px;">
