@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext_lazy as _
 
 from user_manager.models import UserAcl, UserMfaSettings
+from user_manager.trusted_browser import register_trusted_browser
 from wireguard_tools.audit import write_audit_log
 from wireguard.models import PeerGroup
 from .forms import PeerGroupForm, UserMfaDisableForm, UserMfaSetupForm, UserPasswordChangeForm
@@ -128,8 +129,11 @@ def view_user_mfa_setup(request):
             write_audit_log(request, 'user_mfa_configured', request.user, details={'reset': reset_allowed})
             messages.success(request, _('MFAを設定しました。'))
             if use_vpn_portal:
-                return redirect('/vpn/?setup=1')
-            return redirect('/user/mfa/setup/')
+                response = redirect('/vpn/?setup=1')
+            else:
+                response = redirect('/user/mfa/setup/')
+            register_trusted_browser(response, request, mfa_settings)
+            return response
         messages.error(request, _('認証コードが正しくありません。'))
 
     return render(request, 'user_manager/mfa_setup.html', {
@@ -144,6 +148,10 @@ def view_user_mfa_setup(request):
 
 @login_required
 def view_user_mfa_qrcode(request):
+    existing_mfa = UserMfaSettings.objects.filter(user=request.user).first()
+    if existing_mfa and existing_mfa.totp_enabled and not existing_mfa.reset_allowed:
+        return HttpResponse(status=403)
+
     pending_secret = request.session.get('pending_mfa_totp_secret')
     if not pending_secret:
         pending_secret = pyotp.random_base32()

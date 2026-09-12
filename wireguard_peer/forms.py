@@ -100,10 +100,15 @@ class PeerMfaLockModeForm(PeerModelForm):
         max_value=86400,
         help_text=_('切断検知でロックする場合、最終ハンドシェイクからこの秒数を超えると切断扱いにします。')
     )
+    mfa_trusted_browser_required = forms.BooleanField(
+        label=_('登録済みブラウザのみMFA認証を許可'),
+        required=False,
+        help_text=_('有効にすると、ユーザーがMFAを設定したブラウザからのみVPN接続のMFA認証を許可します。')
+    )
 
     class Meta:
         model = Peer
-        fields = ['mfa_lock_mode', 'mfa_disconnect_grace_seconds']
+        fields = ['mfa_lock_mode', 'mfa_disconnect_grace_seconds', 'mfa_trusted_browser_required']
         
 
 class PeerAllowedIPForm(forms.ModelForm):

@@ -110,6 +110,14 @@
                                         / {% trans '切断猶予' %}: {{ current_peer.mfa_disconnect_grace_seconds }}{% trans '秒' %}
                                     {% endif %}
                                 </small>
+                                <small class="text-muted">
+                                    {% trans '登録済みブラウザのみMFA認証' %}:
+                                    {% if current_peer.mfa_trusted_browser_required %}
+                                        {% trans '有効' %}
+                                    {% else %}
+                                        {% trans '無効' %}
+                                    {% endif %}
+                                </small>
                             </div>
                             <div>
                                 {% if current_peer.mfa_required %}

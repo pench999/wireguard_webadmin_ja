@@ -44,6 +44,9 @@ class UserMfaSettings(models.Model):
     totp_secret = models.CharField(max_length=255, blank=True)
     totp_enabled = models.BooleanField(default=False)
     reset_allowed = models.BooleanField(default=False)
+    trusted_browser_token_hash = models.CharField(max_length=128, blank=True)
+    trusted_browser_registered_at = models.DateTimeField(blank=True, null=True)
+    trusted_browser_user_agent = models.TextField(blank=True)
     default_unlock_minutes = models.PositiveIntegerField(default=480)
 
     created = models.DateTimeField(auto_now_add=True)

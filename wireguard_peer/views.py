@@ -22,6 +22,7 @@ from wireguard_peer.forms import PeerAllowedIPForm, PeerNameForm, PeerKeepaliveF
     PeerScheduleProfileForm, PeerAssignedUserForm, PeerMfaUnlockMinutesForm, PeerMfaLockModeForm
 from user_manager.forms import PeerMfaUnlockForm
 from user_manager.models import UserMfaSettings
+from user_manager.trusted_browser import has_trusted_browser
 from wireguard_tools.audit import write_audit_log
 from wireguard_tools.functions import func_reload_wireguard_interface
 from wireguard_tools.views import export_wireguard_configuration, generate_peer_config
@@ -392,6 +393,10 @@ def view_wireguard_peer_mfa_unlock(request):
         if not mfa_settings:
             messages.warning(request, _('VPN接続を有効化するには、先にMFAを設定してください。'))
             return redirect('/user/mfa/setup/')
+        if current_peer.mfa_trusted_browser_required and not has_trusted_browser(request, mfa_settings):
+            write_audit_log(request, 'vpn_mfa_untrusted_browser_blocked', current_peer)
+            messages.error(request, _('このピアはMFAを設定したブラウザからのみVPN接続を有効化できます。端末変更やCookie削除後は管理者へMFA再設定を依頼してください。'))
+            return redirect('/vpn/?setup=1')
 
         form = PeerMfaUnlockForm(request.POST or None, peer=current_peer, back_url=back_url)
 
