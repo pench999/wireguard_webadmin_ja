@@ -686,6 +686,17 @@ def cron_peer_scheduler(request):
             data['scheduled_peers_disabled'] += 1
             peer_scheduling.next_scheduled_disable_at = None
             peer_scheduling.peer.disabled_by_schedule = True
+            if peer_scheduling.peer.mfa_required and peer_scheduling.peer.mfa_unlocked_until:
+                peer_scheduling.peer.mfa_unlocked_until = None
+                data['mfa_peers_locked'] += 1
+                AuditLog.objects.create(
+                    action='peer_mfa_locked',
+                    object_type=peer_scheduling.peer.__class__.__name__,
+                    object_uuid=str(peer_scheduling.peer.uuid),
+                    object_name=str(peer_scheduling.peer),
+                    wireguard_instance=f'wg{peer_scheduling.peer.wireguard_instance.instance_id}',
+                    details={'reason': 'Peer disabled by scheduler'},
+                )
             interfaces.add(peer_scheduling.peer.wireguard_instance)
 
         if peer_scheduling.next_manual_unsuspend_at and peer_scheduling.next_manual_unsuspend_at <= now:
