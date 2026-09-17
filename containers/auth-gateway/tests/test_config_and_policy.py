@@ -18,9 +18,25 @@ build_caddyfile = _PROCESS_CONFIG_MODULE.build_caddyfile
 
 
 class AuthGatewayConfigTests(unittest.TestCase):
+    def _write_runtime_config(self, config_dir):
+        (config_dir / "applications.json").write_text(
+            '{"entries":[{"id":"app1","name":"App 1","hosts":["app1-dev.local"],"upstream":"http://app1"}]}',
+            encoding="utf-8",
+        )
+        (config_dir / "auth_policies.json").write_text(
+            '{"auth_methods":{"password":{"type":"local_password"},"totp":{"type":"totp"},"iplist1":{"type":"ip_address","rules":[{"action":"allow","address":"192.168.0.0","prefix_length":28},{"action":"deny","address":"0.0.0.0","prefix_length":0}]}},"policies":{"senha-totp":{"policy_type":"protected","groups":[],"methods":["totp","password"]},"ips-conhecidos":{"policy_type":"protected","groups":[],"methods":["iplist1"]}}}',
+            encoding="utf-8",
+        )
+        (config_dir / "routes.json").write_text(
+            '{"entries":{"app1":{"routes":[{"path_prefix":"/admin","policy":"senha-totp"},{"path_prefix":"/api","policy":"ips-conhecidos"}],"default_policy":"senha-totp"}}}',
+            encoding="utf-8",
+        )
+
     def test_existing_config_loads_and_resolves_routes(self):
-        config_dir = Path(__file__).resolve().parents[2] / "caddy" / "config_files"
-        runtime_config = load_runtime_config(config_dir)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            config_dir = Path(tmpdir)
+            self._write_runtime_config(config_dir)
+            runtime_config = load_runtime_config(config_dir)
 
         context = resolve_request_context(runtime_config, "app1-dev.local", "/admin/settings")
         self.assertIsNotNone(context)
@@ -50,12 +66,15 @@ class AuthGatewayConfigTests(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            with self.assertRaises(ValueError):
-                load_runtime_config(tmp_path)
+            runtime_config = load_runtime_config(tmp_path)
+            self.assertEqual(runtime_config.policies["default"].policy_type, "error")
+            self.assertNotIn("oidc", runtime_config.auth_methods)
 
     def test_ip_rules_respect_json_order(self):
-        config_dir = Path(__file__).resolve().parents[2] / "caddy" / "config_files"
-        runtime_config = load_runtime_config(config_dir)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            config_dir = Path(tmpdir)
+            self._write_runtime_config(config_dir)
+            runtime_config = load_runtime_config(config_dir)
         method = runtime_config.auth_methods["iplist1"]
         self.assertTrue(evaluate_ip_rules("192.168.0.8", method.rules))
         self.assertTrue(evaluate_ip_rules("192.168.0.12", method.rules))
