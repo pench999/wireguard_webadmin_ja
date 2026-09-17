@@ -64,16 +64,17 @@ class ApiV2ManageDnsRecordTests(TestCase):
         StaticHost.objects.create(hostname="app.example.com", ip_address="10.20.30.40")
         DNSSettings.objects.create(name="dns_settings", pending_changes=True)
 
-        response = self.client.put(
-            self.url,
-            data=json.dumps({
-                "hostname": "app.example.com",
-                "ip_address": "10.20.30.41",
-                "skip_reload": False,
-            }),
-            content_type="application/json",
-            HTTP_TOKEN=str(self.api_key.token),
-        )
+        with self.captureOnCommitCallbacks(execute=True):
+            response = self.client.put(
+                self.url,
+                data=json.dumps({
+                    "hostname": "app.example.com",
+                    "ip_address": "10.20.30.41",
+                    "skip_reload": False,
+                }),
+                content_type="application/json",
+                HTTP_TOKEN=str(self.api_key.token),
+            )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(str(StaticHost.objects.get(hostname="app.example.com").ip_address), "10.20.30.41")
@@ -85,16 +86,18 @@ class ApiV2ManageDnsRecordTests(TestCase):
     def test_put_upserts_missing_record_as_create(self, mock_export):
         mock_export.side_effect = self._fake_export_dns_configuration
 
-        response = self.client.put(
-            self.url,
-            data=json.dumps({
-                "hostname": "new.example.com",
-                "ip_address": "10.20.30.50",
-                "skip_reload": False,
-            }),
-            content_type="application/json",
-            HTTP_TOKEN=str(self.api_key.token),
-        )
+        with self.captureOnCommitCallbacks(execute=True):
+            response = self.client.put(
+                self.url,
+                data=json.dumps({
+                    "hostname": "new.example.com",
+                    "ip_address": "10.20.30.50",
+                    "skip_reload": False,
+                    "create_if_missing": True,
+                }),
+                content_type="application/json",
+                HTTP_TOKEN=str(self.api_key.token),
+            )
 
         self.assertEqual(response.status_code, 201)
         self.assertTrue(StaticHost.objects.filter(hostname="new.example.com").exists())

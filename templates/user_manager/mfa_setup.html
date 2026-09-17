@@ -1,0 +1,51 @@
+{% extends base_template|default:"base.html" %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card card-primary card-outline">
+            <div class="card-header">
+                <h3 class="card-title">{% trans 'MFA設定' %}</h3>
+            </div>
+            <div class="card-body">
+                {% if mfa_settings.totp_enabled and not can_configure_mfa %}
+                    <p class="text-success">
+                        <i class="fas fa-check-circle"></i> {% trans 'MFAは設定済みです。' %}
+                    </p>
+                    <p class="text-muted">
+                        {% trans 'セキュリティ保護のため、MFAの再設定は管理者の許可が必要です。再設定が必要な場合は管理者へ依頼してください。' %}
+                    </p>
+                {% else %}
+                    {% if mfa_settings.totp_enabled and reset_allowed %}
+                        <p class="text-warning">
+                            <i class="fas fa-exclamation-triangle"></i> {% trans '管理者によりMFA再設定が許可されています。新しい認証アプリで登録し直してください。' %}
+                        </p>
+                    {% endif %}
+                    <p>{% trans '認証アプリでQRコードを読み取り、表示された6桁のコードを入力してください。' %}</p>
+                    <div class="text-center mb-3">
+                        <img src="{% url 'user_mfa_qrcode' %}" alt="{% trans 'MFA QRコード' %}" class="img-fluid" style="max-width: 220px;">
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        {% crispy form %}
+                        <button type="submit" class="btn btn-primary">
+                            {% trans 'MFAを有効化' %}
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card card-primary card-outline">
+            <div class="card-body">
+                <h5>{% trans 'VPN接続前MFAについて' %}</h5>
+                <p>{% trans 'MFA必須に設定されたピアは、認証が成功した時間帯だけWireGuard設定へ反映されます。' %}</p>
+                <p>{% trans '認証アプリには Google Authenticator、Microsoft Authenticator、1Password などを利用できます。' %}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -2,7 +2,9 @@ import ipaddress
 import uuid
 from typing import Optional
 
+from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
 from wireguard_tools.networks import normalize_cidr_list, normalize_cidr_pairs, safe_network_cidr
 
@@ -32,6 +34,11 @@ NETMASK_CHOICES = (
         (30, '/30 (255.255.255.252)'),
         (32, '/32 (255.255.255.255)'),
     )
+
+MFA_LOCK_MODE_CHOICES = (
+    ('time', '時間でロック'),
+    ('disconnect', '切断検知でロック'),
+)
 
 
 class WebadminSettings(models.Model):
@@ -201,6 +208,20 @@ class Peer(models.Model):
     disabled_by_schedule = models.BooleanField(default=False)
     suspended = models.BooleanField(default=False)
     suspend_reason = models.TextField(blank=True, null=True)
+    mfa_required = models.BooleanField(default=False)
+    assigned_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='assigned_peers'
+    )
+    mfa_unlock_minutes = models.PositiveIntegerField(default=120)
+    mfa_lock_mode = models.CharField(max_length=16, choices=MFA_LOCK_MODE_CHOICES, default='time')
+    mfa_disconnect_grace_seconds = models.PositiveIntegerField(default=300)
+    mfa_trusted_browser_required = models.BooleanField(default=False)
+    mfa_unlocked_until = models.DateTimeField(blank=True, null=True)
+    mfa_last_verified_at = models.DateTimeField(blank=True, null=True)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -214,7 +235,15 @@ class Peer(models.Model):
 
     @property
     def enabled(self) -> bool:
-        return not self.disabled_by_schedule and not self.suspended
+        return not self.disabled_by_schedule and not self.suspended and self.mfa_unlocked
+
+    @property
+    def mfa_unlocked(self) -> bool:
+        if not self.mfa_required:
+            return True
+        if self.mfa_lock_mode == 'disconnect':
+            return bool(self.mfa_unlocked_until)
+        return bool(self.mfa_unlocked_until and self.mfa_unlocked_until > timezone.now())
 
     @property
     def announced_networks(self):

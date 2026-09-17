@@ -2,6 +2,8 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Column, HTML, Layout, Row, Submit
 from django import forms
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import password_validation
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
@@ -130,8 +132,7 @@ class UserAclForm(forms.Form):
         if password1 or password2: 
             if password1 != password2:
                 raise ValidationError(_("The two password fields didn't match."))
-            if len(password1) < 8:
-                raise ValidationError(_("Password must be at least 8 characters long."))
+            password_validation.validate_password(password1, self.instance)
 
         return cleaned_data
 
@@ -172,6 +173,93 @@ class UserAclForm(forms.Form):
         user_acl.peer_groups.set(peer_groups)
 
         return user
+
+
+class UserMfaSetupForm(forms.Form):
+    totp_pin = forms.CharField(
+        label=_('認証コード'),
+        max_length=6,
+        min_length=6,
+        help_text=_('認証アプリに表示された6桁のコードを入力してください。'),
+    )
+
+
+class UserMfaDisableForm(forms.Form):
+    confirm = forms.BooleanField(
+        label=_('MFAを無効化します'),
+        required=True,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.layout = Layout(
+            'confirm',
+            Row(
+                Column(
+                    Submit('submit', _('無効化'), css_class='btn btn-danger'),
+                    HTML(' <a class="btn btn-secondary" href="/user/mfa/setup/">' + str(_('戻る')) + '</a>'),
+                    css_class='col-md-12'
+                ),
+                css_class='form-row'
+            )
+        )
+
+
+class UserPasswordChangeForm(PasswordChangeForm):
+    def __init__(self, *args, **kwargs):
+        back_url = kwargs.pop('back_url', '/vpn/')
+        super().__init__(*args, **kwargs)
+        self.fields['old_password'].label = _('現在のパスワード')
+        self.fields['new_password1'].label = _('新しいパスワード')
+        self.fields['new_password2'].label = _('新しいパスワード(確認)')
+        self.fields['new_password1'].help_text = _(
+            '12文字以上で、大文字・小文字・数字・記号をそれぞれ1文字以上含めてください。'
+        )
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.layout = Layout(
+            'old_password',
+            'new_password1',
+            'new_password2',
+            Row(
+                Column(
+                    Submit('submit', _('パスワードを変更'), css_class='btn btn-primary'),
+                    HTML(f' <a class="btn btn-secondary" href="{back_url}">{_("戻る")}</a>'),
+                    css_class='col-md-12'
+                ),
+                css_class='form-row'
+            )
+        )
+
+
+class PeerMfaUnlockForm(forms.Form):
+    totp_pin = forms.CharField(
+        label=_('認証コード'),
+        max_length=6,
+        min_length=6,
+    )
+
+    def __init__(self, *args, **kwargs):
+        peer = kwargs.pop('peer', None)
+        back_url = kwargs.pop('back_url', None)
+        super().__init__(*args, **kwargs)
+        if not back_url:
+            back_url = f'/peer/manage/?peer={peer.uuid}' if peer else '/peer/list/'
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.layout = Layout(
+            'totp_pin',
+            Row(
+                Column(
+                    Submit('submit', _('VPN接続を有効化'), css_class='btn btn-primary'),
+                    HTML(f' <a class="btn btn-secondary" href="{back_url}">{_("戻る")}</a>'),
+                    css_class='col-md-12'
+                ),
+                css_class='form-row'
+            )
+        )
 
 
 

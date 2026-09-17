@@ -6,13 +6,14 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Button, Field
 from crispy_forms.layout import HTML, Layout, Row, Submit, Div
 from django import forms
+from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from scheduler.models import PeerScheduling
-from wireguard.models import NETMASK_CHOICES, Peer, PeerAllowedIP
+from wireguard.models import MFA_LOCK_MODE_CHOICES, NETMASK_CHOICES, Peer, PeerAllowedIP
 
 
 class PeerModelForm(forms.ModelForm):
@@ -56,6 +57,58 @@ class PeerKeysForm(PeerModelForm):
     class Meta:
         model = Peer
         fields = ['public_key', 'private_key', 'pre_shared_key']
+
+
+class PeerAssignedUserForm(PeerModelForm):
+    assigned_user = forms.ModelChoiceField(
+        label=_('割当ユーザー'),
+        queryset=User.objects.filter(is_active=True, useracl__user_level=0).order_by('username'),
+        required=False,
+        help_text=_('このピアを利用するVPNユーザーです。管理者などVPNユーザー以外は割り当てできません。未設定の場合、エンドユーザー用ポータルには表示されません。')
+    )
+
+    class Meta:
+        model = Peer
+        fields = ['assigned_user']
+
+
+class PeerMfaUnlockMinutesForm(PeerModelForm):
+    mfa_unlock_minutes = forms.IntegerField(
+        label=_('MFA接続許可時間(分)'),
+        required=True,
+        min_value=5,
+        max_value=1440,
+        help_text=_('MFA認証に成功した後、このピアをWireGuard設定へ反映しておく時間です。')
+    )
+
+    class Meta:
+        model = Peer
+        fields = ['mfa_unlock_minutes']
+
+
+class PeerMfaLockModeForm(PeerModelForm):
+    mfa_lock_mode = forms.ChoiceField(
+        label=_('MFAロック方式'),
+        choices=MFA_LOCK_MODE_CHOICES,
+        required=True,
+        help_text=_('時間でロックするか、切断検知でロックするかを選択します。')
+    )
+    mfa_disconnect_grace_seconds = forms.IntegerField(
+        label=_('MFA切断猶予秒数'),
+        required=True,
+        min_value=60,
+        max_value=86400,
+        help_text=_('切断検知でロックする場合、最終ハンドシェイクからこの秒数を超えると切断扱いにします。')
+    )
+    mfa_trusted_browser_required = forms.BooleanField(
+        label=_('登録済みブラウザのみMFA認証を許可'),
+        required=False,
+        help_text=_('有効にすると、ユーザーがMFAを設定したブラウザからのみVPN接続のMFA認証を許可します。')
+    )
+
+    class Meta:
+        model = Peer
+        fields = ['mfa_lock_mode', 'mfa_disconnect_grace_seconds', 'mfa_trusted_browser_required']
         
 
 class PeerAllowedIPForm(forms.ModelForm):

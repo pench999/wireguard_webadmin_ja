@@ -78,6 +78,77 @@
                         </div>
                     </div>
 
+                    <!-- MFA State -->
+                    <div class="form-group border-bottom pb-3">
+                        <label>{% trans 'VPN MFA' %}</label>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex flex-column">
+                                {% if current_peer.mfa_required %}
+                                    {% if current_peer.mfa_unlocked %}
+                                        <span class="text-success"><i class="fas fa-unlock"></i> {% trans 'MFA認証済み' %}</span>
+                                        <small class="text-muted">{% trans '有効期限' %}: {{ current_peer.mfa_unlocked_until|date:"Y-m-d H:i" }}</small>
+                                    {% else %}
+                                        <span class="text-warning"><i class="fas fa-lock"></i> {% trans 'MFA認証待ち' %}</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">{% trans 'MFA不要' %}</span>
+                                {% endif %}
+                                <small class="text-muted">
+                                    {% trans '割当ユーザー' %}:
+                                    {% if current_peer.assigned_user %}
+                                        {{ current_peer.assigned_user.username }}
+                                    {% else %}
+                                        {% trans '未設定' %}
+                                    {% endif %}
+                                </small>
+                                <small class="text-muted">
+                                    {% trans 'MFA接続許可時間' %}: {{ current_peer.mfa_unlock_minutes }}{% trans '分' %}
+                                </small>
+                                <small class="text-muted">
+                                    {% trans 'MFAロック方式' %}: {{ current_peer.get_mfa_lock_mode_display }}
+                                    {% if current_peer.mfa_lock_mode == 'disconnect' %}
+                                        / {% trans '切断猶予' %}: {{ current_peer.mfa_disconnect_grace_seconds }}{% trans '秒' %}
+                                    {% endif %}
+                                </small>
+                                <small class="text-muted">
+                                    {% trans '登録済みブラウザのみMFA認証' %}:
+                                    {% if current_peer.mfa_trusted_browser_required %}
+                                        {% trans '有効' %}
+                                    {% else %}
+                                        {% trans '無効' %}
+                                    {% endif %}
+                                </small>
+                            </div>
+                            <div>
+                                {% if current_peer.mfa_required %}
+                                    <a href="{% url 'wireguard_peer_mfa_unlock' %}?peer={{ current_peer.uuid }}" class="btn btn-outline-primary btn-xs">
+                                        {% trans 'VPN接続を有効化' %}
+                                    </a>
+                                {% endif %}
+                                {% if user_acl.user_level >= 30 %}
+                                    {% if current_peer.mfa_required %}
+                                        <a href="?peer={{ current_peer.uuid }}&action=disable_mfa" class="btn btn-outline-secondary btn-xs">
+                                            {% trans 'MFA必須を解除' %}
+                                        </a>
+                                    {% else %}
+                                        <a href="?peer={{ current_peer.uuid }}&action=enable_mfa" class="btn btn-outline-secondary btn-xs">
+                                            {% trans 'MFA必須にする' %}
+                                        </a>
+                                    {% endif %}
+                                    <a href="{% url 'wireguard_peer_edit_field' %}?peer={{ current_peer.uuid }}&group=assigned_user" class="btn btn-outline-secondary btn-xs">
+                                        {% trans '割当ユーザーを設定' %}
+                                    </a>
+                                    <a href="{% url 'wireguard_peer_edit_field' %}?peer={{ current_peer.uuid }}&group=mfa_unlock_minutes" class="btn btn-outline-secondary btn-xs">
+                                        {% trans '許可時間を設定' %}
+                                    </a>
+                                    <a href="{% url 'wireguard_peer_edit_field' %}?peer={{ current_peer.uuid }}&group=mfa_lock_mode" class="btn btn-outline-secondary btn-xs">
+                                        {% trans 'ロック方式を設定' %}
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Persistent Keepalive -->
                     <div class="form-group border-bottom pb-3">
                         <label>{% trans 'Persistent Keepalive' %}</label>

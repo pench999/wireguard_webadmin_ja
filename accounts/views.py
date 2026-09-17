@@ -2,6 +2,7 @@ from django.shortcuts import render, Http404, redirect
 from django.contrib.auth.models import User
 from django.contrib import auth
 from django.contrib import messages
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
 
 from api.views import get_api_key
@@ -40,10 +41,17 @@ def view_login(request):
             username = form.cleaned_data['username']
             user = User.objects.get(username=username)
             auth.login(request, user)
+            next_url = request.POST.get('next') or request.GET.get('next')
+            if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+                return redirect(next_url)
+
+            user_acl = UserAcl.objects.filter(user=user).first()
+            if user_acl and user_acl.user_level == 0:
+                return redirect('/vpn/')
             return redirect('/')
     else:
         form = LoginForm()
-    return render(request, 'accounts/login.html', {'form': form})
+    return render(request, 'accounts/login.html', {'form': form, 'next': request.GET.get('next', '')})
 
 
 def view_logout(request):

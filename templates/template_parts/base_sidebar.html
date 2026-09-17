@@ -102,10 +102,19 @@
             {% endif %}
 
             <li class="nav-item">
-                <a href="/user/list/" class="nav-link {% if '/user/' in request.path and 'gatekeeper' not in request.path %}active{% endif %}">
+                <a href="/user/list/" class="nav-link {% if '/user/' in request.path and '/user/mfa/' not in request.path and 'gatekeeper' not in request.path %}active{% endif %}">
                     <i class="fas fa-users nav-icon"></i>
                     <p>
                         {% trans 'User Manager' %}
+                    </p>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="{% url 'user_mfa_setup' %}" class="nav-link {% if '/user/mfa/' in request.path %}active{% endif %}">
+                    <i class="fas fa-user-shield nav-icon"></i>
+                    <p>
+                        {% trans 'MFA設定' %}
                     </p>
                 </a>
             </li>

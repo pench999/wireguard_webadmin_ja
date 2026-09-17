@@ -10,6 +10,7 @@ from wireguard.models import PeerGroup
 class UserAcl(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     user_level = models.PositiveIntegerField(default=0, choices=(
+        (0, _('VPNユーザー')),
         (10, _('Debugging Analyst')),
         (20, _('View Only')),
         (30, _('Peer Manager')),
@@ -36,3 +37,21 @@ class AuthenticationToken(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     uuid = models.UUIDField(editable=False, default=uuid.uuid4)
+
+
+class UserMfaSettings(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='mfa_settings')
+    totp_secret = models.CharField(max_length=255, blank=True)
+    totp_enabled = models.BooleanField(default=False)
+    reset_allowed = models.BooleanField(default=False)
+    trusted_browser_token_hash = models.CharField(max_length=128, blank=True)
+    trusted_browser_registered_at = models.DateTimeField(blank=True, null=True)
+    trusted_browser_user_agent = models.TextField(blank=True)
+    default_unlock_minutes = models.PositiveIntegerField(default=480)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    uuid = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+
+    def __str__(self):
+        return f'{self.user.username} MFA'

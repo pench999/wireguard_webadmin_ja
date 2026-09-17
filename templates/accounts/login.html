@@ -10,6 +10,9 @@
             <div class="card-body register-card-body">
                 <form action="/accounts/login/" method="post">
                     {% csrf_token %}
+                    {% if next %}
+                        <input type="hidden" name="next" value="{{ next }}">
+                    {% endif %}
                     <div class="input-group mb-3">
                         <input type="text" class="form-control" placeholder="{% trans 'Username' %}" name="username">
                         <div class="input-group-append">
