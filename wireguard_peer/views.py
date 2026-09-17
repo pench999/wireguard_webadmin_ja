@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from io import BytesIO
 import re
+import secrets
 import qrcode
 
 from cluster.models import ClusterSettings, Worker
@@ -17,7 +18,7 @@ from scheduler.models import PeerScheduling
 from user_manager.models import UserAcl
 from wgwadmlibrary.tools import check_sort_order_conflict, deduplicate_sort_order, default_sort_peers, \
     user_allowed_instances, user_allowed_peers, user_has_access_to_instance, user_has_access_to_peer
-from wireguard.models import Peer, PeerAllowedIP, PeerMfaClientSession, WireGuardInstance
+from wireguard.models import Peer, PeerAllowedIP, PeerMfaClientSession, UserMfaDevice, WireGuardInstance
 from wireguard_peer.forms import PeerAllowedIPForm, PeerNameForm, PeerKeepaliveForm, PeerKeysForm, PeerSuspensionForm, \
     PeerScheduleProfileForm, PeerAssignedUserForm, PeerMfaUnlockMinutesForm, PeerMfaLockModeForm
 from user_manager.forms import PeerMfaUnlockForm
@@ -449,12 +450,41 @@ def view_wireguard_peer_mfa_unlock(request):
             write_audit_log(request, 'vpn_mfa_failed', current_peer)
             messages.error(request, _('MFA認証に失敗しました。'))
         else:
+            device = None
+            if client_session:
+                device = client_session.registered_device
+                if not device and client_session.device_id:
+                    device, created = UserMfaDevice.objects.get_or_create(
+                        device_id=client_session.device_id,
+                        defaults={
+                            'user': request.user,
+                            'name': client_session.device_name,
+                            'token_hash': client_session.device_token_hash,
+                        },
+                    )
+                    if (
+                        device.user_id != request.user.id
+                        or device.revoked_at
+                        or not secrets.compare_digest(device.token_hash, client_session.device_token_hash)
+                    ):
+                        client_session.status = PeerMfaClientSession.STATUS_FAILED
+                        client_session.error_code = 'device_unauthorized'
+                        client_session.save(update_fields=['status', 'error_code', 'updated'])
+                        request.session.pop('peer_mfa_client_session_id', None)
+                        messages.error(request, _('端末登録を確認できませんでした。'))
+                        return redirect('/vpn/')
+                    client_session.registered_device = device
+                    if created:
+                        write_audit_log(request, 'mfa_device_registered', device)
             success, message = _unlock_peer_mfa(request, current_peer)
             if success:
                 if client_session:
+                    if device:
+                        device.last_used_at = timezone.now()
+                        device.save(update_fields=['last_used_at', 'updated'])
                     client_session.status = PeerMfaClientSession.STATUS_UNLOCKED
                     client_session.authorized_at = timezone.now()
-                    client_session.save(update_fields=['status', 'authorized_at', 'updated'])
+                    client_session.save(update_fields=['registered_device', 'status', 'authorized_at', 'updated'])
                     request.session.pop('peer_mfa_client_session_id', None)
                 messages.success(request, _('VPN接続を一時的に有効化しました。'))
             else:

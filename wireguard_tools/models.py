@@ -50,6 +50,8 @@ class AuditLog(models.Model):
         ('peer_mfa_lock_failed', 'Peer MFA lock failed'),
         ('peer_mfa_required_enabled', 'Peer MFA requirement enabled'),
         ('peer_mfa_required_disabled', 'Peer MFA requirement disabled'),
+        ('mfa_device_registered', 'MFA device registered'),
+        ('mfa_device_revoked', 'MFA device revoked'),
     )
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)

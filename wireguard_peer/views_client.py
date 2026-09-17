@@ -12,7 +12,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
-from wireguard.models import Peer, PeerMfaClientSession
+from wireguard.models import Peer, PeerMfaClientSession, UserMfaDevice
 from wireguard_tools.audit import write_audit_log
 from wireguard_tools.functions import func_reload_wireguard_interface
 from wireguard_tools.views import export_wireguard_configuration
@@ -71,6 +71,32 @@ def create_client_session(request):
     if not peer:
         return JsonResponse({'error': 'peer_unavailable'}, status=404)
 
+    raw_device_id = body.get('device_id')
+    raw_device_token = body.get('device_token')
+    device_name = str(body.get('device_name') or '').strip()[:120]
+    device_id = None
+    device_token_hash = ''
+    registered_device = None
+    has_any_device = UserMfaDevice.objects.filter(user=peer.assigned_user).exists()
+    if raw_device_id or raw_device_token or device_name:
+        try:
+            device_id = uuid.UUID(str(raw_device_id))
+        except (TypeError, ValueError, AttributeError):
+            return JsonResponse({'error': 'invalid_device'}, status=400)
+        if not isinstance(raw_device_token, str) or not 32 <= len(raw_device_token) <= 128 or not device_name:
+            return JsonResponse({'error': 'invalid_device'}, status=400)
+        device_token_hash = _token_hash(raw_device_token)
+        registered_device = UserMfaDevice.objects.filter(device_id=device_id).first()
+        if registered_device:
+            if registered_device.user_id != peer.assigned_user_id:
+                return JsonResponse({'error': 'device_unauthorized'}, status=401)
+            if registered_device.revoked_at:
+                return JsonResponse({'error': 'device_revoked'}, status=403)
+            if not secrets.compare_digest(registered_device.token_hash, device_token_hash):
+                return JsonResponse({'error': 'device_unauthorized'}, status=401)
+    elif has_any_device:
+        return JsonResponse({'error': 'device_required'}, status=401)
+
     now = timezone.now()
     PeerMfaClientSession.objects.filter(
         expires_at__lte=now,
@@ -91,6 +117,10 @@ def create_client_session(request):
         peer=peer,
         browser_token_hash=_token_hash(browser_token),
         poll_token_hash=_token_hash(poll_token),
+        registered_device=registered_device,
+        device_id=device_id,
+        device_name=device_name,
+        device_token_hash=device_token_hash,
         expires_at=now + timezone.timedelta(seconds=max(60, min(ttl_seconds, 900))),
     )
     browser_path = reverse('mfa_client_connect', kwargs={'browser_token': browser_token})
@@ -99,6 +129,7 @@ def create_client_session(request):
         'browser_url': request.build_absolute_uri(browser_path),
         'poll_token': poll_token,
         'expires_at': client_session.expires_at.isoformat(),
+        'device_status': 'registered' if registered_device else ('pending' if device_id else 'legacy'),
     }, status=201)
 
 
