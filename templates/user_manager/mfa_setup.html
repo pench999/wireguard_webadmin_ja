@@ -29,7 +29,7 @@
                     </div>
                     <form method="post">
                         {% csrf_token %}
-                        {% crispy form %}
+                        {{ form|crispy }}
                         <button type="submit" class="btn btn-primary">
                             {% trans 'MFAを有効化' %}
                         </button>
