@@ -4,6 +4,7 @@ import uuid
 import pyotp
 from django.contrib.auth.models import User
 from django.test import TestCase
+from django.utils import timezone
 
 from user_manager.models import UserAcl, UserMfaSettings
 from wireguard.models import UserMfaDevice
@@ -75,3 +76,16 @@ class UserMfaDeviceAdminTests(TestCase):
         self.device.refresh_from_db()
         self.assertIsNotNone(self.device.revoked_at)
         self.assertTrue(AuditLog.objects.filter(action='mfa_device_revoked', user=self.admin).exists())
+
+    def test_admin_can_allow_revoked_device_to_register_again(self):
+        self.device.revoked_at = timezone.now()
+        self.device.save(update_fields=['revoked_at', 'updated'])
+        self.client.force_login(self.admin)
+
+        response = self.client.post('/user/mfa/devices/', {
+            'device_uuid': str(self.device.uuid),
+            'action': 'delete',
+        })
+
+        self.assertRedirects(response, '/user/mfa/devices/', fetch_redirect_response=False)
+        self.assertFalse(UserMfaDevice.objects.filter(uuid=self.device.uuid).exists())

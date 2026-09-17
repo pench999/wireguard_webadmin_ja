@@ -17,9 +17,9 @@
                 <form method="post" class="d-inline">
                     {% csrf_token %}<input type="hidden" name="device_uuid" value="{{ device.uuid }}">
                     {% if device.is_active %}
-                        <input type="hidden" name="action" value="revoke"><button class="btn btn-sm btn-outline-danger" type="submit">{% trans '失効' %}</button>
+                        <button class="btn btn-sm btn-outline-danger" type="submit" name="action" value="revoke">{% trans '失効' %}</button>
                     {% else %}
-                        <input type="hidden" name="action" value="delete"><button class="btn btn-sm btn-outline-secondary" type="submit">{% trans '再登録を許可' %}</button>
+                        <button class="btn btn-sm btn-outline-secondary" type="submit" name="action" value="delete">{% trans '再登録を許可' %}</button>
                     {% endif %}
                 </form>
             </td>
