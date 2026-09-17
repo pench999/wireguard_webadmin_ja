@@ -1,5 +1,7 @@
 from datetime import timedelta
+import json
 from unittest.mock import patch
+from urllib.parse import urlparse
 
 import pyotp
 from django.contrib.auth.models import User
@@ -9,7 +11,7 @@ from django.utils import timezone
 from scheduler.models import PeerScheduling
 from user_manager.models import UserAcl, UserMfaSettings
 from user_manager.trusted_browser import TRUSTED_BROWSER_COOKIE_NAME, hash_trusted_browser_token
-from wireguard.models import Peer, WireGuardInstance
+from wireguard.models import Peer, PeerMfaClientSession, WireGuardInstance
 from wireguard_tools.models import AuditLog
 
 
@@ -179,3 +181,148 @@ class PeerMfaTests(TestCase):
         self.assertTrue(self.peer.disabled_by_schedule)
         self.assertIsNone(self.peer.mfa_unlocked_until)
         self.assertTrue(AuditLog.objects.filter(action="peer_mfa_locked").exists())
+
+
+class PeerMfaClientSessionTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='client-user', password='StrongPass!123')
+        UserAcl.objects.create(user=self.user, user_level=0)
+        self.other_user = User.objects.create_user(username='other-client', password='StrongPass!123')
+        UserAcl.objects.create(user=self.other_user, user_level=0)
+        self.secret = 'JBSWY3DPEHPK3PXP'
+        UserMfaSettings.objects.create(user=self.user, totp_secret=self.secret, totp_enabled=True)
+        self.instance = WireGuardInstance.objects.create(
+            instance_id=10,
+            private_key='private',
+            public_key='public',
+            hostname='vpn.example.test',
+            listen_port=51830,
+            address='10.60.0.1',
+            netmask=24,
+        )
+        self.peer = Peer.objects.create(
+            name='client-peer',
+            public_key='client-public',
+            private_key='client-private',
+            wireguard_instance=self.instance,
+            assigned_user=self.user,
+            mfa_required=True,
+            mfa_unlock_minutes=30,
+        )
+
+    def _create_session(self):
+        response = self.client.post(
+            '/api/client/v1/sessions/',
+            data=json.dumps({'peer_uuid': str(self.peer.uuid)}),
+            content_type='application/json',
+        )
+        self.assertEqual(response.status_code, 201)
+        return response.json()
+
+    def _authorize_browser(self, session_data, user=None):
+        self.client.force_login(user or self.user)
+        browser_path = urlparse(session_data['browser_url']).path
+        return self.client.get(browser_path)
+
+    def test_create_and_poll_pending_session(self):
+        data = self._create_session()
+        client_session = PeerMfaClientSession.objects.get(uuid=data['session_id'])
+        self.assertNotEqual(client_session.poll_token_hash, data['poll_token'])
+        self.assertNotIn(data['poll_token'], data['browser_url'])
+
+        response = self.client.get(
+            f"/api/client/v1/sessions/{data['session_id']}/status/",
+            HTTP_AUTHORIZATION=f"Bearer {data['poll_token']}",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['status'], PeerMfaClientSession.STATUS_PENDING)
+
+    def test_poll_rejects_invalid_token(self):
+        data = self._create_session()
+        response = self.client.get(
+            f"/api/client/v1/sessions/{data['session_id']}/status/",
+            HTTP_AUTHORIZATION='Bearer invalid',
+        )
+        self.assertEqual(response.status_code, 401)
+
+    def test_create_rejects_invalid_peer_uuid(self):
+        response = self.client.post(
+            '/api/client/v1/sessions/',
+            data=json.dumps({'peer_uuid': 'not-a-uuid'}),
+            content_type='application/json',
+        )
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json()['error'], 'peer_unavailable')
+
+    def test_browser_connect_rejects_unassigned_user(self):
+        data = self._create_session()
+        response = self._authorize_browser(data, user=self.other_user)
+        self.assertEqual(response.status_code, 404)
+        client_session = PeerMfaClientSession.objects.get(uuid=data['session_id'])
+        self.assertEqual(client_session.status, PeerMfaClientSession.STATUS_PENDING)
+
+    @patch('wireguard_peer.views.export_wireguard_configuration')
+    @patch('wireguard_peer.views.func_reload_wireguard_interface', return_value=(True, 'ok'))
+    def test_browser_mfa_unlock_updates_poll_status(self, mock_reload, mock_export):
+        data = self._create_session()
+        response = self._authorize_browser(data)
+        self.assertRedirects(
+            response,
+            f'/peer/mfa_unlock/?peer={self.peer.uuid}',
+            fetch_redirect_response=False,
+        )
+
+        response = self.client.post(
+            f'/peer/mfa_unlock/?peer={self.peer.uuid}',
+            {'totp_pin': pyotp.TOTP(self.secret).now()},
+        )
+        self.assertRedirects(response, '/vpn/', fetch_redirect_response=False)
+
+        status_response = self.client.get(
+            f"/api/client/v1/sessions/{data['session_id']}/status/",
+            HTTP_AUTHORIZATION=f"Bearer {data['poll_token']}",
+        )
+        self.assertEqual(status_response.status_code, 200)
+        self.assertEqual(status_response.json()['status'], PeerMfaClientSession.STATUS_UNLOCKED)
+        self.assertEqual(status_response.json()['peer_uuid'], str(self.peer.uuid))
+
+    @patch('wireguard_peer.views.export_wireguard_configuration')
+    @patch('wireguard_peer.views.func_reload_wireguard_interface', return_value=(False, 'reload failed'))
+    def test_reload_failure_rolls_back_unlock_and_marks_session_failed(self, mock_reload, mock_export):
+        data = self._create_session()
+        self._authorize_browser(data)
+
+        self.client.post(
+            f'/peer/mfa_unlock/?peer={self.peer.uuid}',
+            {'totp_pin': pyotp.TOTP(self.secret).now()},
+        )
+
+        self.peer.refresh_from_db()
+        client_session = PeerMfaClientSession.objects.get(uuid=data['session_id'])
+        self.assertFalse(self.peer.mfa_unlocked)
+        self.assertIsNone(self.peer.mfa_last_verified_at)
+        self.assertEqual(client_session.status, PeerMfaClientSession.STATUS_FAILED)
+        self.assertEqual(client_session.error_code, 'wireguard_reload_failed')
+        self.assertTrue(AuditLog.objects.filter(action='peer_mfa_unlock_failed').exists())
+        self.assertEqual(mock_reload.call_count, 2)
+
+    @patch('wireguard_peer.views_client.export_wireguard_configuration')
+    @patch('wireguard_peer.views_client.func_reload_wireguard_interface', return_value=(True, 'ok'))
+    def test_lock_endpoint_locks_authorized_peer(self, mock_reload, mock_export):
+        data = self._create_session()
+        client_session = PeerMfaClientSession.objects.get(uuid=data['session_id'])
+        client_session.user = self.user
+        client_session.status = PeerMfaClientSession.STATUS_UNLOCKED
+        client_session.save(update_fields=['user', 'status', 'updated'])
+        self.peer.mfa_unlocked_until = timezone.now() + timedelta(minutes=30)
+        self.peer.save(update_fields=['mfa_unlocked_until', 'updated'])
+
+        response = self.client.post(
+            f"/api/client/v1/sessions/{data['session_id']}/lock/",
+            HTTP_AUTHORIZATION=f"Bearer {data['poll_token']}",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['status'], PeerMfaClientSession.STATUS_LOCKED)
+        self.peer.refresh_from_db()
+        self.assertFalse(self.peer.mfa_unlocked)

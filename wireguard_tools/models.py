@@ -43,8 +43,11 @@ class AuditLog(models.Model):
         ('wireguard_reload_failed', 'WireGuard reload failed'),
         ('wireguard_restart_failed', 'WireGuard restart failed'),
         ('vpn_mfa_failed', 'VPN MFA failed'),
+        ('vpn_mfa_untrusted_browser_blocked', 'VPN MFA untrusted browser blocked'),
         ('peer_mfa_unlocked', 'Peer MFA unlocked'),
+        ('peer_mfa_unlock_failed', 'Peer MFA unlock failed'),
         ('peer_mfa_locked', 'Peer MFA locked'),
+        ('peer_mfa_lock_failed', 'Peer MFA lock failed'),
         ('peer_mfa_required_enabled', 'Peer MFA requirement enabled'),
         ('peer_mfa_required_disabled', 'Peer MFA requirement disabled'),
     )

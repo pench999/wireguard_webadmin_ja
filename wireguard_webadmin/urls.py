@@ -14,6 +14,7 @@ urlpatterns = [
 
     # API
     path('api/', include('api.urls')),
+    path('api/client/v1/', include('wireguard_peer.urls_client_api')),
     path('manage_api/v2/', include('api_v2.urls_manage')),
 
     # Main features
@@ -30,6 +31,7 @@ urlpatterns = [
     path('vpn_invite/', include('vpn_invite.urls')),
     path('invite/', include('vpn_invite_public.urls')),
     path('vpn/', include('wireguard_peer.urls_vpn')),
+    path('client/', include('wireguard_peer.urls_client')),
 
     # Utilities / misc
     path('console/', include('console.urls')),

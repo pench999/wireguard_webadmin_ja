@@ -22,6 +22,8 @@ class VpnUserPortalMiddleware:
             '/user/mfa/',
             '/user/password/',
             '/peer/mfa_unlock/',
+            '/client/',
+            '/api/client/v1/',
             '/change_language/',
             '/static/',
         )

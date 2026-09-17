@@ -377,6 +377,51 @@ class PeerStatus(models.Model):
         return str(self.peer)
 
 
+class PeerMfaClientSession(models.Model):
+    STATUS_PENDING = 'pending'
+    STATUS_AUTHORIZING = 'authorizing'
+    STATUS_UNLOCKED = 'unlocked'
+    STATUS_FAILED = 'failed'
+    STATUS_EXPIRED = 'expired'
+    STATUS_CANCELLED = 'cancelled'
+    STATUS_LOCKED = 'locked'
+    STATUS_CHOICES = (
+        (STATUS_PENDING, 'Pending'),
+        (STATUS_AUTHORIZING, 'Authorizing'),
+        (STATUS_UNLOCKED, 'Unlocked'),
+        (STATUS_FAILED, 'Failed'),
+        (STATUS_EXPIRED, 'Expired'),
+        (STATUS_CANCELLED, 'Cancelled'),
+        (STATUS_LOCKED, 'Locked'),
+    )
+
+    peer = models.ForeignKey(Peer, on_delete=models.CASCADE, related_name='mfa_client_sessions')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name='wireguard_mfa_client_sessions',
+    )
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES, default=STATUS_PENDING)
+    browser_token_hash = models.CharField(max_length=64, unique=True, blank=True, null=True)
+    poll_token_hash = models.CharField(max_length=64)
+    expires_at = models.DateTimeField(db_index=True)
+    authorized_at = models.DateTimeField(blank=True, null=True)
+    error_code = models.CharField(max_length=64, blank=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    uuid = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+
+    @property
+    def is_expired(self):
+        return self.expires_at <= timezone.now()
+
+    def __str__(self):
+        return f'{self.peer} ({self.status})'
+
+
 class PeerAllowedIP(models.Model):
     peer = models.ForeignKey(Peer, on_delete=models.CASCADE)
     priority = models.PositiveBigIntegerField(default=1)

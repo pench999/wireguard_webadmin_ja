@@ -17,7 +17,7 @@ from scheduler.models import PeerScheduling
 from user_manager.models import UserAcl
 from wgwadmlibrary.tools import check_sort_order_conflict, deduplicate_sort_order, default_sort_peers, \
     user_allowed_instances, user_allowed_peers, user_has_access_to_instance, user_has_access_to_peer
-from wireguard.models import Peer, PeerAllowedIP, WireGuardInstance
+from wireguard.models import Peer, PeerAllowedIP, PeerMfaClientSession, WireGuardInstance
 from wireguard_peer.forms import PeerAllowedIPForm, PeerNameForm, PeerKeepaliveForm, PeerKeysForm, PeerSuspensionForm, \
     PeerScheduleProfileForm, PeerAssignedUserForm, PeerMfaUnlockMinutesForm, PeerMfaLockModeForm
 from user_manager.forms import PeerMfaUnlockForm
@@ -58,6 +58,8 @@ def _user_can_admin_bypass_peer_mfa(user):
 
 
 def _unlock_peer_mfa(request, peer, bypass_mfa=False):
+    previous_unlocked_until = peer.mfa_unlocked_until
+    previous_verified_at = peer.mfa_last_verified_at
     unlock_minutes = peer.mfa_unlock_minutes
     now = timezone.now()
     if peer.mfa_lock_mode == 'disconnect':
@@ -66,6 +68,27 @@ def _unlock_peer_mfa(request, peer, bypass_mfa=False):
         peer.mfa_unlocked_until = now + timezone.timedelta(minutes=unlock_minutes)
     peer.mfa_last_verified_at = now
     peer.save()
+    try:
+        export_wireguard_configuration(peer.wireguard_instance)
+        success, message = func_reload_wireguard_interface(peer.wireguard_instance)
+    except Exception as exc:
+        success, message = False, str(exc)
+
+    if not success:
+        peer.mfa_unlocked_until = previous_unlocked_until
+        peer.mfa_last_verified_at = previous_verified_at
+        peer.save(update_fields=['mfa_unlocked_until', 'mfa_last_verified_at', 'updated'])
+        try:
+            export_wireguard_configuration(peer.wireguard_instance)
+            func_reload_wireguard_interface(peer.wireguard_instance)
+        except Exception:
+            pass
+        write_audit_log(request, 'peer_mfa_unlock_failed', peer, details={
+            'message': str(message),
+            'bypass_mfa': bypass_mfa,
+        })
+        return False, message
+
     write_audit_log(request, 'peer_mfa_unlocked', peer, details={
         'lock_mode': peer.mfa_lock_mode,
         'unlock_minutes': unlock_minutes,
@@ -73,8 +96,26 @@ def _unlock_peer_mfa(request, peer, bypass_mfa=False):
         'unlocked_until': str(peer.mfa_unlocked_until),
         'bypass_mfa': bypass_mfa,
     })
-    export_wireguard_configuration(peer.wireguard_instance)
-    return func_reload_wireguard_interface(peer.wireguard_instance)
+    return True, message
+
+
+def _get_peer_mfa_client_session(request, peer):
+    session_id = request.session.get('peer_mfa_client_session_id')
+    if not session_id:
+        return None
+    client_session = PeerMfaClientSession.objects.filter(
+        uuid=session_id,
+        peer=peer,
+        user=request.user,
+        status=PeerMfaClientSession.STATUS_AUTHORIZING,
+    ).first()
+    if not client_session or client_session.is_expired:
+        request.session.pop('peer_mfa_client_session_id', None)
+        if client_session and client_session.is_expired:
+            client_session.status = PeerMfaClientSession.STATUS_EXPIRED
+            client_session.save(update_fields=['status', 'updated'])
+        return None
+    return client_session
 
 
 def _user_vpn_peer_or_404(request):
@@ -378,6 +419,7 @@ def view_wireguard_peer_mfa_unlock(request):
     use_portal_return = bool(current_peer.assigned_user_id == request.user.id and (not user_acl or user_acl.user_level < 20))
     back_url = '/vpn/' if use_portal_return else f'/peer/manage/?peer={current_peer.uuid}'
     admin_bypass = _user_can_admin_bypass_peer_mfa(request.user)
+    client_session = _get_peer_mfa_client_session(request, current_peer)
     form = None
 
     if admin_bypass:
@@ -409,8 +451,18 @@ def view_wireguard_peer_mfa_unlock(request):
         else:
             success, message = _unlock_peer_mfa(request, current_peer)
             if success:
+                if client_session:
+                    client_session.status = PeerMfaClientSession.STATUS_UNLOCKED
+                    client_session.authorized_at = timezone.now()
+                    client_session.save(update_fields=['status', 'authorized_at', 'updated'])
+                    request.session.pop('peer_mfa_client_session_id', None)
                 messages.success(request, _('VPN接続を一時的に有効化しました。'))
             else:
+                if client_session:
+                    client_session.status = PeerMfaClientSession.STATUS_FAILED
+                    client_session.error_code = 'wireguard_reload_failed'
+                    client_session.save(update_fields=['status', 'error_code', 'updated'])
+                    request.session.pop('peer_mfa_client_session_id', None)
                 messages.error(request, _('MFA認証は成功しましたが、WireGuardのリロードに失敗しました: ') + message)
             if not use_portal_return:
                 return redirect('/peer/manage/?peer=' + str(current_peer.uuid))
