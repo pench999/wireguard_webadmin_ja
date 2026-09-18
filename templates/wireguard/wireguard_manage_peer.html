@@ -118,6 +118,10 @@
                                         {% trans '無効' %}
                                     {% endif %}
                                 </small>
+                                <small class="text-muted">
+                                    {% trans 'MFA Client必須' %}:
+                                    {% if current_peer.mfa_client_required %}{% trans '有効' %}{% else %}{% trans '無効' %}{% endif %}
+                                </small>
                             </div>
                             <div>
                                 {% if current_peer.mfa_required %}
@@ -133,6 +137,15 @@
                                     {% else %}
                                         <a href="?peer={{ current_peer.uuid }}&action=enable_mfa" class="btn btn-outline-secondary btn-xs">
                                             {% trans 'MFA必須にする' %}
+                                        </a>
+                                    {% endif %}
+                                    {% if current_peer.mfa_client_required %}
+                                        <a href="?peer={{ current_peer.uuid }}&action=disable_mfa_client" class="btn btn-outline-secondary btn-xs">
+                                            {% trans 'MFA Client必須を解除' %}
+                                        </a>
+                                    {% else %}
+                                        <a href="?peer={{ current_peer.uuid }}&action=enable_mfa_client" class="btn btn-outline-secondary btn-xs">
+                                            {% trans 'MFA Client必須にする' %}
                                         </a>
                                     {% endif %}
                                     <a href="{% url 'wireguard_peer_edit_field' %}?peer={{ current_peer.uuid }}&group=assigned_user" class="btn btn-outline-secondary btn-xs">

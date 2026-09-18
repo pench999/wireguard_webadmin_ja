@@ -211,10 +211,12 @@
                     </div>
 
                     <div class="vpn-actions">
-                        {% if peer.mfa_required and not peer.mfa_unlocked %}
+                        {% if peer.mfa_required and not peer.mfa_unlocked and not peer.mfa_client_required %}
                             <a class="btn btn-primary btn-sm" href="{% url 'wireguard_peer_mfa_unlock' %}?peer={{ peer.uuid }}">
                                 <i class="fas fa-lock-open"></i> {% trans 'VPN接続を有効化' %}
                             </a>
+                        {% elif peer.mfa_required and not peer.mfa_unlocked and peer.mfa_client_required %}
+                            <span class="text-muted">{% trans 'MFA Clientから接続してください' %}</span>
                         {% endif %}
                         <a class="btn btn-outline-primary btn-sm" href="{% url 'vpn_portal_download_config' %}?peer={{ peer.uuid }}">
                             <i class="fas fa-download"></i> {% trans '設定ファイル' %}

@@ -220,6 +220,7 @@ class Peer(models.Model):
     mfa_lock_mode = models.CharField(max_length=16, choices=MFA_LOCK_MODE_CHOICES, default='time')
     mfa_disconnect_grace_seconds = models.PositiveIntegerField(default=300)
     mfa_trusted_browser_required = models.BooleanField(default=False)
+    mfa_client_required = models.BooleanField(default=False)
     mfa_unlocked_until = models.DateTimeField(blank=True, null=True)
     mfa_last_verified_at = models.DateTimeField(blank=True, null=True)
 
@@ -377,6 +378,29 @@ class PeerStatus(models.Model):
         return str(self.peer)
 
 
+class UserMfaDevice(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='wireguard_mfa_devices',
+    )
+    device_id = models.UUIDField(unique=True)
+    name = models.CharField(max_length=120)
+    token_hash = models.CharField(max_length=64)
+    registered_at = models.DateTimeField(auto_now_add=True)
+    last_used_at = models.DateTimeField(blank=True, null=True)
+    revoked_at = models.DateTimeField(blank=True, null=True)
+    updated = models.DateTimeField(auto_now=True)
+    uuid = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+
+    @property
+    def is_active(self):
+        return self.revoked_at is None
+
+    def __str__(self):
+        return f'{self.user.username}: {self.name}'
+
+
 class PeerMfaClientSession(models.Model):
     STATUS_PENDING = 'pending'
     STATUS_AUTHORIZING = 'authorizing'
@@ -403,6 +427,16 @@ class PeerMfaClientSession(models.Model):
         null=True,
         related_name='wireguard_mfa_client_sessions',
     )
+    registered_device = models.ForeignKey(
+        UserMfaDevice,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='client_sessions',
+    )
+    device_id = models.UUIDField(blank=True, null=True)
+    device_name = models.CharField(max_length=120, blank=True)
+    device_token_hash = models.CharField(max_length=64, blank=True)
     status = models.CharField(max_length=16, choices=STATUS_CHOICES, default=STATUS_PENDING)
     browser_token_hash = models.CharField(max_length=64, unique=True, blank=True, null=True)
     poll_token_hash = models.CharField(max_length=64)

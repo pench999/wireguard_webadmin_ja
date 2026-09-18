@@ -8,12 +8,13 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.sessions.models import Session
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from user_manager.models import UserAcl, UserMfaSettings
 from user_manager.trusted_browser import register_trusted_browser
 from wireguard_tools.audit import write_audit_log
-from wireguard.models import PeerGroup
+from wireguard.models import PeerGroup, PeerMfaClientSession, UserMfaDevice
 from .forms import PeerGroupForm, UserMfaDisableForm, UserMfaSetupForm, UserPasswordChangeForm
 from .forms import UserAclForm
 
@@ -95,6 +96,28 @@ def view_user_list(request):
 
 
 @login_required
+def view_user_mfa_devices(request):
+    if not UserAcl.objects.filter(user=request.user, user_level__gte=50).exists():
+        return render(request, 'access_denied.html', {'page_title': 'Access Denied'})
+    if request.method == 'POST':
+        device = get_object_or_404(UserMfaDevice, uuid=request.POST.get('device_uuid'))
+        if request.POST.get('action') == 'revoke' and device.revoked_at is None:
+            device.revoked_at = timezone.now()
+            device.save(update_fields=['revoked_at', 'updated'])
+            write_audit_log(request, 'mfa_device_revoked', device, details={'device_user': device.user.username})
+            messages.success(request, _('登録済み端末を失効しました。'))
+        elif request.POST.get('action') == 'delete' and device.revoked_at is not None:
+            device_name = str(device)
+            device.delete()
+            messages.success(request, _('失効済み端末を削除しました: ') + device_name)
+        return redirect('/user/mfa/devices/')
+    return render(request, 'user_manager/mfa_devices.html', {
+        'page_title': _('登録済み端末'),
+        'devices': UserMfaDevice.objects.select_related('user').order_by('user__username', '-registered_at'),
+    })
+
+
+@login_required
 def view_user_mfa_setup(request):
     mfa_settings, created = UserMfaSettings.objects.get_or_create(user=request.user)
     user_acl = UserAcl.objects.filter(user=request.user).first()
@@ -128,7 +151,16 @@ def view_user_mfa_setup(request):
             request.session.pop('pending_mfa_totp_secret', None)
             write_audit_log(request, 'user_mfa_configured', request.user, details={'reset': reset_allowed})
             messages.success(request, _('MFAを設定しました。'))
-            if use_vpn_portal:
+            client_session_id = request.session.get('peer_mfa_client_session_id')
+            client_session = PeerMfaClientSession.objects.filter(
+                uuid=client_session_id,
+                user=request.user,
+                status=PeerMfaClientSession.STATUS_AUTHORIZING,
+                expires_at__gt=timezone.now(),
+            ).first() if client_session_id else None
+            if client_session:
+                response = redirect('/peer/mfa_unlock/?peer=' + str(client_session.peer_id))
+            elif use_vpn_portal:
                 response = redirect('/vpn/?setup=1')
             else:
                 response = redirect('/user/mfa/setup/')
