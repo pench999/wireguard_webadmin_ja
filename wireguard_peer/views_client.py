@@ -94,7 +94,9 @@ def create_client_session(request):
                 return JsonResponse({'error': 'device_revoked'}, status=403)
             if not secrets.compare_digest(registered_device.token_hash, device_token_hash):
                 return JsonResponse({'error': 'device_unauthorized'}, status=401)
-    elif has_any_device:
+        elif has_any_device:
+            return JsonResponse({'error': 'device_registration_not_allowed'}, status=403)
+    elif has_any_device or peer.mfa_client_required:
         return JsonResponse({'error': 'device_required'}, status=401)
 
     now = timezone.now()

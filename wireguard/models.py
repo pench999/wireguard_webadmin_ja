@@ -220,6 +220,7 @@ class Peer(models.Model):
     mfa_lock_mode = models.CharField(max_length=16, choices=MFA_LOCK_MODE_CHOICES, default='time')
     mfa_disconnect_grace_seconds = models.PositiveIntegerField(default=300)
     mfa_trusted_browser_required = models.BooleanField(default=False)
+    mfa_client_required = models.BooleanField(default=False)
     mfa_unlocked_until = models.DateTimeField(blank=True, null=True)
     mfa_last_verified_at = models.DateTimeField(blank=True, null=True)
 

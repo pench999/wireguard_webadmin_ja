@@ -215,6 +215,31 @@ class PeerMfaClientSessionTests(TestCase):
         self.device_token = 'test-device-token-' + ('a' * 32)
         self.device_name = 'TEST-PC'
 
+    def test_portal_does_not_offer_browser_unlock_for_client_required_peer(self):
+        self.peer.mfa_client_required = True
+        self.peer.save(update_fields=['mfa_client_required', 'updated'])
+        self.client.force_login(self.user)
+
+        response = self.client.get('/vpn/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'MFA Clientから接続してください')
+        self.assertNotContains(
+            response,
+            f'/peer/mfa_unlock/?peer={self.peer.uuid}',
+        )
+
+    def test_direct_browser_unlock_is_blocked_for_client_required_peer(self):
+        self.peer.mfa_client_required = True
+        self.peer.save(update_fields=['mfa_client_required', 'updated'])
+        self.client.force_login(self.user)
+
+        response = self.client.get(f'/peer/mfa_unlock/?peer={self.peer.uuid}')
+
+        self.assertRedirects(response, '/vpn/?setup=1', fetch_redirect_response=False)
+        self.peer.refresh_from_db()
+        self.assertFalse(self.peer.mfa_unlocked)
+
     def _create_session(self, include_device=True, device_token=None):
         payload = {'peer_uuid': str(self.peer.uuid)}
         if include_device:
@@ -325,6 +350,41 @@ class PeerMfaClientSessionTests(TestCase):
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.json()['error'], 'device_required')
 
+    def test_client_required_peer_rejects_legacy_client_before_registration(self):
+        self.peer.mfa_client_required = True
+        self.peer.save(update_fields=['mfa_client_required', 'updated'])
+
+        response = self.client.post(
+            '/api/client/v1/sessions/',
+            data=json.dumps({'peer_uuid': str(self.peer.uuid)}),
+            content_type='application/json',
+        )
+
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json()['error'], 'device_required')
+
+    def test_second_device_registration_is_rejected(self):
+        UserMfaDevice.objects.create(
+            user=self.user,
+            device_id=uuid.uuid4(),
+            name='FIRST-PC',
+            token_hash=hashlib.sha256(b'first-device-token').hexdigest(),
+        )
+
+        response = self.client.post(
+            '/api/client/v1/sessions/',
+            data=json.dumps({
+                'peer_uuid': str(self.peer.uuid),
+                'device_id': str(self.device_id),
+                'device_token': self.device_token,
+                'device_name': self.device_name,
+            }),
+            content_type='application/json',
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json()['error'], 'device_registration_not_allowed')
+
     def test_poll_rejects_invalid_token(self):
         data = self._create_session()
         response = self.client.get(
@@ -352,6 +412,13 @@ class PeerMfaClientSessionTests(TestCase):
     @patch('wireguard_peer.views.export_wireguard_configuration')
     @patch('wireguard_peer.views.func_reload_wireguard_interface', return_value=(True, 'ok'))
     def test_browser_mfa_unlock_updates_poll_status(self, mock_reload, mock_export):
+        self.peer.mfa_client_required = True
+        self.peer.mfa_trusted_browser_required = True
+        self.peer.save(update_fields=[
+            'mfa_client_required',
+            'mfa_trusted_browser_required',
+            'updated',
+        ])
         data = self._create_session()
         response = self._authorize_browser(data)
         self.assertRedirects(
