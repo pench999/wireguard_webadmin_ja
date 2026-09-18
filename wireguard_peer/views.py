@@ -137,6 +137,8 @@ def view_vpn_portal(request):
 
     if not mfa_settings and peers.filter(mfa_required=True).exists():
         return redirect('/user/mfa/setup/')
+    if mfa_settings and mfa_settings.reset_allowed:
+        return redirect('/user/mfa/setup/')
 
     locked_mfa_peers = [
         peer for peer in peers
@@ -465,6 +467,8 @@ def view_wireguard_peer_mfa_unlock(request):
         mfa_settings = UserMfaSettings.objects.filter(user=request.user, totp_enabled=True).first()
         if not mfa_settings:
             messages.warning(request, _('VPN接続を有効化するには、先にMFAを設定してください。'))
+            return redirect('/user/mfa/setup/')
+        if mfa_settings.reset_allowed:
             return redirect('/user/mfa/setup/')
         if (
             current_peer.mfa_trusted_browser_required

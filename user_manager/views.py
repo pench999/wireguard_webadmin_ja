@@ -14,7 +14,7 @@ from django.utils.translation import gettext_lazy as _
 from user_manager.models import UserAcl, UserMfaSettings
 from user_manager.trusted_browser import register_trusted_browser
 from wireguard_tools.audit import write_audit_log
-from wireguard.models import PeerGroup, UserMfaDevice
+from wireguard.models import PeerGroup, PeerMfaClientSession, UserMfaDevice
 from .forms import PeerGroupForm, UserMfaDisableForm, UserMfaSetupForm, UserPasswordChangeForm
 from .forms import UserAclForm
 
@@ -151,7 +151,16 @@ def view_user_mfa_setup(request):
             request.session.pop('pending_mfa_totp_secret', None)
             write_audit_log(request, 'user_mfa_configured', request.user, details={'reset': reset_allowed})
             messages.success(request, _('MFAを設定しました。'))
-            if use_vpn_portal:
+            client_session_id = request.session.get('peer_mfa_client_session_id')
+            client_session = PeerMfaClientSession.objects.filter(
+                uuid=client_session_id,
+                user=request.user,
+                status=PeerMfaClientSession.STATUS_AUTHORIZING,
+                expires_at__gt=timezone.now(),
+            ).first() if client_session_id else None
+            if client_session:
+                response = redirect('/peer/mfa_unlock/?peer=' + str(client_session.peer_id))
+            elif use_vpn_portal:
                 response = redirect('/vpn/?setup=1')
             else:
                 response = redirect('/user/mfa/setup/')

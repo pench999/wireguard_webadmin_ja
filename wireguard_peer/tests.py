@@ -215,6 +215,16 @@ class PeerMfaClientSessionTests(TestCase):
         self.device_token = 'test-device-token-' + ('a' * 32)
         self.device_name = 'TEST-PC'
 
+    def test_portal_redirects_reset_allowed_user_to_mfa_setup(self):
+        mfa_settings = UserMfaSettings.objects.get(user=self.user)
+        mfa_settings.reset_allowed = True
+        mfa_settings.save(update_fields=['reset_allowed', 'updated'])
+        self.client.force_login(self.user)
+
+        response = self.client.get('/vpn/')
+
+        self.assertRedirects(response, '/user/mfa/setup/', fetch_redirect_response=False)
+
     def test_portal_does_not_offer_browser_unlock_for_client_required_peer(self):
         self.peer.mfa_client_required = True
         self.peer.save(update_fields=['mfa_client_required', 'updated'])
@@ -408,6 +418,42 @@ class PeerMfaClientSessionTests(TestCase):
         self.assertEqual(response.status_code, 404)
         client_session = PeerMfaClientSession.objects.get(uuid=data['session_id'])
         self.assertEqual(client_session.status, PeerMfaClientSession.STATUS_PENDING)
+
+    def test_mfa_reset_resumes_client_authorization(self):
+        mfa_settings = UserMfaSettings.objects.get(user=self.user)
+        mfa_settings.reset_allowed = True
+        mfa_settings.save(update_fields=['reset_allowed', 'updated'])
+        self.peer.mfa_client_required = True
+        self.peer.save(update_fields=['mfa_client_required', 'updated'])
+        data = self._create_session()
+        connect_response = self._authorize_browser(data)
+        self.assertRedirects(
+            connect_response,
+            f'/peer/mfa_unlock/?peer={self.peer.uuid}',
+            fetch_redirect_response=False,
+        )
+
+        unlock_response = self.client.get(connect_response.url)
+        self.assertRedirects(
+            unlock_response,
+            '/user/mfa/setup/',
+            fetch_redirect_response=False,
+        )
+        setup_response = self.client.get('/user/mfa/setup/')
+        self.assertEqual(setup_response.status_code, 200)
+        pending_secret = self.client.session['pending_mfa_totp_secret']
+
+        response = self.client.post('/user/mfa/setup/', {
+            'totp_pin': pyotp.TOTP(pending_secret).now(),
+        })
+
+        self.assertRedirects(
+            response,
+            f'/peer/mfa_unlock/?peer={self.peer.uuid}',
+            fetch_redirect_response=False,
+        )
+        mfa_settings.refresh_from_db()
+        self.assertFalse(mfa_settings.reset_allowed)
 
     @patch('wireguard_peer.views.export_wireguard_configuration')
     @patch('wireguard_peer.views.func_reload_wireguard_interface', return_value=(True, 'ok'))
