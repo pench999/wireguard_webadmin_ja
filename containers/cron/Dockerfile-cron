@@ -1,6 +1,6 @@
 FROM ubuntu:latest
 
-RUN apt-get update && apt-get install -y cron curl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y cron curl util-linux && rm -rf /var/lib/apt/lists/*
 
 COPY entrypoint.sh /entrypoint.sh
 COPY cron_runner.sh /cron_runner.sh
