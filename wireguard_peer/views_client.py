@@ -125,8 +125,8 @@ def provisioning_connect(request, browser_token):
         suspended=False,
         disabled_by_schedule=False,
     ).exclude(private_key__isnull=True).exclude(private_key='').order_by('name', 'uuid')
-    mfa_settings = UserMfaSettings.objects.filter(user=request.user, totp_enabled=True).first()
-    if not mfa_settings:
+    mfa_settings = UserMfaSettings.objects.filter(user=request.user).first()
+    if not mfa_settings or not mfa_settings.totp_enabled or mfa_settings.reset_allowed:
         request.session['mfa_provisioning_return_path'] = request.path
         return redirect('/user/mfa/setup/')
     error = None

@@ -625,6 +625,26 @@ class PeerProvisioningSessionTests(TestCase):
         self.assertRedirects(response, provisioning_path, fetch_redirect_response=False)
         self.assertEqual(self.client.get(provisioning_path).status_code, 200)
 
+    def test_reset_allowed_mfa_returns_to_provisioning_after_setup(self):
+        settings = UserMfaSettings.objects.get(user=self.user)
+        settings.reset_allowed = True
+        settings.save(update_fields=['reset_allowed', 'updated'])
+        data = self._create()
+        self.client.force_login(self.user)
+        provisioning_path = urlparse(data['browser_url']).path
+
+        response = self.client.get(provisioning_path)
+
+        self.assertRedirects(response, '/user/mfa/setup/', fetch_redirect_response=False)
+        self.client.get('/user/mfa/setup/')
+        pending_secret = self.client.session['pending_mfa_totp_secret']
+        response = self.client.post('/user/mfa/setup/', {
+            'totp_pin': pyotp.TOTP(pending_secret).now(),
+        })
+        self.assertRedirects(response, provisioning_path, fetch_redirect_response=False)
+        settings.refresh_from_db()
+        self.assertFalse(settings.reset_allowed)
+
     def test_other_registered_device_blocks_provisioning(self):
         UserMfaDevice.objects.create(
             user=self.user, device_id=uuid.uuid4(), name='OTHER-PC',
