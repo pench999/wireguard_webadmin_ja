@@ -1,4 +1,5 @@
 import io
+import re
 
 import pyotp
 import qrcode
@@ -151,6 +152,7 @@ def view_user_mfa_setup(request):
             request.session.pop('pending_mfa_totp_secret', None)
             write_audit_log(request, 'user_mfa_configured', request.user, details={'reset': reset_allowed})
             messages.success(request, _('MFAを設定しました。'))
+            provisioning_return_path = request.session.pop('mfa_provisioning_return_path', '')
             client_session_id = request.session.get('peer_mfa_client_session_id')
             client_session = PeerMfaClientSession.objects.filter(
                 uuid=client_session_id,
@@ -158,7 +160,9 @@ def view_user_mfa_setup(request):
                 status=PeerMfaClientSession.STATUS_AUTHORIZING,
                 expires_at__gt=timezone.now(),
             ).first() if client_session_id else None
-            if client_session:
+            if re.fullmatch(r'/client/provision/[A-Za-z0-9_-]+/', provisioning_return_path):
+                response = redirect(provisioning_return_path)
+            elif client_session:
                 response = redirect('/peer/mfa_unlock/?peer=' + str(client_session.peer_id))
             elif use_vpn_portal:
                 response = redirect('/vpn/?setup=1')

@@ -604,6 +604,27 @@ class PeerProvisioningSessionTests(TestCase):
         second = self.client.get(f"/api/client/v1/provisioning/{data['session_id']}/config/", **headers)
         self.assertEqual(second.status_code, 409)
 
+    def test_unconfigured_mfa_returns_to_provisioning_after_setup(self):
+        settings = UserMfaSettings.objects.get(user=self.user)
+        settings.totp_secret = ''
+        settings.totp_enabled = False
+        settings.save(update_fields=['totp_secret', 'totp_enabled', 'updated'])
+        data = self._create()
+        self.client.force_login(self.user)
+        provisioning_path = urlparse(data['browser_url']).path
+
+        response = self.client.get(provisioning_path)
+
+        self.assertRedirects(response, '/user/mfa/setup/', fetch_redirect_response=False)
+        setup_response = self.client.get('/user/mfa/setup/')
+        self.assertEqual(setup_response.status_code, 200)
+        pending_secret = self.client.session['pending_mfa_totp_secret']
+        response = self.client.post('/user/mfa/setup/', {
+            'totp_pin': pyotp.TOTP(pending_secret).now(),
+        })
+        self.assertRedirects(response, provisioning_path, fetch_redirect_response=False)
+        self.assertEqual(self.client.get(provisioning_path).status_code, 200)
+
     def test_other_registered_device_blocks_provisioning(self):
         UserMfaDevice.objects.create(
             user=self.user, device_id=uuid.uuid4(), name='OTHER-PC',

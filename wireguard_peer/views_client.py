@@ -126,6 +126,9 @@ def provisioning_connect(request, browser_token):
         disabled_by_schedule=False,
     ).exclude(private_key__isnull=True).exclude(private_key='').order_by('name', 'uuid')
     mfa_settings = UserMfaSettings.objects.filter(user=request.user, totp_enabled=True).first()
+    if not mfa_settings:
+        request.session['mfa_provisioning_return_path'] = request.path
+        return redirect('/user/mfa/setup/')
     error = None
     if request.method == 'POST':
         peer = peers.filter(uuid=request.POST.get('peer_uuid')).first()
@@ -172,6 +175,7 @@ def provisioning_connect(request, browser_token):
                     write_audit_log(request, 'mfa_client_provisioning_authorized', peer, details={
                         'device_name': device.name,
                     })
+                    request.session.pop('mfa_provisioning_return_path', None)
                     return render(request, 'wireguard/client_provision.html', {'complete': True})
 
     return render(request, 'wireguard/client_provision.html', {
