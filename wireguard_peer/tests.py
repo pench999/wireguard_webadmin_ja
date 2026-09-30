@@ -13,7 +13,7 @@ from django.utils import timezone
 from scheduler.models import PeerScheduling
 from user_manager.models import UserAcl, UserMfaSettings
 from user_manager.trusted_browser import TRUSTED_BROWSER_COOKIE_NAME, hash_trusted_browser_token
-from wireguard.models import Peer, PeerMfaClientSession, UserMfaDevice, WireGuardInstance
+from wireguard.models import Peer, PeerAllowedIP, PeerMfaClientSession, PeerProvisioningSession, UserMfaDevice, WireGuardInstance
 from wireguard_tools.models import AuditLog
 
 
@@ -249,6 +249,7 @@ class PeerMfaClientSessionTests(TestCase):
         self.assertRedirects(response, '/vpn/?setup=1', fetch_redirect_response=False)
         self.peer.refresh_from_db()
         self.assertFalse(self.peer.mfa_unlocked)
+
 
     def _create_session(self, include_device=True, device_token=None):
         payload = {'peer_uuid': str(self.peer.uuid)}
@@ -559,3 +560,60 @@ class PeerMfaClientSessionTests(TestCase):
         self.assertEqual(response.json()['status'], PeerMfaClientSession.STATUS_LOCKED)
         self.peer.refresh_from_db()
         self.assertFalse(self.peer.mfa_unlocked)
+
+
+class PeerProvisioningSessionTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='provision-user', password='StrongPass!123')
+        UserAcl.objects.create(user=self.user, user_level=0)
+        self.secret = 'JBSWY3DPEHPK3PXP'
+        UserMfaSettings.objects.create(user=self.user, totp_secret=self.secret, totp_enabled=True)
+        self.instance = WireGuardInstance.objects.create(
+            instance_id=20, private_key='server-private', public_key='server-public',
+            hostname='vpn.example.test', listen_port=51840, address='10.70.0.1', netmask=24,
+        )
+        self.peer = Peer.objects.create(
+            name='provision-peer', public_key='client-public', private_key='client-private',
+            wireguard_instance=self.instance, assigned_user=self.user, mfa_required=True,
+        )
+        PeerAllowedIP.objects.create(peer=self.peer, priority=0, allowed_ip='10.70.0.2', netmask=32, config_file='server')
+        PeerAllowedIP.objects.create(peer=self.peer, priority=1, allowed_ip='0.0.0.0', netmask=0, config_file='client')
+        self.device_id = uuid.uuid4()
+        self.device_token = 'provision-token-' + ('x' * 32)
+
+    def _create(self):
+        response = self.client.post('/api/client/v1/provisioning/', data=json.dumps({
+            'device_id': str(self.device_id), 'device_token': self.device_token, 'device_name': 'PROVISION-PC',
+        }), content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        return response.json()
+
+    def test_authorizes_and_delivers_config_once(self):
+        data = self._create()
+        self.client.force_login(self.user)
+        response = self.client.post(urlparse(data['browser_url']).path, {
+            'peer_uuid': str(self.peer.uuid), 'totp_pin': pyotp.TOTP(self.secret).now(),
+        })
+        self.assertEqual(response.status_code, 200)
+        headers = {'HTTP_AUTHORIZATION': f"Bearer {data['poll_token']}"}
+        status = self.client.get(f"/api/client/v1/provisioning/{data['session_id']}/status/", **headers)
+        self.assertEqual(status.json()['status'], PeerProvisioningSession.STATUS_AUTHORIZED)
+        config = self.client.get(f"/api/client/v1/provisioning/{data['session_id']}/config/", **headers)
+        self.assertEqual(config.status_code, 200)
+        self.assertIn('PrivateKey = client-private', config.json()['config'])
+        second = self.client.get(f"/api/client/v1/provisioning/{data['session_id']}/config/", **headers)
+        self.assertEqual(second.status_code, 409)
+
+    def test_other_registered_device_blocks_provisioning(self):
+        UserMfaDevice.objects.create(
+            user=self.user, device_id=uuid.uuid4(), name='OTHER-PC',
+            token_hash=hashlib.sha256(b'other-token').hexdigest(),
+        )
+        data = self._create()
+        self.client.force_login(self.user)
+        response = self.client.post(urlparse(data['browser_url']).path, {
+            'peer_uuid': str(self.peer.uuid), 'totp_pin': pyotp.TOTP(self.secret).now(),
+        })
+        self.assertContains(response, '別の端末が登録されています')
+        session = PeerProvisioningSession.objects.get(uuid=data['session_id'])
+        self.assertEqual(session.status, PeerProvisioningSession.STATUS_PENDING)

@@ -1,0 +1,40 @@
+{% extends "base_mfa.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="mfa-shell">
+  <div class="mfa-card">
+    <div class="mfa-card-header">
+      <h1>{% trans 'MFA Clientの初期設定' %}</h1>
+      {% if complete %}
+        <p>{% trans '認証が完了しました。この画面を閉じてアプリに戻ってください。' %}</p>
+      {% else %}
+        <p>{% trans 'この端末へ割り当てるVPN接続を選び、MFAコードを入力してください。' %}</p>
+      {% endif %}
+    </div>
+    {% if not complete %}
+      {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+      {% if not mfa_configured %}
+        <div class="alert alert-warning">{% trans '先にユーザーポータルでMFAを設定してください。' %}</div>
+      {% elif not peers %}
+        <div class="alert alert-warning">{% trans '利用可能なピアが割り当てられていません。' %}</div>
+      {% else %}
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="peer_uuid">{% trans 'VPN接続' %}</label>
+            <select class="form-control" id="peer_uuid" name="peer_uuid" required>
+              {% for peer in peers %}<option value="{{ peer.uuid }}">{{ peer }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="totp_pin">{% trans 'MFAコード' %}</label>
+            <input class="form-control" id="totp_pin" name="totp_pin" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required>
+          </div>
+          <button type="submit" class="btn btn-primary">{% trans 'この端末を設定' %}</button>
+        </form>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
