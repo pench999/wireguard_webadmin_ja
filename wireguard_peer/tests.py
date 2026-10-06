@@ -272,6 +272,21 @@ class PeerMfaClientSessionTests(TestCase):
         browser_path = urlparse(session_data['browser_url']).path
         return self.client.get(browser_path)
 
+    @patch('wireguard_peer.views.export_wireguard_configuration')
+    @patch('wireguard_peer.views.func_reload_wireguard_interface', return_value=(True, 'ok'))
+    def test_android_unlock_returns_to_app_after_success(self, mock_reload, mock_export):
+        data = self._create_session()
+        self.client.force_login(self.user)
+        self.client.get(urlparse(data['browser_url']).path + '?return_to_app=android')
+        response = self.client.post(f'/peer/mfa_unlock/?peer={self.peer.uuid}', {
+            'totp_pin': pyotp.TOTP(self.secret).now(),
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'intent://auth/complete')
+        self.assertNotContains(response, data['poll_token'])
+        session = PeerMfaClientSession.objects.get(uuid=data['session_id'])
+        self.assertEqual(session.status, PeerMfaClientSession.STATUS_UNLOCKED)
+
     def test_create_and_poll_pending_session(self):
         data = self._create_session()
         client_session = PeerMfaClientSession.objects.get(uuid=data['session_id'])
@@ -603,6 +618,20 @@ class PeerProvisioningSessionTests(TestCase):
         self.assertIn('PrivateKey = client-private', config.json()['config'])
         second = self.client.get(f"/api/client/v1/provisioning/{data['session_id']}/config/", **headers)
         self.assertEqual(second.status_code, 409)
+
+    def test_android_provisioning_returns_to_app_after_success(self):
+        data = self._create()
+        self.client.force_login(self.user)
+        path = urlparse(data['browser_url']).path
+        self.client.get(path + '?return_to_app=android')
+        response = self.client.post(path, {
+            'peer_uuid': str(self.peer.uuid), 'totp_pin': pyotp.TOTP(self.secret).now(),
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'intent://auth/complete')
+        self.assertNotContains(response, data['poll_token'])
+        session = PeerProvisioningSession.objects.get(uuid=data['session_id'])
+        self.assertEqual(session.status, PeerProvisioningSession.STATUS_AUTHORIZED)
 
     def test_unconfigured_mfa_returns_to_provisioning_after_setup(self):
         settings = UserMfaSettings.objects.get(user=self.user)

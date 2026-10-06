@@ -1,0 +1,22 @@
+{% extends "base_mfa.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="mfa-shell">
+  <div class="mfa-card">
+    <div class="mfa-card-header">
+      <h1>{% trans '認証が完了しました' %}</h1>
+      <p>{% trans 'アプリに戻って接続を続けてください。' %}</p>
+    </div>
+    <a id="app-return" class="btn btn-primary" href="{{ app_return_uri }}">{% trans 'アプリへ戻る' %}</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block custom_page_scripts %}
+<script>
+  window.setTimeout(function () {
+    window.location.href = document.getElementById('app-return').href;
+  }, 300);
+</script>
+{% endblock %}

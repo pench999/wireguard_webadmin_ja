@@ -17,6 +17,7 @@ from wireguard.models import Peer, PeerMfaClientSession, PeerProvisioningSession
 from wireguard_tools.audit import write_audit_log
 from wireguard_tools.functions import func_reload_wireguard_interface
 from wireguard_tools.views import export_wireguard_configuration, generate_peer_config
+from .client_return import remember_app_return, app_return_requested, render_app_return
 
 
 def _token_hash(token):
@@ -120,6 +121,8 @@ def provisioning_connect(request, browser_token):
     if not client_session or client_session.is_expired:
         raise Http404
 
+    remember_app_return(request, client_session)
+
     peers = Peer.objects.filter(
         assigned_user=request.user,
         suspended=False,
@@ -176,6 +179,8 @@ def provisioning_connect(request, browser_token):
                         'device_name': device.name,
                     })
                     request.session.pop('mfa_provisioning_return_path', None)
+                    if app_return_requested(request, client_session):
+                        return render_app_return(request)
                     return render(request, 'wireguard/client_provision.html', {'complete': True})
 
     return render(request, 'wireguard/client_provision.html', {
@@ -338,6 +343,8 @@ def client_connect(request, browser_token):
         raise Http404
     if client_session.peer.assigned_user_id != request.user.id:
         raise Http404
+
+    remember_app_return(request, client_session)
 
     client_session.user = request.user
     client_session.status = PeerMfaClientSession.STATUS_AUTHORIZING

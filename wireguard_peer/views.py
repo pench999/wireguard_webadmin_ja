@@ -28,6 +28,7 @@ from wireguard_tools.audit import write_audit_log
 from wireguard_tools.functions import func_reload_wireguard_interface
 from wireguard_tools.views import export_wireguard_configuration, generate_peer_config
 from .functions import func_create_new_peer
+from .client_return import app_return_requested, render_app_return
 
 
 def _auto_apply(request, instance):
@@ -525,6 +526,8 @@ def view_wireguard_peer_mfa_unlock(request):
                     client_session.save(update_fields=['registered_device', 'status', 'authorized_at', 'updated'])
                     request.session.pop('peer_mfa_client_session_id', None)
                 messages.success(request, _('VPN接続を一時的に有効化しました。'))
+                if client_session and app_return_requested(request, client_session):
+                    return render_app_return(request)
             else:
                 if client_session:
                     client_session.status = PeerMfaClientSession.STATUS_FAILED
