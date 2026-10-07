@@ -42,6 +42,32 @@ class UserMfaSetupTests(TestCase):
         settings = UserMfaSettings.objects.get(user=self.user)
         self.assertTrue(settings.totp_enabled)
 
+    def test_setup_exposes_pending_key_with_copy_control_and_no_cache(self):
+        response = self.client.get('/user/mfa/setup/')
+        secret = self.client.session['pending_mfa_totp_secret']
+        self.assertEqual(response.context['registration_key'], secret)
+        self.assertContains(response, 'value="' + secret + '"')
+        self.assertContains(response, 'id="copy-mfa-key"')
+        self.assertIn('no-store', response['Cache-Control'])
+        qr_response = self.client.get('/user/mfa/qrcode/')
+        self.assertEqual(qr_response.status_code, 200)
+        self.assertIn('no-store', qr_response['Cache-Control'])
+
+    def test_configured_mfa_does_not_expose_key_without_reset_permission(self):
+        secret = pyotp.random_base32()
+        UserMfaSettings.objects.create(user=self.user, totp_enabled=True, totp_secret=secret)
+        response = self.client.get('/user/mfa/setup/')
+        self.assertNotContains(response, secret)
+        self.assertNotContains(response, 'id="copy-mfa-key"')
+
+    def test_reset_displays_new_pending_key_not_existing_secret(self):
+        secret = pyotp.random_base32()
+        UserMfaSettings.objects.create(user=self.user, totp_enabled=True, totp_secret=secret, reset_allowed=True)
+        response = self.client.get('/user/mfa/setup/')
+        self.assertNotContains(response, secret)
+        self.assertEqual(response.context['registration_key'], self.client.session['pending_mfa_totp_secret'])
+        self.assertContains(response, 'id="copy-mfa-key"')
+
 
 class UserMfaDeviceAdminTests(TestCase):
     def setUp(self):

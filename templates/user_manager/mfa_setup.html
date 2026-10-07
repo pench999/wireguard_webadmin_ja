@@ -27,6 +27,18 @@
                     <div class="text-center mb-3">
                         <img src="{% url 'user_mfa_qrcode' %}" alt="{% trans 'MFA QRコード' %}" class="img-fluid" style="max-width: 220px;">
                     </div>
+                    <div class="mb-3">
+                        <label for="mfa-registration-key">{% trans '登録キー' %}</label>
+                        <div class="input-group">
+                            <input id="mfa-registration-key" type="text" class="form-control text-monospace" value="{{ registration_key }}" readonly autocomplete="off" spellcheck="false" aria-describedby="mfa-key-note">
+                            <div class="input-group-append">
+                                <button id="copy-mfa-key" type="button" class="btn btn-outline-secondary" title="{% trans '登録キーをコピー' %}" aria-label="{% trans '登録キーをコピー' %}"><i class="fas fa-copy" aria-hidden="true"></i></button>
+                            </div>
+                        </div>
+                        <small id="mfa-key-note" class="form-text text-muted">{% trans '同じスマートフォンで登録する場合は、認証アプリの手動登録にこのキーを入力してください。種類は時間ベースを選択してください。' %}</small>
+                        <small class="form-text text-muted">{% trans '登録キーは秘密情報です。他人へ共有しないでください。' %}</small>
+                        <span id="mfa-key-copy-status" role="status" aria-live="polite" class="d-block mt-1"></span>
+                    </div>
                     <form method="post">
                         {% csrf_token %}
                         {{ form|crispy }}
@@ -48,4 +60,27 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block custom_page_scripts %}
+<script>
+  (function () {
+    var button = document.getElementById('copy-mfa-key');
+    if (!button) return;
+    button.addEventListener('click', async function () {
+      var key = document.getElementById('mfa-registration-key');
+      var status = document.getElementById('mfa-key-copy-status');
+      try {
+        if (!navigator.clipboard || !window.isSecureContext) throw new Error();
+        await navigator.clipboard.writeText(key.value);
+        status.textContent = '{% trans "登録キーをコピーしました。" %}';
+      } catch (_) {
+        key.focus();
+        key.select();
+        key.setSelectionRange(0, key.value.length);
+        status.textContent = '{% trans "コピーできませんでした。選択された登録キーを手動でコピーしてください。" %}';
+      }
+    });
+  })();
+</script>
 {% endblock %}

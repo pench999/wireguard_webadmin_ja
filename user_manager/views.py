@@ -11,6 +11,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.cache import never_cache
 
 from user_manager.models import UserAcl, UserMfaSettings
 from user_manager.trusted_browser import register_trusted_browser
@@ -119,6 +120,7 @@ def view_user_mfa_devices(request):
 
 
 @login_required
+@never_cache
 def view_user_mfa_setup(request):
     mfa_settings, created = UserMfaSettings.objects.get_or_create(user=request.user)
     user_acl = UserAcl.objects.filter(user=request.user).first()
@@ -175,6 +177,7 @@ def view_user_mfa_setup(request):
     return render(request, 'user_manager/mfa_setup.html', {
         'page_title': _('MFA設定'),
         'form': form,
+        'registration_key': pending_secret,
         'mfa_settings': mfa_settings,
         'reset_allowed': reset_allowed,
         'can_configure_mfa': can_configure_mfa,
@@ -183,6 +186,7 @@ def view_user_mfa_setup(request):
 
 
 @login_required
+@never_cache
 def view_user_mfa_qrcode(request):
     existing_mfa = UserMfaSettings.objects.filter(user=request.user).first()
     if existing_mfa and existing_mfa.totp_enabled and not existing_mfa.reset_allowed:
