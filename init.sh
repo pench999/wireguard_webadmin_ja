@@ -31,5 +31,8 @@ if [[ "${DEV_MODE,,}" == "true" ]]; then
     exec python manage.py runserver 0.0.0.0:8000
 else
     echo "Starting Gunicorn"
-    exec gunicorn wireguard_webadmin.wsgi:application --bind 0.0.0.0:8000 --workers 2 --threads 2 --timeout 60 --log-level info --capture-output --access-logfile - --error-logfile -
+    exec gunicorn wireguard_webadmin.wsgi:application --bind 0.0.0.0:8000 \
+        --workers "${GUNICORN_WORKERS:-4}" --worker-class sync --timeout 60 \
+        --max-requests 1000 --max-requests-jitter 100 \
+        --log-level info --capture-output --access-logfile - --error-logfile -
 fi

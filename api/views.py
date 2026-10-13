@@ -224,13 +224,29 @@ def api_instance_info(request):
 
 
 def func_process_wireguard_status() -> Dict[str, Any]:
-    command = "wg show all dump"
+    command = ["wg", "show", "all", "dump"]
+    timeout_seconds = 15
 
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    stdout, stderr = process.communicate()
+    try:
+        process = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=timeout_seconds,
+            check=False,
+        )
+    except subprocess.TimeoutExpired:
+        return {
+            "message": f"wg show all dump timed out after {timeout_seconds} seconds",
+            "status": "error",
+        }
+    except OSError as exc:
+        return {"message": f"Failed to run wg show all dump: {exc}", "status": "error"}
 
     if process.returncode != 0:
-        return {"message": stderr, "status": "error"}
+        return {"message": process.stderr.strip(), "status": "error"}
+
+    stdout = process.stdout
 
     data: Dict[str, Dict[str, Dict[str, Any]]] = {}
 
@@ -336,8 +352,9 @@ def func_get_wireguard_status(cache_previous: int = 0):
             'cache_hit': False,
             'cache_enabled': False,
         }
-        data['status'] = 'success'
-        data['message'] = 'WireGuard status retrieved without cache'
+        if data.get('status') != 'error':
+            data['status'] = 'success'
+            data['message'] = 'WireGuard status retrieved without cache'
     return data
 
 
@@ -559,6 +576,8 @@ def cron_refresh_wireguard_status_cache(request):
         return JsonResponse(data)
     start_time = time.monotonic()
     wireguard_status_data = func_process_wireguard_status()
+    if wireguard_status_data.get('status') == 'error':
+        return JsonResponse(wireguard_status_data, status=503)
     func_update_peer_connection_audit(wireguard_status_data)
     end_time = time.monotonic()
     processing_time_ms = int((end_time - start_time) * 1000)
@@ -951,7 +970,7 @@ def cron_check_updates(request):
         try:
             version = settings.WIREGUARD_WEBADMIN_VERSION / 10000
             url = f'https://updates.eth0.com.br/api/check_updates/?app=wireguard_webadmin&version={version}'
-            response = requests.get(url)
+            response = requests.get(url, timeout=(5, 15))
             response.raise_for_status()
             data = response.json()
             

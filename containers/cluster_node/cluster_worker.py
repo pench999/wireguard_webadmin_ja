@@ -42,13 +42,29 @@ class ClusterWorker:
 
 
     def func_process_wireguard_status(self) -> Dict[str, Any]:
-        command = "wg show all dump"
+        command = ["wg", "show", "all", "dump"]
+        timeout_seconds = 15
 
-        process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        stdout, stderr = process.communicate()
+        try:
+            process = subprocess.run(
+                command,
+                capture_output=True,
+                text=True,
+                timeout=timeout_seconds,
+                check=False,
+            )
+        except subprocess.TimeoutExpired:
+            return {
+                "message": f"wg show all dump timed out after {timeout_seconds} seconds",
+                "status": "error",
+            }
+        except OSError as exc:
+            return {"message": f"Failed to run wg show all dump: {exc}", "status": "error"}
 
         if process.returncode != 0:
-            return {"message": stderr, "status": "error"}
+            return {"message": process.stderr.strip(), "status": "error"}
+
+        stdout = process.stdout
 
         data: Dict[str, Dict[str, Dict[str, Any]]] = {}
 
@@ -243,6 +259,9 @@ class ClusterWorker:
     def send_stats(self):
         try:
             stats = self.func_process_wireguard_status()
+            if stats.get('status') == 'error':
+                logger.error(f"Unable to collect WireGuard stats: {stats['message']}")
+                return False
             params = {
                 'token': TOKEN,
                 'worker_config_version': self.config_version,
