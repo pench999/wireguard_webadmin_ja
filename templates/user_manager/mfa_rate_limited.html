@@ -1,0 +1,17 @@
+{% extends "base_mfa.html" %}
+{% load i18n %}
+{% block content %}
+<div class="mfa-shell">
+  <div class="mfa-card">
+    <div class="mfa-card-header">
+      {% if unavailable %}
+        <h1>{% trans '認証を一時的に利用できません' %}</h1>
+      {% else %}
+        <h1>{% trans '認証の試行回数が上限に達しました' %}</h1>
+      {% endif %}
+      <p>{% blocktrans %}{{ retry_after }}秒後に、もう一度お試しください。{% endblocktrans %}</p>
+    </div>
+    <a class="btn btn-primary" href="{{ return_url }}">{% trans '認証画面に戻る' %}</a>
+  </div>
+</div>
+{% endblock %}

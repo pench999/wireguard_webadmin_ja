@@ -13,6 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from user_manager.models import UserMfaSettings
+from user_manager.security_limits import anonymous_api_limit, verify_mfa, mfa_limit_response
 from wireguard.models import Peer, PeerMfaClientSession, PeerProvisioningSession, UserMfaDevice
 from wireguard_tools.audit import write_audit_log
 from wireguard_tools.functions import func_reload_wireguard_interface
@@ -68,6 +69,9 @@ def _poll_provisioning_session(request, session_id):
 @csrf_exempt
 @require_POST
 def create_provisioning_session(request):
+    limited = anonymous_api_limit(request)
+    if limited is not None:
+        return limited
     body = _json_body(request)
     if not isinstance(body, dict):
         return JsonResponse({'error': 'invalid_json'}, status=400)
@@ -141,8 +145,10 @@ def provisioning_connect(request, browser_token):
         elif not mfa_settings:
             error = '先にユーザーポータルでMFAを設定してください。'
         else:
-            import pyotp
-            if not pyotp.TOTP(mfa_settings.totp_secret).verify(pin, valid_window=1):
+            verification = verify_mfa(request, mfa_settings.totp_secret, pin)
+            if verification.retry_after:
+                return mfa_limit_response(request, verification)
+            if not verification.valid:
                 error = 'MFA認証に失敗しました。'
                 write_audit_log(request, 'mfa_client_provisioning_failed', peer)
             else:
@@ -245,6 +251,9 @@ def download_provisioning_config(request, session_id):
 @csrf_exempt
 @require_POST
 def create_client_session(request):
+    limited = anonymous_api_limit(request)
+    if limited is not None:
+        return limited
     body = _json_body(request)
     if not isinstance(body, dict):
         return JsonResponse({'error': 'invalid_json'}, status=400)

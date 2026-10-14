@@ -24,6 +24,7 @@ from wireguard_peer.forms import PeerAllowedIPForm, PeerNameForm, PeerKeepaliveF
 from user_manager.forms import PeerMfaUnlockForm
 from user_manager.models import UserMfaSettings
 from user_manager.trusted_browser import has_trusted_browser
+from user_manager.security_limits import verify_mfa, mfa_limit_response
 from wireguard_tools.audit import write_audit_log
 from wireguard_tools.functions import func_reload_wireguard_interface
 from wireguard_tools.views import export_wireguard_configuration, generate_peer_config
@@ -483,9 +484,10 @@ def view_wireguard_peer_mfa_unlock(request):
         form = PeerMfaUnlockForm(request.POST or None, peer=current_peer, back_url=back_url)
 
     if form and form.is_valid():
-        import pyotp
-        totp = pyotp.TOTP(mfa_settings.totp_secret)
-        if not totp.verify(form.cleaned_data['totp_pin'], valid_window=1):
+        verification = verify_mfa(request, mfa_settings.totp_secret, form.cleaned_data['totp_pin'])
+        if verification.retry_after:
+            return mfa_limit_response(request, verification)
+        if not verification.valid:
             write_audit_log(request, 'vpn_mfa_failed', current_peer)
             messages.error(request, _('MFA認証に失敗しました。'))
         else:
