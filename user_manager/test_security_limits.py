@@ -65,6 +65,17 @@ class MfaLimitTests(TestCase):
             self.assertTrue(verify_mfa(request, self.secret, pyotp.TOTP(self.secret).now()).valid)
         self.assertEqual(SecurityRateLimit.objects.count(), 1)
 
+    @override_settings(SECURITY_RATE_LIMIT_KEY='persistent-test-key')
+    def test_django_secret_rotation_does_not_reset_budget(self):
+        with override_settings(SECRET_KEY='before-restart'):
+            for _ in range(2):
+                verify_mfa(self.request(), self.secret, 'abcdef')
+        with override_settings(SECRET_KEY='after-restart'):
+            result = verify_mfa(self.request(), self.secret, pyotp.TOTP(self.secret).now())
+        self.assertFalse(result.valid)
+        self.assertGreater(result.retry_after, 0)
+        self.assertEqual(SecurityRateLimit.objects.count(), 1)
+
     @patch('user_manager.security_limits._reserve', side_effect=DatabaseError('unavailable'))
     def test_storage_failure_denies_verification(self, _reserve):
         result = verify_mfa(self.request(), self.secret, pyotp.TOTP(self.secret).now())

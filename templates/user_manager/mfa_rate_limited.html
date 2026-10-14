@@ -1,7 +1,7 @@
 {% extends "base_mfa.html" %}
 {% load i18n %}
 {% block content %}
-<div class="mfa-shell">
+<div class="mfa-shell" data-wgmfa-retry-page="true">
   <div class="mfa-card">
     <div class="mfa-card-header">
       {% if unavailable %}

@@ -28,7 +28,11 @@ def _reserve(scope, identity, limit, seconds):
     seconds = max(1, int(seconds))
     bucket = int(now.timestamp()) // seconds
     expires_at = datetime.fromtimestamp((bucket + 1) * seconds, datetime_timezone.utc)
-    key = salted_hmac('security-rate-limit', f'{scope}:{identity}:{bucket}', algorithm='sha256').hexdigest()
+    key = salted_hmac(
+        'security-rate-limit', f'{scope}:{identity}:{bucket}',
+        secret=getattr(settings, 'SECURITY_RATE_LIMIT_KEY', settings.SECRET_KEY),
+        algorithm='sha256',
+    ).hexdigest()
     _, created = SecurityRateLimit.objects.get_or_create(
         key=key, defaults={'expires_at': expires_at},
     )

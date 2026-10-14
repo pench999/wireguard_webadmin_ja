@@ -22,6 +22,11 @@ These controls do not replace login throttling, edge limits, or device revocatio
 revalidation. Status polling and other API families are outside this change.
 
 ## Nginx deployment
+The container stores its dedicated HMAC key in
+`/app_secrets/security_rate_limit_key`. Preserve the `app_secrets` volume along
+with the database. Django's per-start SECRET_KEY rotation does not reset counters.
+The first upgrade to this persistent key starts new counters; retest limits after
+that upgrade. Do not delete the key or use `down -v` during restart testing.
 
 By default, X-Forwarded-For is ignored. Set SECURITY_TRUSTED_PROXY_CIDRS only to
 the exact Nginx source address(es) as seen by Django, not to an arbitrary private
