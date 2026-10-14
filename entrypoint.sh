@@ -25,6 +25,16 @@ if [ ! -f /app_secrets/cron_key ]; then
     cat /proc/sys/kernel/random/uuid > /app_secrets/cron_key
 fi
 
+# Rate-limit identities must survive the per-start Django SECRET_KEY rotation.
+if [ ! -f /app_secrets/security_rate_limit_key ]; then
+    (umask 077; openssl rand -hex 32 > /app_secrets/security_rate_limit_key)
+fi
+SECURITY_RATE_LIMIT_KEY=$(cat /app_secrets/security_rate_limit_key)
+if [[ ! "$SECURITY_RATE_LIMIT_KEY" =~ ^[0-9a-f]{64}$ ]]; then
+    echo "ERROR: Invalid persistent security rate-limit key."
+    exit 1
+fi
+
 SERVER_HOSTNAME=$(echo $SERVER_ADDRESS | cut -d ':' -f 1)
 EXTRA_ALLOWED_HOSTS_STRING=""
 CSRF_EXTRA_TRUSTED_ORIGINS=""
@@ -41,6 +51,7 @@ DEBUG = $DEBUG_VALUE
 ALLOWED_HOSTS = ['wireguard-webadmin', '${SERVER_HOSTNAME}'${EXTRA_ALLOWED_HOSTS_STRING}]
 CSRF_TRUSTED_ORIGINS = ['http://wireguard-webadmin', 'https://$SERVER_ADDRESS'${CSRF_EXTRA_TRUSTED_ORIGINS}]
 SECRET_KEY = '$(openssl rand -base64 32)'
+SECURITY_RATE_LIMIT_KEY = '${SECURITY_RATE_LIMIT_KEY}'
 EOL
 
 if [ -n "${TZ:-}" ]; then

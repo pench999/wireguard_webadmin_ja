@@ -55,3 +55,9 @@ class UserMfaSettings(models.Model):
 
     def __str__(self):
         return f'{self.user.username} MFA'
+
+
+class SecurityRateLimit(models.Model):
+    key = models.CharField(max_length=64, primary_key=True)
+    count = models.PositiveIntegerField(default=0)
+    expires_at = models.DateTimeField(db_index=True)

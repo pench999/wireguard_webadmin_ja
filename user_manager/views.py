@@ -15,6 +15,7 @@ from django.views.decorators.cache import never_cache
 
 from user_manager.models import UserAcl, UserMfaSettings
 from user_manager.trusted_browser import register_trusted_browser
+from user_manager.security_limits import verify_mfa, mfa_limit_response
 from wireguard_tools.audit import write_audit_log
 from wireguard.models import PeerGroup, PeerMfaClientSession, UserMfaDevice
 from .forms import PeerGroupForm, UserMfaDisableForm, UserMfaSetupForm, UserPasswordChangeForm
@@ -145,8 +146,10 @@ def view_user_mfa_setup(request):
 
     form = UserMfaSetupForm(request.POST or None)
     if form.is_valid():
-        totp = pyotp.TOTP(pending_secret)
-        if totp.verify(form.cleaned_data['totp_pin'], valid_window=1):
+        verification = verify_mfa(request, pending_secret, form.cleaned_data['totp_pin'])
+        if verification.retry_after:
+            return mfa_limit_response(request, verification)
+        if verification.valid:
             mfa_settings.totp_secret = pending_secret
             mfa_settings.totp_enabled = True
             mfa_settings.reset_allowed = False
